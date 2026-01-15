@@ -5,6 +5,7 @@ import main.UtilityTool;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,10 +19,11 @@ public class TileManager {
 
     public TileManager(GamePanel gp) {
         this.gp = gp;
-        tile = new Tile[10];
+        tile = new Tile[50];
         mapTileNum = new int[gp.maxWorldRow][gp.maxWorldCol];
-        getTileImage();
-        loadMap("/maps/world01.csv");
+        //getTileImage();
+        getTileImageFromTileSet("TunicTilesetV1");
+        loadMap("/maps/Worldtest.csv");
     }
     public void getTileImage(){
         setup(0,"grass",false);
@@ -35,6 +37,32 @@ public class TileManager {
         setup(4,"tree",true);
 
         setup(5,"sand",false);
+    }
+    public void getTileImageFromTileSet(String tileSetName){
+        try{
+            BufferedImage tileset = ImageIO.read(getClass().getResourceAsStream("/tilesets/"+tileSetName+".png"));
+            int width = tileset.getWidth();
+            int height = tileset.getHeight();
+            int nbcol = width/gp.originalTileSize;
+            int nbrow = height/gp.originalTileSize;
+            int index = 0;
+            for(int i = 0; i < nbrow; i++){
+                for(int j = 0; j < nbcol; j++){
+                    BufferedImage tile = tileset.getSubimage(j*gp.originalTileSize,i*gp.originalTileSize,gp.originalTileSize,gp.originalTileSize);
+                    boolean collision = false;
+                    if ((17 <= index && index <= 29)|| (32 <= index && index <= 44)){
+                        collision = true;
+                    }
+                    setup2(index,tile,collision);
+                    index++;
+
+                }
+
+            }
+
+
+        }catch(IOException e){e.printStackTrace();}
+
     }
 
     public void loadMap(String mapPath){
@@ -72,6 +100,15 @@ public class TileManager {
         }catch (IOException e){
             e.printStackTrace();
         }
+    }
+
+    public void setup2(int index,BufferedImage image,boolean collision){
+        UtilityTool uTool = new UtilityTool();
+        tile[index] = new Tile();
+        tile[index].image = image;
+        tile[index].image = uTool.scaleImage(tile[index].image, gp.tileSize,  gp.tileSize);
+        tile[index].collision = collision;
+
     }
 
     public void draw(Graphics2D g2d){
