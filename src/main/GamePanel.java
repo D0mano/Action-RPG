@@ -1,6 +1,7 @@
 package main;
 
 import entity.Player;
+import object.SuperObject;
 import tile.TileManager;
 
 import javax.swing.JPanel;
@@ -19,12 +20,22 @@ public class GamePanel extends JPanel implements Runnable {
     public final int screenWidth = tileSize * maxScreenCol;    // 768 pixels
     public final int screenHeight = tileSize * maxScreenRow;    // 576 pixels
 
+    // WORLD SETTINGS
+    public final int maxWorldCol = 50;
+    public final int maxWorldRow = 50;
+    public final int worldWidth = tileSize * maxWorldCol;
+    public final int worldHeight = tileSize * maxWorldRow;
+
     //FPS
     int FPS = 60;
-    TileManager tileM = new TileManager(this);
+
+     TileManager tileM = new TileManager(this);
     KeyHandler keyH = new KeyHandler();
     Thread gameThread;
-    Player player = new Player(this,this.keyH);
+    public CollisionChecker collisionChecker = new CollisionChecker(this);
+    public Player player = new Player(this,this.keyH);
+    public SuperObject[]  obj = new SuperObject[10];
+    public AssetSetter assetSetter = new AssetSetter(this);
 
 
 
@@ -40,6 +51,9 @@ public class GamePanel extends JPanel implements Runnable {
 
     }
 
+    public void setupGame(){
+        assetSetter.setObject();
+    }
     public void startGameThread() {
         gameThread = new Thread(this);
         gameThread.start();
@@ -72,12 +86,12 @@ public class GamePanel extends JPanel implements Runnable {
                 drawCounter++;
 
             }
-            // Display FPS
-            if (timer >= 1000000000) {
-                System.out.println("FPS :" +drawCounter);
-                drawCounter = 0;
-                timer = 0;
-            }
+//            // Display FPS
+//            if (timer >= 1000000000) {
+//                System.out.println("FPS :" +drawCounter);
+//                drawCounter = 0;
+//                timer = 0;
+//            }
 
 
 
@@ -97,8 +111,40 @@ public class GamePanel extends JPanel implements Runnable {
         super.paintComponent(g);
 
         Graphics2D g2d = (Graphics2D) g;
+        long drawStart =0;
+
+
+        //DEBUG
+        if (keyH.debugKeyPressed){
+            drawStart = System.nanoTime();
+        }
+
+
+        //TILE
         tileM.draw(g2d);
+
+        // OBJECT
+        for (SuperObject superObject : obj) {
+            if (superObject != null) {
+                superObject.draw(g2d, this);
+            }
+        }
+
+        //PLAYER
         player.draw(g2d);
+
+        //DEBUG
+        if (keyH.debugKeyPressed){
+            long drawEnd = System.nanoTime();
+            long passedTime = drawEnd - drawStart;
+            g2d.setColor(Color.white);
+            g2d.drawString("Draw Time: " + passedTime , 10, 400);
+            System.out.println("Draw Time: " + passedTime );
+
+        }
+
+
+
         g2d.dispose();
     }
 
