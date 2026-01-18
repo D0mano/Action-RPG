@@ -21,26 +21,34 @@ public class GamePanel extends JPanel implements Runnable {
     public final int screenHeight = tileSize * maxScreenRow;    // 576 pixels
 
     // WORLD SETTINGS
-    public final int maxWorldCol = 25;
-    public final int maxWorldRow = 25;
+    public final int maxWorldCol = 50;
+    public final int maxWorldRow = 50;
     public final int worldWidth = tileSize * maxWorldCol;
     public final int worldHeight = tileSize * maxWorldRow;
 
     //FPS
     int FPS = 60;
 
-     TileManager tileM = new TileManager(this);
-    KeyHandler keyH = new KeyHandler();
+
+    // SYSTEM
+    TileManager tileM = new TileManager(this);
+    KeyHandler keyH = new KeyHandler(this);
+    public AssetSetter assetSetter = new AssetSetter(this);
+    public UI ui = new UI(this);
     Thread gameThread;
     public CollisionChecker collisionChecker = new CollisionChecker(this);
+
+    // ENTITY AND PLAYER
     public Player player = new Player(this,this.keyH);
     public SuperObject[]  obj = new SuperObject[10];
-    public AssetSetter assetSetter = new AssetSetter(this);
 
 
 
-
-
+    // GAMESATE
+    public int gameState;
+    public final int titleState = 0;
+    public final int playState = 1;
+    public final int pauseState = 2;
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -53,6 +61,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void setupGame(){
         assetSetter.setObject();
+        gameState = titleState;
     }
     public void startGameThread() {
         gameThread = new Thread(this);
@@ -102,8 +111,12 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void update(){
-        player.update();
-
+        if (gameState == playState){
+            player.update();
+        }
+        if (gameState == pauseState){
+            // NOTHING
+        }
 
     }
     public void paintComponent(Graphics g) {
@@ -119,29 +132,37 @@ public class GamePanel extends JPanel implements Runnable {
             drawStart = System.nanoTime();
         }
 
+        if (gameState == titleState){
 
-        //TILE
-        tileM.draw(g2d);
 
-        // OBJECT
-        for (SuperObject superObject : obj) {
-            if (superObject != null) {
-                superObject.draw(g2d, this);
+        }else{
+            //TILE 1ST LAYER
+            tileM.draw(g2d,1);
+
+            // OBJECT
+            for (SuperObject superObject : obj) {
+                if (superObject != null) {
+                    superObject.draw(g2d, this);
+                }
             }
-        }
 
-        //PLAYER
-        player.draw(g2d);
+            //PLAYER
+            player.draw(g2d);
 
-        //DEBUG
-        if (keyH.debugKeyPressed){
-            long drawEnd = System.nanoTime();
-            long passedTime = drawEnd - drawStart;
-            g2d.setColor(Color.white);
-            g2d.drawString("Draw Time: " + passedTime , 10, 400);
-            System.out.println("Draw Time: " + passedTime );
+            //TILE 2ND LAYER
+            tileM.draw(g2d,2);
 
-        }
+            ui.draw(g2d);
+
+            //DEBUG
+            if (keyH.debugKeyPressed){
+                long drawEnd = System.nanoTime();
+                long passedTime = drawEnd - drawStart;
+                g2d.setColor(Color.white);
+                g2d.drawString("Draw Time: " + passedTime , 10, 400);
+                System.out.println("Draw Time: " + passedTime );
+
+            }
 
 
 
