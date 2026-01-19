@@ -1,4 +1,5 @@
 package entity;
+import main.Animator;
 import main.GamePanel;
 import main.KeyHandler;
 import main.UtilityTool;
@@ -12,6 +13,7 @@ public class Player extends Entity {
     GamePanel gp;
     KeyHandler keyH;
     int hasKey = 0;
+    Animator downAnimator,upAnimator,leftAnimator,rightAnimator;
 
     public  int screenX,screenY;
 
@@ -32,6 +34,12 @@ public class Player extends Entity {
         solideAreaDefaultY = solidArea.y;
         solidArea.width = (2 * gp.tileSize) / 3;
         solidArea.height = (2 * gp.tileSize) / 3;
+
+        downAnimator = new Animator("/player/player_down.png",screenX,screenY,gp.originalTileSize,gp.originalTileSize,true);
+        upAnimator = new Animator("/player/player_up-Sheet.png",screenX,screenY,gp.originalTileSize,gp.originalTileSize,true);
+        leftAnimator = new Animator("/player/player_left-Sheet.png",screenX,screenY,gp.originalTileSize,gp.originalTileSize,true);
+        rightAnimator = new Animator("/player/player_right-Sheet.png",screenX,screenY,gp.originalTileSize,gp.originalTileSize,true);
+
     }
 
     public void setDefaultsValues(){
@@ -71,16 +79,21 @@ public class Player extends Entity {
 
             if (keyH.upPressed) {
                 direction = "up";
+                upAnimator.update(screenX,screenY);
             }
             else if (keyH.downPressed) {
                 direction = "down";
+                downAnimator.update(screenX,screenY);
             }
             else if (keyH.leftPressed) {
                 direction = "left";
+                leftAnimator.update(screenX,screenY);
             }
             else {
                 direction = "right";
+                rightAnimator.update(screenX,screenY);
             }
+
 
             // CHECK TILE COLLISION
             collisionOn = false;
@@ -174,7 +187,7 @@ public class Player extends Entity {
         }
     }
 
-    public void draw(Graphics g2d) {
+    public void draw(Graphics2D g2d) {
         // g2d.setColor(Color.white);
         // g2d.fillRect(x, y,gp.tileSize , gp.tileSize);
 
@@ -183,40 +196,44 @@ public class Player extends Entity {
 
         switch (direction) {
             case "up":
-                if (spriteNumber == 1) {
-                    image = up1;
-                }
-                if (spriteNumber == 2) {
-                    image = up2;
-                }
+                upAnimator.draw(g2d);
+//                if (spriteNumber == 1) {
+//                    image = up1;
+//                }
+//                if (spriteNumber == 2) {
+//                    image = up2;
+//                }
                 break;
             case "down":
-                if (spriteNumber == 1) {
-                    image = down1;
-                }
-                if (spriteNumber == 2) {
-                    image = down2;
-                }
+                downAnimator.draw(g2d);
+//                if (spriteNumber == 1) {
+//                    image = down1;
+//                }
+//                if (spriteNumber == 2) {
+//                    image = down2;
+//                }
                 break;
             case "left":
-                if (spriteNumber == 1) {
-                    image = left1;
-                }
-                if (spriteNumber == 2) {
-                    image = left2;
-                }
+                leftAnimator.draw(g2d);
+//                if (spriteNumber == 1) {
+//                    image = left1;
+//                }
+//                if (spriteNumber == 2) {
+//                    image = left2;
+//                }
                 break;
             case "right":
-                if (spriteNumber == 1) {
-                    image = right1;
-                }
-                if (spriteNumber == 2) {
-                    image = right2;
-                }
+                rightAnimator.draw(g2d);
+//                if (spriteNumber == 1) {
+//                    image = right1;
+//                }
+//                if (spriteNumber == 2) {
+//                    image = right2;
+//                }
                 break;
 
         }
-        g2d.drawImage(image, screenX, screenY,gp.tileSize, gp.tileSize,null);
+//        g2d.drawImage(image, screenX, screenY,gp.tileSize, gp.tileSize,null);
 
 
     }
