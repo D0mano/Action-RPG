@@ -1,90 +1,70 @@
 package main;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
+import java.util.ArrayList;
 
 public class Animator {
-    public BufferedImage spriteSheet;
-    public BufferedImage[] sprites;
-    public BufferedImage sprite;
+    public ArrayList<BufferedImage> sprites;
+    public BufferedImage currentsprite;
     public int index;
     public int counter = 0;
     public int animationSpeed;
-    public int x, y;
-    public int spriteWidth;
-    public int spriteHeight;
     public boolean repeatAnimation = true;
 
-    public Animator(String spritSheetPath ,int x, int y,int spriteWidth,int spriteHeight,boolean repeatAnimation)  {
-        sprites = new BufferedImage[4];
-        this.spriteWidth = spriteWidth;
-        this.spriteHeight = spriteHeight;
-        this.x = x;
-        this.y = y;
-        setSprites(spritSheetPath);
+    public Animator(BufferedImage spriteSheet ,int spriteWidth,int spriteHeight,int speed,boolean repeatAnimation)  {
+        sprites = new ArrayList<>();
+        loadSprites(spriteSheet,spriteWidth,spriteHeight);
         this.repeatAnimation = repeatAnimation;
-        animationSpeed = 12;
-        System.out.println(sprites.length);
+        animationSpeed = speed;
 
     }
 
-    public void loadSpriteSheet(String path) {
-        try {
-            spriteSheet = ImageIO.read(getClass().getResourceAsStream(path));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public void setSprites(String path) {
-        loadSpriteSheet(path);
+    public void loadSprites(BufferedImage spriteSheet ,int spriteWidth,int spriteHeight) {
 
         int imageWidth = spriteSheet.getWidth();
         int imageHeight = spriteSheet.getHeight();
-        int index = 0;
         int nbcol = imageWidth / spriteWidth;
         int nbrow = imageHeight / spriteHeight;
         for (int i = 0; i < nbrow; i++) {
             for (int j = 0; j < nbcol; j++) {
                 BufferedImage image = spriteSheet.getSubimage(j * spriteWidth, i * spriteHeight, spriteWidth, spriteHeight);
-                sprites[index] = image;
-                index++;
+                sprites.add(image);
 
 
             }
         }
-        sprite = sprites[this.index];
+        currentsprite = sprites.get(index);
     }
 
-    public void update(int x,int y) {
+    public void update() {
 
-        this.x = x;
-        this.y = y;
-        if (sprites != null){
-            counter++;
-            if (counter >= animationSpeed) {
+        if (sprites.isEmpty()) {return;}
+
+        counter++;
+        if (counter >= animationSpeed) {
+            counter = 0;
+            index++;
+        }
+        if (index >= sprites.size()) {
+            if(repeatAnimation) {
+                index = 0;
                 counter = 0;
-                index++;
-            }
-            if (index >= sprites.length) {
-                if(repeatAnimation) {
-                    index = 0;
-                }else{}
-
-            }
-            else{
-                sprite = sprites[index];
             }
         }
+        currentsprite = sprites.get(index);
     }
 
-    public void draw(Graphics2D g2d) {
-        g2d.drawImage(sprite,x,y,spriteWidth*3,spriteHeight*3,null);
+
+    public void draw(Graphics2D g2d,int x,int y,int width,int height) {
+        if (currentsprite != null){
+            g2d.drawImage(currentsprite, x, y, width, height, null);
+        }
+
     }
+
 }
+
+
 
 

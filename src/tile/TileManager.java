@@ -28,19 +28,19 @@ public class TileManager {
         getTileImageFromTileSet("TunicTilesetV2");
         loadMap("/maps/world02");
     }
-    public void getTileImage(){
-        setup(0,"grass",false);
-
-        setup(1,"wall",true);
-
-        setup(2,"water",true);
-
-        setup(3,"earth",false);
-
-        setup(4,"tree",true);
-
-        setup(5,"sand",false);
-    }
+//    public void getTileImage(){
+//        setup(0,"grass",false);
+//
+//        setup(1,"wall",true);
+//
+//        setup(2,"water",true);
+//
+//        setup(3,"earth",false);
+//
+//        setup(4,"tree",true);
+//
+//        setup(5,"sand",false);
+//    }
     public void getTileImageFromTileSet(String tileSetName){
         try{
             BufferedImage tileset = ImageIO.read(getClass().getResourceAsStream("/tilesets/"+tileSetName+".png"));
@@ -154,6 +154,7 @@ public class TileManager {
                int worldY = worldRow * gp.tileSize;
                int screenX = worldX - gp.player.worldX + gp.player.screenX;
                int screenY = worldY - gp.player.worldY + gp.player.screenY;
+
                if(((-gp.tileSize) <= screenX &&  screenX <= (gp.worldWidth + gp.tileSize)) &&
                        ((- gp.tileSize) <= screenY &&  screenY <= (gp.worldHeight + gp.tileSize))){
                    if (layer==1){

@@ -5,8 +5,9 @@ import java.awt.event.KeyListener;
 
 public class KeyHandler implements KeyListener {
 
-    public boolean upPressed, downPressed, leftPressed, rightPressed;
+    public boolean upPressed, downPressed, leftPressed, rightPressed, spacePressed;
     boolean debugKeyPressed = false;
+    public boolean healPressed,attackPressed;
     GamePanel gp;
 
     public KeyHandler(GamePanel gp) {
@@ -17,51 +18,102 @@ public class KeyHandler implements KeyListener {
     public void keyTyped(KeyEvent e) {
 
 
+
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
 
         int code = e.getKeyCode();
-        if(gp.gameState == gp.titleState){
-            if (code == KeyEvent.VK_ENTER){
-                gp.gameState = gp.playState;
+        if(gp.gameState == gp.titleState) {
+            if (code == KeyEvent.VK_UP || code == KeyEvent.VK_Z) {
+                if (gp.ui.commandNumber == 0) {
+                    gp.ui.commandNumber = 2;
+                } else {
+                    gp.ui.commandNumber--;
+                }
+            }
+            if (code == KeyEvent.VK_DOWN || code == KeyEvent.VK_S) {
+                if (gp.ui.commandNumber == 2) {
+                    gp.ui.commandNumber = 0;
+                } else {
+                    gp.ui.commandNumber++;
+                }
+            }
+            if (code == KeyEvent.VK_ENTER) {
+                if (gp.ui.commandNumber == 0) {
+                    gp.gameState = gp.playState;
+                }
+            }
+            if (code == KeyEvent.VK_ESCAPE) {
+                System.exit(0);
             }
         }
-        else{
+        else if(gp.gameState == gp.playState){
             if(code == KeyEvent.VK_Z){
                 upPressed = true;
-
             }
             if(code == KeyEvent.VK_Q){
                 leftPressed = true;
-
             }
             if(code == KeyEvent.VK_S){
                 downPressed = true;
-
             }
             if(code == KeyEvent.VK_D){
                 rightPressed = true;
-
             }
             if(code == KeyEvent.VK_P){
                 debugKeyPressed = !debugKeyPressed;
             }
             if(code == KeyEvent.VK_ESCAPE){
-                if(gp.gameState == gp.playState){
-                    gp.gameState = gp.pauseState;
-                }else if(gp.gameState == gp.pauseState){
-                    gp.gameState = gp.playState;
-                }
+                gp.gameState = gp.pauseState;
+
             }
 
+            if (code == KeyEvent.VK_U){
+                healPressed = true;
+            }
+            if (code == KeyEvent.VK_J){
+                attackPressed = true;
+            }
+            if(code == KeyEvent.VK_SPACE){
+                spacePressed = true;
+            }
+
+
+        }
+        else if(gp.gameState == gp.pauseState){
+            if(code == KeyEvent.VK_ESCAPE){
+                gp.gameState = gp.playState;
+            }
+            if (code == KeyEvent.VK_UP || code == KeyEvent.VK_Z) {
+                if (gp.ui.commandNumberPause == 0) {
+                    gp.ui.commandNumberPause = 2;
+                } else {
+                    gp.ui.commandNumberPause--;
+                }
+            }
+            if (code == KeyEvent.VK_DOWN || code == KeyEvent.VK_S) {
+                if (gp.ui.commandNumberPause == 2) {
+                    gp.ui.commandNumberPause = 0;
+                } else {
+                    gp.ui.commandNumberPause++;
+                }
+            }
+            if (code == KeyEvent.VK_ENTER) {
+                if (gp.ui.commandNumberPause == 0) {
+                    gp.gameState = gp.playState;
+                }
+                if (gp.ui.commandNumberPause == 2) {
+                    gp.gameState = gp.titleState;}
+            }
         }
 
 
 
 
-    }
+        }
+
 
     @Override
     public void keyReleased(KeyEvent e) {
@@ -84,6 +136,16 @@ public class KeyHandler implements KeyListener {
             rightPressed = false;
 
         }
+        if (code == KeyEvent.VK_U){
+            healPressed = false;
+        }
+        if (code == KeyEvent.VK_J){
+            attackPressed = false;
+        }
+        if(code == KeyEvent.VK_SPACE){
+            spacePressed = false;
+        }
+
 
     }
 }

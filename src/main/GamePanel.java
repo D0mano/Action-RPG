@@ -12,7 +12,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     // SCREEN SETTINGS
     public final int originalTileSize = 16;        //16x16 Tiles
-    final int scale = 3;
+    public final int scale = 3;
 
     public final int tileSize = originalTileSize * scale;   // 48x48 Tiles
     public final int maxScreenCol = 16;
@@ -34,13 +34,15 @@ public class GamePanel extends JPanel implements Runnable {
     TileManager tileM = new TileManager(this);
     KeyHandler keyH = new KeyHandler(this);
     public AssetSetter assetSetter = new AssetSetter(this);
-    public UI ui = new UI(this);
     Thread gameThread;
     public CollisionChecker collisionChecker = new CollisionChecker(this);
 
     // ENTITY AND PLAYER
     public Player player = new Player(this,this.keyH);
     public SuperObject[]  obj = new SuperObject[10];
+
+    public UI ui = new UI(this,player);
+
 
 
 
@@ -152,17 +154,29 @@ public class GamePanel extends JPanel implements Runnable {
             //TILE 2ND LAYER
             tileM.draw(g2d,2);
 
-            ui.draw(g2d);
 
-            //DEBUG
-            if (keyH.debugKeyPressed){
-                long drawEnd = System.nanoTime();
-                long passedTime = drawEnd - drawStart;
-                g2d.setColor(Color.white);
-                g2d.drawString("Draw Time: " + passedTime , 10, 400);
-                System.out.println("Draw Time: " + passedTime );
 
-            }
+
+
+        }
+
+        ui.draw(g2d);
+
+        //DEBUG
+        if (keyH.debugKeyPressed){
+            long drawEnd = System.nanoTime();
+            long passedTime = drawEnd - drawStart;
+            g2d.setColor(Color.white);
+            g2d.drawString("Draw Time: " + passedTime , 10, 400);
+            System.out.println("Draw Time: " + passedTime );
+
+            player.showHitbox(g2d);
+
+        }
+
+
+
+
 
 
 
