@@ -15,6 +15,7 @@ public class SuperObject {
     public Rectangle solidArea = new Rectangle(0,0,48,48);
     public int solideAreaDefaultX = 0;
     public int solideAreaDefaultY = 0;
+    public String[] dialogues = new String[20];
 
     UtilityTool uTool = new UtilityTool();
 
@@ -28,6 +29,9 @@ public class SuperObject {
 
         }
 
+    }
+
+    public void speak(int i) {
     }
 }
 

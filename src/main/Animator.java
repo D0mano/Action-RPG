@@ -50,6 +50,9 @@ public class Animator {
             if(repeatAnimation) {
                 index = 0;
                 counter = 0;
+            }else{
+
+                return;
             }
         }
         currentsprite = sprites.get(index);
@@ -61,6 +64,10 @@ public class Animator {
             g2d.drawImage(currentsprite, x, y, width, height, null);
         }
 
+    }
+
+    public void resetAnimation(){
+        index = 0;
     }
 
 }

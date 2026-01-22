@@ -8,6 +8,8 @@ import java.io.IOException;
 public class OBJ_Key extends SuperObject{
     GamePanel gp;
     public OBJ_Key(GamePanel gp) {
+        solidArea.width = gp.tileSize;
+        solidArea.height = gp.tileSize;
         name = "key";
         this.gp = gp;
         try{

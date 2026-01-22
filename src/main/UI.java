@@ -15,12 +15,14 @@ public class UI {
     public boolean messageOn = false;
     public String message = "";
     int messageCounter = 0;
+    public String currentDialogue = "";
     public boolean gameFinished = false;
     Player player;
     BufferedImage healthTop,healthOverlay, healthMiddle;
     BufferedImage enduranceTop,enduranceOverlay,enduranceMiddle;
     BufferedImage manaTop,manaOverlay,manaMiddle;
     BufferedImage menuSelection ,menuSelectionOrange;
+    BufferedImage messageWindow;
     int commandNumber = 0;
 
      public String[] pauseCommand = {"Return to Game","Options","Quit"};
@@ -67,6 +69,8 @@ public class UI {
 
         menuSelection = setup("/menu/menuOverlayWhite",gp.scale);
         menuSelectionOrange = setup("/menu/menuOverlayOrange",gp.scale);
+
+        messageWindow = setup("/menu/window1",gp.scale);
     }
 
     public BufferedImage setup(String imageName, float scale) {
@@ -105,6 +109,9 @@ public class UI {
         if (gp.gameState == gp.pauseState){
             drawPauseScreen();
 
+        }
+        if(gp.gameState == gp.dialogueState){
+            drawDialogueScreen();
         }
     }
 
@@ -178,6 +185,26 @@ public class UI {
         }
         g2.drawString("Options",getXForCenteredTextAroundX("Options",x),titleY+200);
 
+    }
+
+    public void drawDialogueScreen(){
+
+        //WINDOW
+        int x = gp.tileSize*2;
+        int y= gp.tileSize/2;
+        int width = gp.screenWidth-(gp.tileSize*4);
+        int height= gp.tileSize*5;
+        drawSubWindow(x,y,width,height);
+        g2.setFont(trunic);
+        g2.setFont(g2.getFont().deriveFont(Font.BOLD, gp.tileSize/2f));
+        x = getXForCenteredTextAroundX(currentDialogue,(2*x+width)/2);
+        y = (2*y+height)/2;
+
+        g2.drawString(currentDialogue,x,y);
+    }
+
+    public void drawSubWindow(int x,int y,int width,int height){
+       g2.drawImage(messageWindow,x,y,width,height,null);
     }
 
     public void drawPlayerHealth(){

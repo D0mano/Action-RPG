@@ -9,6 +9,8 @@ public class OBJ_Door extends SuperObject{
     GamePanel gp;
 
     public OBJ_Door(GamePanel gp) {
+        solidArea.width = gp.tileSize;
+        solidArea.height = gp.tileSize;
         name = "door";
         this.gp = gp;
         try{
@@ -18,6 +20,16 @@ public class OBJ_Door extends SuperObject{
         }catch(IOException e){
             e.printStackTrace();}
         collision = true;
+        setDialogues();
+    }
+    public void setDialogues(){
+        dialogues[0]= "Doors lock !";
+        dialogues[1]= "Doors open !";
+    }
+    public void speak(int index){
+        gp.ui.currentDialogue =dialogues[index];
+
+
     }
 
 }

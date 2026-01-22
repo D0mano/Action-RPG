@@ -10,6 +10,8 @@ public class OBJ_Chest extends SuperObject {
 
     public OBJ_Chest(GamePanel gp) {
         this.gp = gp;
+        solidArea.width = gp.tileSize;
+        solidArea.height = gp.tileSize;
         name = "chest";
 
         try{

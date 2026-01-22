@@ -17,6 +17,7 @@ public class Player extends Entity {
     final int idle = 0;
     final int walking = 1;
     final int rolling = 2;
+    final int attacking = 3;
 
     public int maxEndurance;
     public int endurance;
@@ -31,13 +32,27 @@ public class Player extends Entity {
     int rollSpeed;
     int normalSpeed;
 
+    int attackCounter;
+    int attackDuration;
+
+    // ANIMATION
     Animator downAnimator,upAnimator,leftAnimator,rightAnimator;
     Animator downRollAnimator,upRollAnimator,leftRollAnimator,rightRollAnimator;
+    Animator downIdleAnimator,upIdleAnimator,leftIdleAnimator,rightIdleAnimator;
+    Animator downAttackingAnimator,upAttackingAnimator,leftAttackingAnimator,rightAttackingAnimator;
     public float displayedHealth = health;
 
     public  int screenX,screenY;
 
     public BufferedImage downRoll,upRoll,leftRoll,rightRoll;
+    public BufferedImage downIdle,upIdle,leftIdle,rightIdle;
+    public BufferedImage downAttacking,upAttacking,leftAttacking,rightAttacking;
+
+    // Key Flags
+    public boolean attackKeyProcessed=false;
+    public boolean healKeyProcessed = false;
+    public boolean parryKeyProcessed = false;
+    public boolean interactionKeyProcessed= false;
 
     public Player(GamePanel gp, KeyHandler keyH) {
         this.gp = gp;
@@ -70,12 +85,24 @@ public class Player extends Entity {
         leftRollAnimator = new Animator(leftRoll,gp.tileSize,gp.tileSize,6,true);
         rightRollAnimator = new Animator(rightRoll,gp.tileSize,gp.tileSize,6,true);
 
+        downIdleAnimator = new Animator(downIdle,gp.tileSize,gp.tileSize,10,true);
+        upIdleAnimator = new Animator(upIdle,gp.tileSize,gp.tileSize,10,true);
+        leftIdleAnimator = new Animator(leftIdle,gp.tileSize,gp.tileSize,10,true);
+        rightIdleAnimator = new Animator(rightIdle,gp.tileSize,gp.tileSize,10,true);
+
+        downAttackingAnimator = new Animator(downAttacking,gp.tileSize*2,gp.tileSize*2,10,false);
+        upAttackingAnimator = new Animator(upAttacking,gp.tileSize*2,gp.tileSize*2,10,false);
+        leftAttackingAnimator = new Animator(leftAttacking,gp.tileSize*2,gp.tileSize*2,10,false);
+        rightAttackingAnimator = new Animator(rightAttacking,gp.tileSize*2,gp.tileSize*2,10,false);
+
+
+
 
     }
 
     public void setDefaultsValues(){
-        worldX = gp.tileSize*19;
-        worldY = gp.tileSize*12;
+        worldX = gp.tileSize*20;
+        worldY = gp.tileSize*8;
         speed = gp.tileSize/10;
         direction = "down";
 
@@ -89,11 +116,14 @@ public class Player extends Entity {
         enduranceCounter = 0;
 
 
-        playerStatus = walking;
+        playerStatus = idle;
         rollCounter = 0;
         rollDuration = 30;
         normalSpeed = speed;
         rollSpeed = 2*normalSpeed;
+
+        attackCounter = 0;
+        attackDuration = 50;
 
     }
 
@@ -108,6 +138,16 @@ public class Player extends Entity {
         upRoll = setup("rolling/player_up-roll-Sheet",gp.scale);
         leftRoll = setup("rolling/player_left-roll-Sheet",gp.scale);
         rightRoll = setup("rolling/player_right-roll-Sheet",gp.scale);
+
+        downIdle = setup("idling/player_down-idle-Sheet",gp.scale);
+        upIdle = setup("idling/player_up-idle-Sheet",gp.scale);
+        leftIdle = setup("idling/player_left-idle-Sheet",gp.scale);
+        rightIdle = setup("idling/player_right-idle-Sheet",gp.scale);
+
+        downAttacking = setup("attacking/player_down-slash-Sheet",gp.scale);
+        upAttacking = setup("attacking/player_up-slash-Sheet",gp.scale);
+        leftAttacking = setup("attacking/player_left-slash-Sheet",gp.scale);
+        rightAttacking = setup("attacking/player_right-slash-Sheet",gp.scale);
     }
 
     public BufferedImage setup(String imageName,int scale){
@@ -127,11 +167,30 @@ public class Player extends Entity {
 
         displayedHealth += (health-displayedHealth)*0.15f;
         displayedEndurance += (endurance-displayedEndurance)*0.15f;
-        // CHECK TILE COLLISION
-        collisionOn = false;
-        gp.collisionChecker.checkTile(this);
+
+        if (playerStatus == attacking){
+            attackCounter++;
+            switch (direction) {
+                case "up": upAttackingAnimator.update();break;
+                case "down": downAttackingAnimator.update();break;
+                case "left": leftAttackingAnimator.update();break;
+                case "right": rightAttackingAnimator.update();break;
+            }
+            if (attackCounter >= attackDuration){
+                attackCounter = 0;
+                playerStatus = idle;
+            }System.out.println(playerStatus);
+            return;
+        }
 
         if (playerStatus == rolling){
+            // CHECK TILE COLLISION
+            collisionOn = false;
+            gp.collisionChecker.checkTile(this);
+
+            //CHECK OBJECT COLLISION
+            gp.collisionChecker.checkObject(this,true);
+
             useEndurance = true;
             rollCounter ++;
             if (!collisionOn) {
@@ -195,7 +254,7 @@ public class Player extends Entity {
                 }
             }
             if (rollCounter > rollDuration) {
-                playerStatus = walking;
+                playerStatus = idle;
                 rollCounter = 0;
                 speed = normalSpeed; // Restaurer la vitesse
             }
@@ -210,10 +269,11 @@ public class Player extends Entity {
                 useEndurance = false;
             }
         }else{
-            rechargeEndurnace(1);
+            rechargeEndurance(1);
         }
 
         if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
+            playerStatus = walking;
 
             if (keyH.upPressed) {
                 direction = "up";
@@ -235,12 +295,15 @@ public class Player extends Entity {
 
 
 
-            //CHECK OBJECT COLLISION
-            int objIndex = gp.collisionChecker.checkObject(this,true);
-            pickUpObject(objIndex);
+
+
             // CHECK TILE COLLISION
             collisionOn = false;
             gp.collisionChecker.checkTile(this);
+
+            //CHECK OBJECT COLLISION
+            int objIndex = gp.collisionChecker.checkObject(this,true);
+
 
             //IF COLLISION IS FALSE PLAYER CAN MOVE
             if (!collisionOn) {
@@ -295,13 +358,45 @@ public class Player extends Entity {
 
 
         }
+        else{playerStatus = idle;}
 
+        if (playerStatus == idle) {
+            switch (direction) {
+                case "up": upIdleAnimator.update();break;
+                case "down": downIdleAnimator.update();break;
+                case "left": leftIdleAnimator.update();break;
+                case "right": rightIdleAnimator.update();break;
+            }
+        }
+
+
+        //CHECK OBJECT COLLISION
+        int objIndex = gp.collisionChecker.checkObject(this,true);
         if (keyH.attackPressed){
-            takeDamage(5);
+            if (!attackKeyProcessed){
+                takeDamage(30);
+                attack();
+                attackKeyProcessed = true;
+            }
+        }else{
+            attackKeyProcessed = false;
         }
         if(keyH.healPressed){
-            heal(5);
-        }
+            if (!healKeyProcessed){
+                heal(20);
+                healKeyProcessed = true;
+            }
+
+        }else{healKeyProcessed = false;}
+        if(keyH.interactionPressed){
+            if (!interactionKeyProcessed){
+                pickUpObject(objIndex);
+                interactionKeyProcessed=true;
+            }
+        }else{interactionKeyProcessed = false;}
+
+
+
         if (keyH.spacePressed){
             if (endurance > 0){
                 consumeEndurance(40);
@@ -310,14 +405,19 @@ public class Player extends Entity {
             }
 
         }
+        System.out.println(playerStatus);
 
     }
 
     public void pickUpObject(int index){
         if (index != 999){
+
+
             String objName = gp.obj[index].name;
             switch (objName) {
                 case "key":
+                    gp.ui.currentDialogue = "You pick up a key !";
+                    gp.gameState = gp.dialogueState;
                     gp.obj[index] = null;
                     hasKey++;
                     break;
@@ -325,6 +425,10 @@ public class Player extends Entity {
                     if (hasKey > 0){
                         gp.obj[index] = null;
                         hasKey--;
+                    }else{
+                        gp.ui.currentDialogue = "Doors is locked !";
+                        gp.gameState = gp.dialogueState;
+
                     }
                     break;
 
@@ -336,7 +440,6 @@ public class Player extends Entity {
         // g2d.setColor(Color.white);
         // g2d.fillRect(x, y,gp.tileSize , gp.tileSize);
 
-
         switch (direction) {
             case "up":
                 if (playerStatus == rolling) {
@@ -344,6 +447,10 @@ public class Player extends Entity {
 
                 }else if (playerStatus == walking) {
                     upAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
+                }else if (playerStatus == idle) {
+                    upIdleAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
+                }else if(playerStatus == attacking) {
+                    upAttackingAnimator.draw(g2d,screenX-gp.tileSize,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
                 }
                 break;
             case "down":
@@ -351,6 +458,10 @@ public class Player extends Entity {
                     downAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
                 }else if (playerStatus == rolling) {
                     downRollAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
+                }else if (playerStatus == idle) {
+                    downIdleAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
+                }else if (playerStatus == attacking) {
+                    downAttackingAnimator.draw(g2d,screenX,screenY,gp.tileSize*2,gp.tileSize*2);
                 }
 
                 break;
@@ -359,6 +470,10 @@ public class Player extends Entity {
                     leftRollAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
                 }else if (playerStatus == walking) {
                     leftAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
+                }else if (playerStatus == idle) {
+                    leftIdleAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
+                }else if (playerStatus == attacking) {
+                    leftAttackingAnimator.draw(g2d,screenX-gp.tileSize,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
                 }
                 break;
             case "right":
@@ -367,6 +482,10 @@ public class Player extends Entity {
 
                 }else if (playerStatus == walking) {
                     rightAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
+                }else if (playerStatus == idle) {
+                    rightIdleAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
+                }else if (playerStatus == attacking) {
+                    rightAttackingAnimator.draw(g2d,screenX,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
                 }
                 break;
 
@@ -380,7 +499,7 @@ public class Player extends Entity {
             health -= damage;
         }
         else{health=0;}
-        System.out.println("health:"+health);
+
     }
 
     public void heal(int heal){
@@ -398,7 +517,7 @@ public class Player extends Entity {
 
     }
 
-    public void rechargeEndurnace(int amount){
+    public void rechargeEndurance(int amount){
         if(endurance+amount < maxEndurance){
             endurance += amount;
         }else{
@@ -409,5 +528,13 @@ public class Player extends Entity {
         g2.setColor(Color.RED);
         g2.drawRect(screenX+solidArea.x,screenY+solidArea.y,solidArea.width,solidArea.height);
 
+    }
+
+    public void attack(){
+        upAttackingAnimator.resetAnimation();
+        downAttackingAnimator.resetAnimation();
+        leftAttackingAnimator.resetAnimation();
+        rightAttackingAnimator.resetAnimation();
+        playerStatus = attacking;
     }
 }

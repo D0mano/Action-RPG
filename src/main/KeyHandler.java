@@ -7,7 +7,7 @@ public class KeyHandler implements KeyListener {
 
     public boolean upPressed, downPressed, leftPressed, rightPressed, spacePressed;
     boolean debugKeyPressed = false;
-    public boolean healPressed,attackPressed;
+    public boolean healPressed,attackPressed,parryPressed,interactionPressed;
     GamePanel gp;
 
     public KeyHandler(GamePanel gp) {
@@ -76,6 +76,14 @@ public class KeyHandler implements KeyListener {
             if (code == KeyEvent.VK_J){
                 attackPressed = true;
             }
+            if (code == KeyEvent.VK_K){
+                parryPressed = true;
+
+            }
+            if(code == KeyEvent.VK_F){
+                interactionPressed = true;
+
+            }
             if(code == KeyEvent.VK_SPACE){
                 spacePressed = true;
             }
@@ -106,6 +114,11 @@ public class KeyHandler implements KeyListener {
                 }
                 if (gp.ui.commandNumberPause == 2) {
                     gp.gameState = gp.titleState;}
+            }
+        }
+        else if(gp.gameState== gp.dialogueState){
+            if(code == KeyEvent.VK_ENTER){
+                gp.gameState = gp.playState;
             }
         }
 
@@ -141,6 +154,14 @@ public class KeyHandler implements KeyListener {
         }
         if (code == KeyEvent.VK_J){
             attackPressed = false;
+        }
+        if (code == KeyEvent.VK_K){
+            parryPressed = false;
+
+        }
+        if(code == KeyEvent.VK_F){
+            interactionPressed = false;
+
         }
         if(code == KeyEvent.VK_SPACE){
             spacePressed = false;

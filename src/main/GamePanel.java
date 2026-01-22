@@ -51,6 +51,7 @@ public class GamePanel extends JPanel implements Runnable {
     public final int titleState = 0;
     public final int playState = 1;
     public final int pauseState = 2;
+    public final int dialogueState = 3;
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -168,8 +169,7 @@ public class GamePanel extends JPanel implements Runnable {
             long passedTime = drawEnd - drawStart;
             g2d.setColor(Color.white);
             g2d.drawString("Draw Time: " + passedTime , 10, 400);
-            System.out.println("Draw Time: " + passedTime );
-
+            g2d.drawString("Coordinate :" + player.worldX+","+player.worldY , 10, 200);
             player.showHitbox(g2d);
 
         }

@@ -6,16 +6,17 @@ import main.UtilityTool;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class TileManager {
     GamePanel gp;
     public Tile[] tile;
     public int[][] mapTileNum1; // First layer
     public int[][] mapTileNum2; // Seconde layer
+    HashMap<Integer, TileData> tileDataMap = new HashMap<>();
+
 
 
 
@@ -24,23 +25,55 @@ public class TileManager {
         tile = new Tile[80];
         mapTileNum1 = new int[gp.maxWorldRow][gp.maxWorldCol];
         mapTileNum2 = new int[gp.maxWorldRow][gp.maxWorldCol];
-        //getTileImage();
+        loadTileData("/maps/tile_data.txt");
         getTileImageFromTileSet("TunicTilesetV2");
         loadMap("/maps/world02");
     }
-//    public void getTileImage(){
-//        setup(0,"grass",false);
-//
-//        setup(1,"wall",true);
-//
-//        setup(2,"water",true);
-//
-//        setup(3,"earth",false);
-//
-//        setup(4,"tree",true);
-//
-//        setup(5,"sand",false);
-//    }
+
+    public void loadTileData(String filePath) {
+        try {
+            InputStream is = getClass().getResourceAsStream(filePath);
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.isEmpty() || line.startsWith("#")) continue;
+
+                String[] parts = line.split(",");
+
+                int id = Integer.parseInt(parts[0].trim());
+                boolean collision = Boolean.parseBoolean(parts[1].trim());
+                int layer = Integer.parseInt(parts[2].trim());
+
+                String sidesRaw = parts[3].trim(); // ex: "up;right"
+                ArrayList<String> collisionSide = new ArrayList<>();
+
+                if (sidesRaw.equals("none")) {
+                }
+                else if (sidesRaw.equals("all")) {
+                    collisionSide.add("up");
+                    collisionSide.add("down");
+                    collisionSide.add("left");
+                    collisionSide.add("right");
+                }
+                else {
+                    String[] sides = sidesRaw.split(";");
+                    for (String side : sides) {
+                        collisionSide.add(side.trim());
+                    }
+                }
+
+
+                tileDataMap.put(id, new TileData(collision, layer, collisionSide));
+            }
+            br.close();
+
+        } catch (Exception e) {
+            System.out.println("Erreur lecture fichier tuiles !");
+            e.printStackTrace();
+        }
+    }
+
     public void getTileImageFromTileSet(String tileSetName){
         try{
             BufferedImage tileset = ImageIO.read(getClass().getResourceAsStream("/tilesets/"+tileSetName+".png"));
@@ -51,19 +84,22 @@ public class TileManager {
             int index = 0;
             for(int i = 0; i < nbrow; i++){
                 for(int j = 0; j < nbcol; j++){
+                    boolean collision ;
+                    int layer;
+                    ArrayList<String> collisionSide;
                     BufferedImage tile = tileset.getSubimage(j*gp.originalTileSize,i*gp.originalTileSize,gp.originalTileSize,gp.originalTileSize);
-                    boolean collision = false;
-                    int layer = 1;
-                    // SET COLLISION
-                    if ((17 <= index && index <= 29)|| (32 <= index && index <= 44)|| index ==61 || index == 65||(67 <= index && index <= 74)){
-                        collision = true;
+                    if (tileDataMap.containsKey(index)) {
+                        TileData data = tileDataMap.get(index);
+
+                        collision = data.collision;
+
+                        layer = data.layer;
+
+                        collisionSide = new ArrayList<>(data.collisionSide);
+                        setup(index,tile,collision,layer,collisionSide);
+                        index++;
                     }
-                    // SET LAYERS
-                    if ((62 <= index && index <= 64)||( index == 66)){
-                        layer = 2;
-                    }
-                    setup2(index,tile,collision,layer);
-                    index++;
+
 
                 }
 
@@ -121,26 +157,14 @@ public class TileManager {
         }
     }
 
-    public void setup(int index ,String imageName,boolean collision){
-        UtilityTool uTool = new UtilityTool();
-        try{
-            tile[index] = new Tile();
-            tile[index].image = ImageIO.read(getClass().getResourceAsStream("/tiles/"+imageName+".png"));
-            tile[index].image = uTool.scaleImage(tile[index].image, gp.tileSize,  gp.tileSize);
-            tile[index].collision = collision;
-
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-    }
-
-    public void setup2(int index,BufferedImage image,boolean collision,int layer){
+    public void setup(int index,BufferedImage image,boolean collision,int layer,ArrayList<String>collisionSide){
         UtilityTool uTool = new UtilityTool();
         tile[index] = new Tile();
         tile[index].image = image;
         tile[index].image = uTool.scaleImage(tile[index].image, gp.tileSize,  gp.tileSize);
         tile[index].collision = collision;
         tile[index].layer = layer;
+        tile[index].collisionSide = collisionSide;
 
     }
 
