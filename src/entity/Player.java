@@ -10,7 +10,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class Player extends Entity {
-    GamePanel gp;
     KeyHandler keyH;
     int hasKey = 0;
     int playerStatus;
@@ -36,7 +35,7 @@ public class Player extends Entity {
     int attackDuration;
 
     // ANIMATION
-    Animator downAnimator,upAnimator,leftAnimator,rightAnimator;
+
     Animator downRollAnimator,upRollAnimator,leftRollAnimator,rightRollAnimator;
     Animator downIdleAnimator,upIdleAnimator,leftIdleAnimator,rightIdleAnimator;
     Animator downAttackingAnimator,upAttackingAnimator,leftAttackingAnimator,rightAttackingAnimator;
@@ -55,7 +54,7 @@ public class Player extends Entity {
     public boolean interactionKeyProcessed= false;
 
     public Player(GamePanel gp, KeyHandler keyH) {
-        this.gp = gp;
+        super(gp);
         this.keyH = keyH;
 
         screenX = (gp.screenWidth / 2) - (gp.tileSize / 2);
@@ -123,7 +122,7 @@ public class Player extends Entity {
         rollSpeed = 2*normalSpeed;
 
         attackCounter = 0;
-        attackDuration = 50;
+        attackDuration = 40;
 
     }
 
@@ -149,7 +148,6 @@ public class Player extends Entity {
         leftAttacking = setup("attacking/player_left-slash-Sheet",gp.scale);
         rightAttacking = setup("attacking/player_right-slash-Sheet",gp.scale);
     }
-
     public BufferedImage setup(String imageName,int scale){
         UtilityTool uTool = new UtilityTool();
         BufferedImage image = null;
@@ -162,6 +160,7 @@ public class Player extends Entity {
         }
         return image;
     }
+
 
     public void update() {
 
@@ -179,17 +178,21 @@ public class Player extends Entity {
             if (attackCounter >= attackDuration){
                 attackCounter = 0;
                 playerStatus = idle;
-            }System.out.println(playerStatus);
+            }
             return;
         }
 
         if (playerStatus == rolling){
-            // CHECK TILE COLLISION
+
             collisionOn = false;
+            // CHECK TILE COLLISION
             gp.collisionChecker.checkTile(this);
 
             //CHECK OBJECT COLLISION
             gp.collisionChecker.checkObject(this,true);
+
+            //CHECK MONSTER COLLISION
+            gp.collisionChecker.checkEntity(this,gp.monster);
 
             useEndurance = true;
             rollCounter ++;
@@ -222,6 +225,7 @@ public class Player extends Entity {
                         }
                         break;
                     case "left":
+
                         if (worldX - speed > 0) {
                             worldX -= speed;
                             if ((worldX + (gp.tileSize / 2) <= gp.screenWidth / 2) || (gp.worldWidth - (gp.screenWidth / 2) <= worldX + (gp.tileSize / 2))) {
@@ -302,7 +306,10 @@ public class Player extends Entity {
             gp.collisionChecker.checkTile(this);
 
             //CHECK OBJECT COLLISION
-            int objIndex = gp.collisionChecker.checkObject(this,true);
+            gp.collisionChecker.checkObject(this,true);
+
+            // CHECK MONSTER COLLISION
+            gp.collisionChecker.checkEntity(this,gp.monster);
 
 
             //IF COLLISION IS FALSE PLAYER CAN MOVE
@@ -374,6 +381,7 @@ public class Player extends Entity {
         int objIndex = gp.collisionChecker.checkObject(this,true);
         if (keyH.attackPressed){
             if (!attackKeyProcessed){
+                gp.playSoundEffect(17);
                 takeDamage(30);
                 attack();
                 attackKeyProcessed = true;
@@ -399,13 +407,18 @@ public class Player extends Entity {
 
         if (keyH.spacePressed){
             if (endurance > 0){
+                switch (direction) {
+                    case "up":gp.playSoundEffect(12); break;
+                    case "down": gp.playSoundEffect(11);break;
+                    case "left":gp.playSoundEffect(13);break;
+                    case "right":gp.playSoundEffect(14);break;
+                }
                 consumeEndurance(40);
                 playerStatus = rolling;
                 speed = rollSpeed;
             }
 
         }
-        System.out.println(playerStatus);
 
     }
 
@@ -416,6 +429,7 @@ public class Player extends Entity {
             String objName = gp.obj[index].name;
             switch (objName) {
                 case "key":
+                    gp.playSoundEffect(2);
                     gp.ui.currentDialogue = "You pick up a key !";
                     gp.gameState = gp.dialogueState;
                     gp.obj[index] = null;
@@ -426,6 +440,7 @@ public class Player extends Entity {
                         gp.obj[index] = null;
                         hasKey--;
                     }else{
+                        gp.playSoundEffect(2);
                         gp.ui.currentDialogue = "Doors is locked !";
                         gp.gameState = gp.dialogueState;
 

@@ -1,18 +1,27 @@
 package main;
 
+import entity.Entity;
 import entity.Player;
 import object.SuperObject;
 import tile.TileManager;
 
 import javax.swing.JPanel;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Random;
 
 public class GamePanel extends JPanel implements Runnable {
+
+    Random random = new Random();
+
+    public boolean debugMode = false;
 
 
     // SCREEN SETTINGS
     public final int originalTileSize = 16;        //16x16 Tiles
-    public final int scale = 3;
+    public final int scale = 4;
 
     public final int tileSize = originalTileSize * scale;   // 48x48 Tiles
     public final int maxScreenCol = 16;
@@ -37,9 +46,14 @@ public class GamePanel extends JPanel implements Runnable {
     Thread gameThread;
     public CollisionChecker collisionChecker = new CollisionChecker(this);
 
+    public Sound music = new Sound();
+    public Sound soundEffects = new Sound();
+
     // ENTITY AND PLAYER
     public Player player = new Player(this,this.keyH);
     public SuperObject[]  obj = new SuperObject[10];
+    public Entity[] monster = new Entity[20];
+    public ArrayList<Entity> entitiesList = new ArrayList<Entity>();
 
     public UI ui = new UI(this,player);
 
@@ -64,11 +78,14 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void setupGame(){
         assetSetter.setObject();
+        assetSetter.setMonster();
         gameState = titleState;
     }
     public void startGameThread() {
         gameThread = new Thread(this);
         gameThread.start();
+        playMusic(18);
+
     }
 
     @Override
@@ -115,7 +132,15 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void update(){
         if (gameState == playState){
+
+
             player.update();
+
+            for (Entity entity : monster) {
+                if (entity != null) {
+                    entity.update();
+                }
+            }
         }
         if (gameState == pauseState){
             // NOTHING
@@ -131,7 +156,7 @@ public class GamePanel extends JPanel implements Runnable {
 
 
         //DEBUG
-        if (keyH.debugKeyPressed){
+        if (debugMode){
             drawStart = System.nanoTime();
         }
 
@@ -148,9 +173,24 @@ public class GamePanel extends JPanel implements Runnable {
                     superObject.draw(g2d, this);
                 }
             }
+            entitiesList.add(player);
+            for (Entity e : monster) {
+                if (e != null) {
+                    entitiesList.add(e);
+                }
+            }
 
-            //PLAYER
-            player.draw(g2d);
+            Collections.sort(entitiesList,new Comparator<Entity>() {
+                @Override
+                public int compare(Entity e1, Entity e2) {
+                    return Integer.compare(e1.worldY,e2.worldY);
+                }
+            });
+            for (Entity e : entitiesList){
+                e.draw(g2d);
+            }
+
+            entitiesList.clear();
 
             //TILE 2ND LAYER
             tileM.draw(g2d,2);
@@ -164,7 +204,7 @@ public class GamePanel extends JPanel implements Runnable {
         ui.draw(g2d);
 
         //DEBUG
-        if (keyH.debugKeyPressed){
+        if (debugMode){
             long drawEnd = System.nanoTime();
             long passedTime = drawEnd - drawStart;
             g2d.setColor(Color.white);
@@ -181,6 +221,28 @@ public class GamePanel extends JPanel implements Runnable {
 
 
         g2d.dispose();
+    }
+
+    public void playMusic(int i){
+        music.setFile(i);
+        music.play();
+        music.loop();
+    }
+
+    public void stopMusic(){
+        music.stop();
+    }
+
+    public void playSoundEffect(int i){
+        soundEffects.setFile(i);
+        soundEffects.play();
+    }
+
+    public void updateMusicVolume(float volume){
+        music.updateVolume(volume);
+    }
+    public void updateSoundVolume(float volume){
+        soundEffects.updateVolume(volume);
     }
 
 }

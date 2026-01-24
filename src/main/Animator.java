@@ -68,6 +68,7 @@ public class Animator {
 
     public void resetAnimation(){
         index = 0;
+        currentsprite = sprites.get(index);
     }
 
 }

@@ -2,6 +2,7 @@ package main;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Random;
 
 public class KeyHandler implements KeyListener {
 
@@ -9,6 +10,7 @@ public class KeyHandler implements KeyListener {
     boolean debugKeyPressed = false;
     public boolean healPressed,attackPressed,parryPressed,interactionPressed;
     GamePanel gp;
+    Random random = new Random();
 
     public KeyHandler(GamePanel gp) {
         this.gp = gp;
@@ -27,6 +29,7 @@ public class KeyHandler implements KeyListener {
         int code = e.getKeyCode();
         if(gp.gameState == gp.titleState) {
             if (code == KeyEvent.VK_UP || code == KeyEvent.VK_Z) {
+                gp.playSoundEffect(5);
                 if (gp.ui.commandNumber == 0) {
                     gp.ui.commandNumber = 2;
                 } else {
@@ -34,6 +37,7 @@ public class KeyHandler implements KeyListener {
                 }
             }
             if (code == KeyEvent.VK_DOWN || code == KeyEvent.VK_S) {
+                gp.playSoundEffect(5);
                 if (gp.ui.commandNumber == 2) {
                     gp.ui.commandNumber = 0;
                 } else {
@@ -42,7 +46,11 @@ public class KeyHandler implements KeyListener {
             }
             if (code == KeyEvent.VK_ENTER) {
                 if (gp.ui.commandNumber == 0) {
+                    gp.stopMusic();
+                    gp.playSoundEffect(4);
+                    gp.playMusic(random.nextInt(2)+19);
                     gp.gameState = gp.playState;
+
                 }
             }
             if (code == KeyEvent.VK_ESCAPE) {
@@ -63,9 +71,11 @@ public class KeyHandler implements KeyListener {
                 rightPressed = true;
             }
             if(code == KeyEvent.VK_P){
-                debugKeyPressed = !debugKeyPressed;
+                gp.debugMode = !gp.debugMode;
             }
             if(code == KeyEvent.VK_ESCAPE){
+                gp.updateMusicVolume(gp.music.currentVolume/2);
+                gp.playSoundEffect(0);
                 gp.gameState = gp.pauseState;
 
             }
@@ -92,9 +102,13 @@ public class KeyHandler implements KeyListener {
         }
         else if(gp.gameState == gp.pauseState){
             if(code == KeyEvent.VK_ESCAPE){
+                gp.playSoundEffect(7);
+                gp.updateMusicVolume(gp.music.originalVolume);
+
                 gp.gameState = gp.playState;
             }
             if (code == KeyEvent.VK_UP || code == KeyEvent.VK_Z) {
+                gp.playSoundEffect(5);
                 if (gp.ui.commandNumberPause == 0) {
                     gp.ui.commandNumberPause = 2;
                 } else {
@@ -102,6 +116,7 @@ public class KeyHandler implements KeyListener {
                 }
             }
             if (code == KeyEvent.VK_DOWN || code == KeyEvent.VK_S) {
+                gp.playSoundEffect(5);
                 if (gp.ui.commandNumberPause == 2) {
                     gp.ui.commandNumberPause = 0;
                 } else {
@@ -110,10 +125,18 @@ public class KeyHandler implements KeyListener {
             }
             if (code == KeyEvent.VK_ENTER) {
                 if (gp.ui.commandNumberPause == 0) {
+                    gp.playSoundEffect(7);
+                    gp.updateMusicVolume(gp.music.originalVolume);
                     gp.gameState = gp.playState;
+
                 }
                 if (gp.ui.commandNumberPause == 2) {
-                    gp.gameState = gp.titleState;}
+                    gp.stopMusic();
+                    gp.playSoundEffect(1);
+                    gp.updateMusicVolume(gp.music.originalVolume);
+                    gp.gameState = gp.titleState;
+                    gp.playMusic(18);
+                }
             }
         }
         else if(gp.gameState== gp.dialogueState){

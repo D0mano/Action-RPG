@@ -1,5 +1,7 @@
 package main;
 
+import entity.Entity;
+import monster.MON_Blob;
 import object.OBJ_Chest;
 import object.OBJ_Door;
 import object.OBJ_Key;
@@ -31,5 +33,18 @@ public class AssetSetter {
         gp.obj[4] = new OBJ_Chest(gp);
         gp.obj[4].worldX = 4 * gp.tileSize;
         gp.obj[4].worldY = 31 * gp.tileSize;
+    }
+
+    public void setMonster(){
+
+        gp.monster[0] = new MON_Blob(gp);
+        gp.monster[0].worldX =34 * gp.tileSize;
+        gp.monster[0].worldY = 36 * gp.tileSize;
+
+
+        gp.monster[1] = new MON_Blob(gp);
+        gp.monster[1].worldX =24 * gp.tileSize;
+        gp.monster[1].worldY = 39 * gp.tileSize;
+
     }
 }
