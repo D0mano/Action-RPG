@@ -23,6 +23,10 @@ public class Sound {
         soundUrl[5] = getClass().getResource("/sounds/ui/ui_main_roll_down.wav");
         soundUrl[6] = getClass().getResource("/sounds/ui/ui_main_select.wav");
         soundUrl[7] = getClass().getResource("/sounds/ui/ui_game_unpause.wav");
+        soundUrl[22] =  getClass().getResource("/sounds/ui/ui_game_popup_out.wav");
+        soundUrl[23] =  getClass().getResource("/sounds/ui/ui_main_button_options.wav");
+        soundUrl[24] =  getClass().getResource("/sounds/ui/ui_main_nav_backtotitle_A.wav");
+        soundUrl[25] =  getClass().getResource("/sounds/ui/ui_main_rollover.wav");
 
         // Player Sounds effects
         soundUrl[8] = getClass().getResource("/sounds/player/en_shared_hit_02.wav");
@@ -46,6 +50,7 @@ public class Sound {
     }
 
     public void setVolume(float volumeScale) {
+
         try {
             if (clip != null) {
                 FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);

@@ -21,18 +21,30 @@ public class UI {
     BufferedImage healthTop,healthOverlay, healthMiddle;
     BufferedImage enduranceTop,enduranceOverlay,enduranceMiddle;
     BufferedImage manaTop,manaOverlay,manaMiddle;
-    BufferedImage menuSelection ,menuSelectionOrange;
+    BufferedImage menuSelection ,menuSelectionOrange,menuSelectionOrange2;
     BufferedImage messageWindow;
+    BufferedImage optionWindow;
     int commandNumber = 0;
 
      public String[] pauseCommand = {"Return to Game","Options","Quit"};
      public int commandNumberPause = 0;
+     public String[] optionCommand = {"Audio","Graphics","Return"};
+     public int commandNumberOption = 0;
+
+     public String[] audioCommand = {"Musics","Sounds Effects","Return"};
+     public int commandNumberAudio = 0;
+
+     public String[] graphicCommand = {"Display Mode","Resolution","Return"};
+     public int commandNumberGraphic = 0;
+
+
 
 
     BufferedImage whiteTitle,blackTitle;
     public UI(GamePanel gp,Player player) {
         this.gp = gp;
         this.player = player;
+
         try {
             // Tu changes juste l'extension du fichier ici
             InputStream is = getClass().getResourceAsStream("/fonts/Lilliput Steps.otf");
@@ -69,8 +81,13 @@ public class UI {
 
         menuSelection = setup("/menu/menuOverlayWhite",gp.scale);
         menuSelectionOrange = setup("/menu/menuOverlayOrange",gp.scale);
+        menuSelectionOrange2 = setup("/menu/menuOverlayOrange2",gp.scale);
 
         messageWindow = setup("/menu/window1",gp.scale);
+
+        optionWindow = setup("/menu/optionOverlay",gp.scale);
+
+
     }
 
     public BufferedImage setup(String imageName, float scale) {
@@ -99,6 +116,29 @@ public class UI {
         if(gp.gameState == gp.titleState){
             drawTitleScreen();
 
+        }
+        if(gp.gameState == gp.optionState){
+            if (gp.previousState == gp.titleState){
+                g2.setColor(Color.black);
+                g2.fillRect(0,0,gp.screenWidth,gp.screenHeight);
+            }
+            drawOptionScreen();
+        }
+
+        if (gp.gameState == gp.audioSettingstate){
+            if (gp.previousState == gp.titleState){
+                g2.setColor(Color.black);
+                g2.fillRect(0,0,gp.screenWidth,gp.screenHeight);
+            }
+            drawAudioScreen();
+        }
+
+        if (gp.gameState == gp.graphicsSettingstate){
+            if (gp.previousState == gp.titleState){
+                g2.setColor(Color.black);
+                g2.fillRect(0,0,gp.screenWidth,gp.screenHeight);
+            }
+            drawGraphicsScreen();
         }
 
         if (gp.gameState == gp.playState){
@@ -194,7 +234,7 @@ public class UI {
         int y= gp.tileSize/2;
         int width = gp.screenWidth-(gp.tileSize*4);
         int height= gp.tileSize*5;
-        drawSubWindow(x,y,width,height);
+        drawSubWindow(x,y,width,height,messageWindow);
         g2.setFont(trunic);
         g2.setFont(g2.getFont().deriveFont(Font.BOLD, gp.tileSize/2f));
         x = getXForCenteredTextAroundX(currentDialogue,(2*x+width)/2);
@@ -203,8 +243,162 @@ public class UI {
         g2.drawString(currentDialogue,x,y);
     }
 
-    public void drawSubWindow(int x,int y,int width,int height){
-       g2.drawImage(messageWindow,x,y,width,height,null);
+    public void drawOptionScreen(){
+        RadialGradientPaint vignette = new RadialGradientPaint(
+                new Point(gp.screenWidth/2,gp.screenHeight/2),
+                2*gp.screenWidth,
+                new float[]{0.0f,1.0f},
+                new Color[]{new Color(0,0,0,240),new Color(0,0,0,100)});
+        g2.setPaint(vignette);
+        g2.fillRect(0,0,gp.screenWidth,gp.screenHeight);
+        g2.setColor(Color.white);
+        drawSubWindow(0,0,gp.screenWidth,gp.screenHeight,optionWindow);
+        g2.setFont(lilliput_40);
+        int x =getXforCenteredText("Option");
+        int y = 2*gp.tileSize;
+        g2.drawString("Option",x,y);
+
+        g2.setFont(lilliput_20);
+        FontMetrics metrics = g2.getFontMetrics();
+
+        int buttonWidth = menuSelection.getWidth();
+        int buttonHeight = menuSelection.getHeight();
+        int startY = gp.screenHeight / 2 - (optionCommand.length * buttonHeight) / 2;
+
+        for (int i = 0; i < optionCommand.length; i++) {
+            int buttonX = (gp.screenWidth - buttonWidth) / 2;
+            int buttonY = startY + (i * (buttonHeight + 10));
+
+            if (i == commandNumberOption) {
+                if (menuSelectionOrange != null) {
+                    g2.drawImage(menuSelectionOrange, buttonX, buttonY, buttonWidth, buttonHeight, null);
+                }
+                g2.setColor(Color.WHITE);
+
+
+            } else {
+                if (menuSelection != null) {
+                    g2.drawImage(menuSelection, buttonX, buttonY, buttonWidth, buttonHeight, null);
+                }
+                g2.setColor(Color.LIGHT_GRAY);
+            }
+
+            int textX = buttonX + (buttonWidth - metrics.stringWidth(optionCommand[i])) / 2;
+            int textY = buttonY + 38;
+            g2.drawString(optionCommand[i], textX, textY);
+        }
+
+
+
+    }
+
+    public void drawAudioScreen(){
+        RadialGradientPaint vignette = new RadialGradientPaint(
+                new Point(gp.screenWidth/2,gp.screenHeight/2),
+                2*gp.screenWidth,
+                new float[]{0.0f,1.0f},
+                new Color[]{new Color(0,0,0,240),new Color(0,0,0,100)});
+        g2.setPaint(vignette);
+        g2.fillRect(0,0,gp.screenWidth,gp.screenHeight);
+        g2.setColor(Color.white);
+        drawSubWindow(0,0,gp.screenWidth,gp.screenHeight,optionWindow);
+        g2.setFont(lilliput_40);
+        int x = getXforCenteredText("Audio");
+        int y = 2*gp.tileSize;
+        g2.drawString("Audio",x,y);
+
+        g2.setFont(lilliput_20);
+        FontMetrics metrics = g2.getFontMetrics();
+        int buttonWidth =(int)(1.3f*menuSelection.getWidth());
+        int buttonHeight = menuSelection.getHeight();
+        int startY = gp.screenHeight / 2 - (audioCommand.length * buttonHeight) / 2;
+
+        for (int i = 0; i < audioCommand.length; i++) {
+            int buttonX = (gp.screenWidth - buttonWidth) / 2;
+            int buttonY = startY + (i * (buttonHeight + 10));
+
+            if (i == commandNumberAudio) {
+                if (i == 2 && menuSelectionOrange != null){
+                    g2.drawImage(menuSelectionOrange, buttonX, buttonY, buttonWidth, buttonHeight, null);
+                }else if ( menuSelectionOrange2 != null) {
+                    g2.drawImage(menuSelectionOrange2, buttonX, buttonY, buttonWidth, buttonHeight, null);
+                }
+                g2.setColor(Color.WHITE);
+
+
+            } else {
+                if (menuSelection != null) {
+                    g2.drawImage(menuSelection, buttonX, buttonY, buttonWidth, buttonHeight, null);
+                }
+                g2.setColor(Color.LIGHT_GRAY);
+            }
+
+            int textX = buttonX + (buttonWidth ) / 8;
+            int textY = buttonY + 38;
+            g2.drawString(audioCommand[i], textX, textY);
+            if (i ==0){
+                g2.setColor(new Color(196, 148, 62));
+                textX += 7*gp.tileSize;
+                g2.drawString(Math.round(gp.music.currentVolume * 100)+"%", textX, textY);
+            }
+            if (i == 1){
+                g2.setColor(new Color(196, 148, 62));
+                textX += 7*gp.tileSize;
+                g2.drawString(Math.round(gp.soundEffects.currentVolume * 100)+"%", textX, textY);
+
+            }
+        }
+    }
+
+    public void drawGraphicsScreen(){
+        RadialGradientPaint vignette = new RadialGradientPaint(
+                new Point(gp.screenWidth/2,gp.screenHeight/2),
+                2*gp.screenWidth,
+                new float[]{0.0f,1.0f},
+                new Color[]{new Color(0,0,0,240),new Color(0,0,0,100)});
+        g2.setPaint(vignette);
+        g2.fillRect(0,0,gp.screenWidth,gp.screenHeight);
+        g2.setColor(Color.white);
+        drawSubWindow(0,0,gp.screenWidth,gp.screenHeight,optionWindow);
+        g2.setFont(lilliput_40);
+        int x = getXforCenteredText("Graphics");
+        int y = 2*gp.tileSize;
+        g2.drawString("Graphics",x,y);
+
+        g2.setFont(lilliput_20);
+        int buttonWidth =(int)(1.3f*menuSelection.getWidth());
+        int buttonHeight = menuSelection.getHeight();
+        int startY = gp.screenHeight / 2 - (graphicCommand.length * buttonHeight) / 2;
+
+        for (int i = 0; i < graphicCommand.length; i++) {
+            int buttonX = (gp.screenWidth - buttonWidth) / 2;
+            int buttonY = startY + (i * (buttonHeight + 10));
+
+            if (i == commandNumberGraphic) {
+                if (i == 2 && menuSelectionOrange != null){
+                    g2.drawImage(menuSelectionOrange, buttonX, buttonY, buttonWidth, buttonHeight, null);
+                }else if ( menuSelectionOrange2 != null) {
+                    g2.drawImage(menuSelectionOrange2, buttonX, buttonY, buttonWidth, buttonHeight, null);
+                }
+                g2.setColor(Color.WHITE);
+
+
+            } else {
+                if (menuSelection != null) {
+                    g2.drawImage(menuSelection, buttonX, buttonY, buttonWidth, buttonHeight, null);
+                }
+                g2.setColor(Color.LIGHT_GRAY);
+            }
+
+            int textX = buttonX + (buttonWidth ) / 8;
+            int textY = buttonY + 38;
+            g2.drawString(graphicCommand[i], textX, textY);
+        }
+
+    }
+
+    public void drawSubWindow(int x,int y,int width,int height,BufferedImage image){
+       g2.drawImage(image,x,y,width,height,null);
     }
 
     public void drawPlayerHealth(){

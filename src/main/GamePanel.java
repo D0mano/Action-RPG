@@ -30,8 +30,8 @@ public class GamePanel extends JPanel implements Runnable {
     public final int screenHeight = tileSize * maxScreenRow;    // 576 pixels
 
     // WORLD SETTINGS
-    public final int maxWorldCol = 50;
-    public final int maxWorldRow = 50;
+    public final int maxWorldCol = 79;
+    public final int maxWorldRow = 49;
     public final int worldWidth = tileSize * maxWorldCol;
     public final int worldHeight = tileSize * maxWorldRow;
 
@@ -62,10 +62,14 @@ public class GamePanel extends JPanel implements Runnable {
 
     // GAMESATE
     public int gameState;
+    public int previousState;
     public final int titleState = 0;
-    public final int playState = 1;
-    public final int pauseState = 2;
-    public final int dialogueState = 3;
+    public final int optionState = 1;
+    public final int playState = 2;
+    public final int pauseState = 3;
+    public final int dialogueState = 5;
+    public final int audioSettingstate = 6;
+    public final int graphicsSettingstate = 7;
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -203,16 +207,19 @@ public class GamePanel extends JPanel implements Runnable {
 
         ui.draw(g2d);
 
-        //DEBUG
-        if (debugMode){
-            long drawEnd = System.nanoTime();
-            long passedTime = drawEnd - drawStart;
-            g2d.setColor(Color.white);
-            g2d.drawString("Draw Time: " + passedTime , 10, 400);
-            g2d.drawString("Coordinate :" + player.worldX+","+player.worldY , 10, 200);
-            player.showHitbox(g2d);
+        if(gameState == playState ){
+            //DEBUG
+            if (debugMode){
+                long drawEnd = System.nanoTime();
+                long passedTime = drawEnd - drawStart;
+                g2d.setColor(Color.white);
+                g2d.drawString("Draw Time: " + passedTime , 10, 400);
+                g2d.drawString("Coordinate :" + player.worldX+","+player.worldY , 10, 200);
+                player.showHitbox(g2d);
 
+            }
         }
+
 
 
 

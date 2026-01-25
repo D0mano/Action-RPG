@@ -13,38 +13,42 @@ public class AssetSetter {
     }
 
     public void setObject(){
-        gp.obj[0] = new OBJ_Key(gp);
-        gp.obj[0].worldX = 7 * gp.tileSize;
-        gp.obj[0].worldY = 15 * gp.tileSize;
-
-        gp.obj[1] = new OBJ_Key(gp);
-        gp.obj[1].worldX = 24 * gp.tileSize;
-        gp.obj[1].worldY = 38 * gp.tileSize;
-
-        gp.obj[2] = new OBJ_Door(gp);
-        gp.obj[2].worldX = 3 * gp.tileSize;
-        gp.obj[2].worldY = 39 * gp.tileSize;
-
-
-        gp.obj[3] = new OBJ_Door(gp);
-        gp.obj[3].worldX = 5 * gp.tileSize;
-        gp.obj[3].worldY = 34 * gp.tileSize;
-
-        gp.obj[4] = new OBJ_Chest(gp);
-        gp.obj[4].worldX = 4 * gp.tileSize;
-        gp.obj[4].worldY = 31 * gp.tileSize;
+//        gp.obj[0] = new OBJ_Key(gp);
+//        gp.obj[0].worldX = 7 * gp.tileSize;
+//        gp.obj[0].worldY = 15 * gp.tileSize;
+//
+//        gp.obj[1] = new OBJ_Key(gp);
+//        gp.obj[1].worldX = 24 * gp.tileSize;
+//        gp.obj[1].worldY = 38 * gp.tileSize;
+//
+//        gp.obj[2] = new OBJ_Door(gp);
+//        gp.obj[2].worldX = 3 * gp.tileSize;
+//        gp.obj[2].worldY = 39 * gp.tileSize;
+//
+//
+//        gp.obj[3] = new OBJ_Door(gp);
+//        gp.obj[3].worldX = 5 * gp.tileSize;
+//        gp.obj[3].worldY = 34 * gp.tileSize;
+//
+//        gp.obj[4] = new OBJ_Chest(gp);
+//        gp.obj[4].worldX = 4 * gp.tileSize;
+//        gp.obj[4].worldY = 31 * gp.tileSize;
     }
 
     public void setMonster(){
 
         gp.monster[0] = new MON_Blob(gp);
-        gp.monster[0].worldX =34 * gp.tileSize;
-        gp.monster[0].worldY = 36 * gp.tileSize;
+        gp.monster[0].worldX =40 * gp.tileSize;
+        gp.monster[0].worldY = 27 * gp.tileSize;
 
 
         gp.monster[1] = new MON_Blob(gp);
-        gp.monster[1].worldX =24 * gp.tileSize;
-        gp.monster[1].worldY = 39 * gp.tileSize;
+        gp.monster[1].worldX =49 * gp.tileSize;
+        gp.monster[1].worldY = 16 * gp.tileSize;
+
+        gp.monster[2] = new MON_Blob(gp);
+        gp.monster[2].worldX =37 * gp.tileSize;
+        gp.monster[2].worldY = 44 * gp.tileSize;
 
     }
 }

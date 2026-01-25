@@ -22,12 +22,12 @@ public class TileManager {
 
     public TileManager(GamePanel gp) {
         this.gp = gp;
-        tile = new Tile[80];
+        tile = new Tile[90];
         mapTileNum1 = new int[gp.maxWorldRow][gp.maxWorldCol];
         mapTileNum2 = new int[gp.maxWorldRow][gp.maxWorldCol];
         loadTileData("/maps/tile_data.txt");
         getTileImageFromTileSet("TunicTilesetV2");
-        loadMap("/maps/world02");
+        loadMap("/maps/World03");
     }
 
     public void loadTileData(String filePath) {

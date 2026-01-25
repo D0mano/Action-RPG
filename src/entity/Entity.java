@@ -21,11 +21,21 @@ public class Entity {
     public int solideAreaDefaultX, solideAreaDefaultY;
     public boolean collisionOn = false;
 
+    public Rectangle attackingArea = new Rectangle(0,0,0,0);
+    public int attackingAreaDefaultHX, attackingAreaDefaultHY,attackingAreaDefaultVX, attackingAreaDefaultVY;
+    public Rectangle attackingAreaHorizontal = new Rectangle(0,0,0,0);
+    public Rectangle attackingAreaVertical = new Rectangle(0,0,0,0);
+
+    public boolean hitOn = false;
+
     // CHARACTER SETTINGS
     public int maxHealth;
     public int health;
 
     public int actionLockCounter = 0;
+    public boolean invisible = false;
+    public int invisibleCounter = 0;
+    public int invisibleTimer;
 
     public Entity(GamePanel gp) {
         this.gp = gp;
@@ -40,6 +50,7 @@ public class Entity {
         collisionOn = false;
         gp.collisionChecker.checkTile(this);
         gp.collisionChecker.checkPlayer(this);
+        gp.collisionChecker.checkEntity(this ,gp.monster);
         if (!collisionOn) {
             switch (direction) {
                 case "up":

@@ -74,6 +74,20 @@ public class Player extends Entity {
         solidArea.width = (2 * gp.tileSize) / 3;
         solidArea.height = (2 * gp.tileSize) / 3;
 
+        attackingAreaVertical.x = gp.tileSize/ 8;
+        attackingAreaVertical.y = 0;
+        attackingAreaDefaultVX = attackingAreaVertical.x;
+        attackingAreaDefaultVY = attackingAreaVertical.y;
+        attackingAreaVertical.width = (int)(gp.tileSize * 3/4f);
+        attackingAreaVertical.height = gp.tileSize;
+
+        attackingAreaHorizontal.x =  attackingAreaVertical.y;
+        attackingAreaHorizontal.y = attackingAreaVertical.x;
+        attackingAreaDefaultHX = attackingAreaHorizontal.x;
+        attackingAreaDefaultHY = attackingAreaHorizontal.y;
+        attackingAreaHorizontal.width = attackingAreaVertical.height;
+        attackingAreaHorizontal.height = attackingAreaVertical.width;
+
         downAnimator = new Animator(down,gp.tileSize,gp.tileSize,12,true);
         upAnimator = new Animator(up,gp.tileSize,gp.tileSize,12,true);
         leftAnimator = new Animator(left,gp.tileSize,gp.tileSize,12,true);
@@ -100,8 +114,8 @@ public class Player extends Entity {
     }
 
     public void setDefaultsValues(){
-        worldX = gp.tileSize*20;
-        worldY = gp.tileSize*8;
+        worldX = gp.tileSize*40;
+        worldY = gp.tileSize*44;
         speed = gp.tileSize/10;
         direction = "down";
 
@@ -123,6 +137,7 @@ public class Player extends Entity {
 
         attackCounter = 0;
         attackDuration = 40;
+        invisibleTimer = 15;
 
     }
 
@@ -168,7 +183,9 @@ public class Player extends Entity {
         displayedEndurance += (endurance-displayedEndurance)*0.15f;
 
         if (playerStatus == attacking){
+
             attackCounter++;
+
             switch (direction) {
                 case "up": upAttackingAnimator.update();break;
                 case "down": downAttackingAnimator.update();break;
@@ -179,6 +196,7 @@ public class Player extends Entity {
                 attackCounter = 0;
                 playerStatus = idle;
             }
+
             return;
         }
 
@@ -257,11 +275,19 @@ public class Player extends Entity {
                     case "right": rightRollAnimator.update();break;
                 }
             }
+            if (invisibleCounter >= invisibleTimer){
+                invisible = false;
+            }else{
+                invisible = true;
+                invisibleCounter++;
+            }
             if (rollCounter > rollDuration) {
                 playerStatus = idle;
                 rollCounter = 0;
                 speed = normalSpeed; // Restaurer la vitesse
+                invisibleCounter = 0;
             }
+
 
             return;
 
@@ -431,6 +457,7 @@ public class Player extends Entity {
                 case "key":
                     gp.playSoundEffect(2);
                     gp.ui.currentDialogue = "You pick up a key !";
+                    gp.previousState = gp.gameState;
                     gp.gameState = gp.dialogueState;
                     gp.obj[index] = null;
                     hasKey++;
@@ -442,6 +469,7 @@ public class Player extends Entity {
                     }else{
                         gp.playSoundEffect(2);
                         gp.ui.currentDialogue = "Doors is locked !";
+                        gp.previousState = gp.gameState;
                         gp.gameState = gp.dialogueState;
 
                     }
@@ -540,8 +568,47 @@ public class Player extends Entity {
     }
 
     public void showHitbox(Graphics2D g2){
+
         g2.setColor(Color.RED);
         g2.drawRect(screenX+solidArea.x,screenY+solidArea.y,solidArea.width,solidArea.height);
+        if (invisible) {
+            g2.setColor(Color.blue);
+            g2.drawRect(screenX+solidArea.x,screenY+solidArea.y,solidArea.width,solidArea.height);
+
+        }
+        if (playerStatus == attacking) {
+
+            g2.setColor(Color.GREEN);
+
+            switch(direction){
+                case "up":
+                    attackingArea = attackingAreaVertical;
+                    attackingArea.y -= gp.tileSize;
+                    break;
+                case "down":
+                    attackingArea = attackingAreaVertical;
+                    attackingArea.y += gp.tileSize;
+                    break;
+                case "left":
+                    attackingArea = attackingAreaHorizontal;
+                    attackingArea.x -= gp.tileSize;
+                    break;
+                case "right":
+                    attackingArea = attackingAreaHorizontal;
+                    attackingArea.x += gp.tileSize;
+                    break;
+
+            }
+
+            g2.drawRect(screenX+attackingArea.x,screenY+attackingArea.y,attackingArea.width,attackingArea.height);
+            attackingAreaHorizontal.x = attackingAreaDefaultHX;
+            attackingAreaHorizontal.y = attackingAreaDefaultHY;
+            attackingAreaVertical.x = attackingAreaDefaultVX;
+            attackingAreaVertical.y = attackingAreaDefaultVY;
+
+
+        }
+
 
     }
 
@@ -551,5 +618,15 @@ public class Player extends Entity {
         leftAttackingAnimator.resetAnimation();
         rightAttackingAnimator.resetAnimation();
         playerStatus = attacking;
+        hitOn = false;
+        for(Entity e : gp.monster){
+            if (e != null){
+                gp.collisionChecker.checkAttack(this ,e);
+            }
+        }
+        if (hitOn){
+            gp.playSoundEffect(8);
+        }
+        hitOn = false;
     }
 }
