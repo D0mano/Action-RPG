@@ -12,11 +12,7 @@ import java.io.IOException;
 public class Player extends Entity {
     KeyHandler keyH;
     int hasKey = 0;
-    int playerStatus;
-    final int idle = 0;
-    final int walking = 1;
-    final int rolling = 2;
-    final int attacking = 3;
+
 
     public int maxEndurance;
     public int endurance;
@@ -31,21 +27,18 @@ public class Player extends Entity {
     int rollSpeed;
     int normalSpeed;
 
-    int attackCounter;
-    int attackDuration;
+
 
     // ANIMATION
 
     Animator downRollAnimator,upRollAnimator,leftRollAnimator,rightRollAnimator;
     Animator downIdleAnimator,upIdleAnimator,leftIdleAnimator,rightIdleAnimator;
-    Animator downAttackingAnimator,upAttackingAnimator,leftAttackingAnimator,rightAttackingAnimator;
     public float displayedHealth = health;
 
     public  int screenX,screenY;
 
     public BufferedImage downRoll,upRoll,leftRoll,rightRoll;
     public BufferedImage downIdle,upIdle,leftIdle,rightIdle;
-    public BufferedImage downAttacking,upAttacking,leftAttacking,rightAttacking;
 
     // Key Flags
     public boolean attackKeyProcessed=false;
@@ -129,7 +122,7 @@ public class Player extends Entity {
         enduranceCounter = 0;
 
 
-        playerStatus = idle;
+        entityStatus = idle;
         rollCounter = 0;
         rollDuration = 30;
         normalSpeed = speed;
@@ -182,7 +175,7 @@ public class Player extends Entity {
         displayedHealth += (health-displayedHealth)*0.15f;
         displayedEndurance += (endurance-displayedEndurance)*0.15f;
 
-        if (playerStatus == attacking){
+        if (entityStatus == attacking){
 
             attackCounter++;
 
@@ -194,13 +187,13 @@ public class Player extends Entity {
             }
             if (attackCounter >= attackDuration){
                 attackCounter = 0;
-                playerStatus = idle;
+                entityStatus = idle;
             }
 
             return;
         }
 
-        if (playerStatus == rolling){
+        if (entityStatus == rolling){
 
             collisionOn = false;
             // CHECK TILE COLLISION
@@ -282,7 +275,7 @@ public class Player extends Entity {
                 invisibleCounter++;
             }
             if (rollCounter > rollDuration) {
-                playerStatus = idle;
+                entityStatus = idle;
                 rollCounter = 0;
                 speed = normalSpeed; // Restaurer la vitesse
                 invisibleCounter = 0;
@@ -303,7 +296,7 @@ public class Player extends Entity {
         }
 
         if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
-            playerStatus = walking;
+            entityStatus = walking;
 
             if (keyH.upPressed) {
                 direction = "up";
@@ -391,9 +384,10 @@ public class Player extends Entity {
 
 
         }
-        else{playerStatus = idle;}
+        else{
+            entityStatus = idle;}
 
-        if (playerStatus == idle) {
+        if (entityStatus == idle) {
             switch (direction) {
                 case "up": upIdleAnimator.update();break;
                 case "down": downIdleAnimator.update();break;
@@ -408,7 +402,6 @@ public class Player extends Entity {
         if (keyH.attackPressed){
             if (!attackKeyProcessed){
                 gp.playSoundEffect(17);
-                takeDamage(30);
                 attack();
                 attackKeyProcessed = true;
             }
@@ -440,7 +433,7 @@ public class Player extends Entity {
                     case "right":gp.playSoundEffect(14);break;
                 }
                 consumeEndurance(40);
-                playerStatus = rolling;
+                entityStatus = rolling;
                 speed = rollSpeed;
             }
 
@@ -485,49 +478,49 @@ public class Player extends Entity {
 
         switch (direction) {
             case "up":
-                if (playerStatus == rolling) {
+                if (entityStatus == rolling) {
                     upRollAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
 
-                }else if (playerStatus == walking) {
+                }else if (entityStatus == walking) {
                     upAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
-                }else if (playerStatus == idle) {
+                }else if (entityStatus == idle) {
                     upIdleAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
-                }else if(playerStatus == attacking) {
+                }else if(entityStatus == attacking) {
                     upAttackingAnimator.draw(g2d,screenX-gp.tileSize,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
                 }
                 break;
             case "down":
-                if (playerStatus == walking) {
+                if (entityStatus == walking) {
                     downAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
-                }else if (playerStatus == rolling) {
+                }else if (entityStatus == rolling) {
                     downRollAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
-                }else if (playerStatus == idle) {
+                }else if (entityStatus == idle) {
                     downIdleAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
-                }else if (playerStatus == attacking) {
+                }else if (entityStatus == attacking) {
                     downAttackingAnimator.draw(g2d,screenX,screenY,gp.tileSize*2,gp.tileSize*2);
                 }
 
                 break;
             case "left":
-                if (playerStatus == rolling) {
+                if (entityStatus == rolling) {
                     leftRollAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
-                }else if (playerStatus == walking) {
+                }else if (entityStatus == walking) {
                     leftAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
-                }else if (playerStatus == idle) {
+                }else if (entityStatus == idle) {
                     leftIdleAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
-                }else if (playerStatus == attacking) {
+                }else if (entityStatus == attacking) {
                     leftAttackingAnimator.draw(g2d,screenX-gp.tileSize,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
                 }
                 break;
             case "right":
-                if (playerStatus == rolling) {
+                if (entityStatus == rolling) {
                     rightRollAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
 
-                }else if (playerStatus == walking) {
+                }else if (entityStatus == walking) {
                     rightAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
-                }else if (playerStatus == idle) {
+                }else if (entityStatus == idle) {
                     rightIdleAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
-                }else if (playerStatus == attacking) {
+                }else if (entityStatus == attacking) {
                     rightAttackingAnimator.draw(g2d,screenX,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
                 }
                 break;
@@ -537,20 +530,7 @@ public class Player extends Entity {
 
     }
 
-    public void takeDamage(int damage){
-        if(health-damage > 0){
-            health -= damage;
-        }
-        else{health=0;}
 
-    }
-
-    public void heal(int heal){
-        if(health+heal < maxHealth){
-            health += heal;
-        }else{
-            health = maxHealth;}
-    }
 
     public void consumeEndurance(int amount){
         if(endurance-amount > 0){
@@ -576,7 +556,7 @@ public class Player extends Entity {
             g2.drawRect(screenX+solidArea.x,screenY+solidArea.y,solidArea.width,solidArea.height);
 
         }
-        if (playerStatus == attacking) {
+        if (entityStatus == attacking) {
 
             g2.setColor(Color.GREEN);
 
@@ -617,14 +597,19 @@ public class Player extends Entity {
         downAttackingAnimator.resetAnimation();
         leftAttackingAnimator.resetAnimation();
         rightAttackingAnimator.resetAnimation();
-        playerStatus = attacking;
-        hitOn = false;
+        entityStatus = attacking;
+        int monsterHit = 0;
         for(Entity e : gp.monster){
             if (e != null){
+                hitOn = false;
                 gp.collisionChecker.checkAttack(this ,e);
+                if(hitOn){
+                    e.takeDamage(30);
+                    monsterHit++;
+                }
             }
         }
-        if (hitOn){
+        if (monsterHit > 0){
             gp.playSoundEffect(8);
         }
         hitOn = false;

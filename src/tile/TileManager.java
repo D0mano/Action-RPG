@@ -169,7 +169,8 @@ public class TileManager {
     }
 
     public void draw(Graphics2D g2d,int layer){
-       for(int worldRow = 0; worldRow < gp.maxWorldRow; worldRow++){
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+        for(int worldRow = 0; worldRow < gp.maxWorldRow; worldRow++){
            for(int worldCol = 0; worldCol < gp.maxWorldCol; worldCol++){
                int tileNum = mapTileNum1[worldRow][worldCol];
                int tileNum2 = mapTileNum2[worldRow][worldCol];
@@ -194,8 +195,6 @@ public class TileManager {
 
                    }
                }
-
-
            }
        }
     }

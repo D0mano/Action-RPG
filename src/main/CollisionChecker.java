@@ -341,18 +341,18 @@ public class CollisionChecker {
 
     }
 
-    public int checkEntity(Entity entity,Entity[] target){
+    public int checkEntity(Entity entity,ArrayList<Entity> target){
         int index = 999;
 
-        for(int i =0; i<target.length; i++){
-            if(target[i]!= null){
+        for(int i =0; i<target.size(); i++){
+            if(target.get(i)!= null){
                 //Get entity's solide area position
                 entity.solidArea.x = entity.worldX + entity.solidArea.x;
                 entity.solidArea.y = entity.worldY + entity.solidArea.y;
 
                 //Get other entity's solide area position
-                target[i].solidArea.x = target[i].worldX + target[i].solidArea.x;
-                target[i].solidArea.y = target[i].worldY + target[i].solidArea.y;
+                target.get(i).solidArea.x = target.get(i).worldX + target.get(i).solidArea.x;
+                target.get(i).solidArea.y = target.get(i).worldY + target.get(i).solidArea.y;
 
                 switch(entity.direction){
                     case "up": entity.solidArea.y -= entity.speed;break;
@@ -361,8 +361,8 @@ public class CollisionChecker {
                     case "right": entity.solidArea.x += entity.speed;break;
 
                 }
-                if(entity.solidArea.intersects(target[i].solidArea)){
-                    if (target[i] != entity) {
+                if(entity.solidArea.intersects(target.get(i).solidArea)){
+                    if (target.get(i) != entity) {
                         entity.collisionOn = true;
                         index = i;
                     }
@@ -370,8 +370,8 @@ public class CollisionChecker {
                 }
                 entity.solidArea.x = entity.solideAreaDefaultX;
                 entity.solidArea.y = entity.solideAreaDefaultY;
-                target[i].solidArea.x = target[i].solideAreaDefaultX;
-                target[i].solidArea.y = target[i].solideAreaDefaultY;
+                target.get(i).solidArea.x = target.get(i).solideAreaDefaultX;
+                target.get(i).solidArea.y = target.get(i).solideAreaDefaultY;
             }
 
         }

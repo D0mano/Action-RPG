@@ -9,7 +9,7 @@ import javax.sound.sampled.FloatControl;
 public class Sound {
 
     Clip clip;
-    URL[] soundUrl= new URL[30];
+    URL[] soundUrl= new URL[50];
     float originalVolume = 1.0f;
     float currentVolume = originalVolume;
 
@@ -39,6 +39,12 @@ public class Sound {
         soundUrl[15] = getClass().getResource("/sounds/player/pl_gen_hurt_minor.wav");
         soundUrl[16] = getClass().getResource("/sounds/player/pl_gen_shield_block.wav");
         soundUrl[17] = getClass().getResource("/sounds/player/pl_itm_wep_sword_com1_01.wav");
+        soundUrl[29] = getClass().getResource("/sounds/player/pl_gen_spell_heal.wav");
+
+        // Monsters Sounds effects
+        soundUrl[26] = getClass().getResource("/sounds/monsters/en_blob_attack_vo_01.wav");
+        soundUrl[27] = getClass().getResource("/sounds/monsters/en_blob_death_01.wav");
+        soundUrl[28] = getClass().getResource("/sounds/monsters/en_blob_hop_01.wav");
 
         // Musics
         soundUrl[18] = getClass().getResource("/sounds/musics/Tunic - Main Menu Music Title Screen.wav");

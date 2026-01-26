@@ -48,7 +48,7 @@ public class KeyHandler implements KeyListener {
                 if (gp.ui.commandNumber == 0) {
                     gp.stopMusic();
                     gp.playSoundEffect(4);
-                    gp.playMusic(random.nextInt(2)+19);
+                    gp.playMusic(random.nextInt(3)+19);
                     gp.previousState = gp.gameState;
                     gp.gameState = gp.playState;
 

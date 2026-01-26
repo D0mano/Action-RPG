@@ -21,8 +21,10 @@ public class MON_Blob  extends Entity {
         name = "Blob";
         speed = 1;
 
-        maxHealth = 20;
+        maxHealth = 100;
         health = maxHealth;
+
+        deathSoundIndex = 27;
 
         solidArea = new Rectangle();
         solidArea.x = 0;
@@ -32,6 +34,22 @@ public class MON_Blob  extends Entity {
         solideAreaDefaultX = solidArea.x;
         solideAreaDefaultY = solidArea.y;
 
+        attackingAreaVertical.x = gp.tileSize/ 8;
+        attackingAreaVertical.y = 0;
+        attackingAreaDefaultVX = attackingAreaVertical.x;
+        attackingAreaDefaultVY = attackingAreaVertical.y;
+        attackingAreaVertical.width = (int)(gp.tileSize * 3/4f);
+        attackingAreaVertical.height = gp.tileSize;
+
+        attackingAreaHorizontal.x =  attackingAreaVertical.y;
+        attackingAreaHorizontal.y = attackingAreaVertical.x;
+        attackingAreaDefaultHX = attackingAreaHorizontal.x;
+        attackingAreaDefaultHY = attackingAreaHorizontal.y;
+        attackingAreaHorizontal.width = attackingAreaVertical.height;
+        attackingAreaHorizontal.height = attackingAreaVertical.width;
+
+        damageTakenTimer = 15;
+
 
         getImage();
 
@@ -40,6 +58,11 @@ public class MON_Blob  extends Entity {
         upAnimator = new Animator(up,gp.tileSize,gp.tileSize,12,true);
         leftAnimator = new Animator(left,gp.tileSize,gp.tileSize,12,true);
         rightAnimator = new Animator(right,gp.tileSize,gp.tileSize,12,true);
+
+        downAttackingAnimator = new Animator(downAttacking,gp.tileSize,2*gp.tileSize,10,false);
+        upAttackingAnimator = new Animator(upAttacking,gp.tileSize,2*gp.tileSize,10,true);
+        leftAttackingAnimator = new Animator(leftAttacking,gp.tileSize*2,gp.tileSize,10,false);
+        rightAttackingAnimator = new Animator(rightAttacking,gp.tileSize*2,gp.tileSize,10,false);
 
     }
 
@@ -57,29 +80,81 @@ public class MON_Blob  extends Entity {
     }
 
     public void getImage(){
-        up = setup("blob_up-Sheet",gp.scale);
-        down = setup("blob_down-Sheet",gp.scale);
-        left = setup("blob_left-Sheet",gp.scale);
-        right = setup("blob_right-Sheet",gp.scale);
+        up = setup("walking/blob_up-Sheet",gp.scale);
+        down = setup("walking/blob_down-Sheet",gp.scale);
+        left = setup("walking/blob_left-Sheet",gp.scale);
+        right = setup("walking/blob_right-Sheet",gp.scale);
+
+        upAttacking = setup("attacking/blob_up-attack-Sheet",gp.scale);
+        downAttacking = setup("attacking/blob_down-attack-Sheet",gp.scale);
+        leftAttacking = setup("attacking/blob_left-attack-Sheet",gp.scale);
+        rightAttacking =  setup("attacking/blob_right-attack-Sheet",gp.scale);
 
     }
     public void setAction(){
-        actionLockCounter++;
-        if (actionLockCounter == 120){
-            Random rand = new Random();
-            int i = rand.nextInt(100)+1;
+        int xDistance = Math.abs(worldX-gp.player.worldX);
+        int yDistance = Math.abs(worldY-gp.player.worldY);
+        int tileDistance = (xDistance+yDistance)/gp.tileSize;
 
-            if ( i <=25){
-                direction = "up";
-            }else if (i <= 50){
-                direction = "down";
-            }else if (i <= 75){
-                direction = "left";
-            }else{
-                direction = "right";
-           }
-            actionLockCounter = 0;
+        if(!onPath && tileDistance < 5){
+            onPath = true;
         }
+        if(onPath && tileDistance > 10){
+            onPath = false;
+            entityStatus = walking;
+
+        }
+        if (onPath){
+            if (tileDistance <= 1 && canAttack){
+               attack();
+            }
+
+            if (gp.player.worldX > worldX){
+                direction = "right";
+            }
+            else if (gp.player.worldX < worldX){
+                direction = "left";
+            }
+            if (gp.player.worldY > worldY){
+                direction = "down";
+            }else if (gp.player.worldY < worldY){
+                direction = "up";
+            }
+        }else {
+
+            actionLockCounter++;
+            if (actionLockCounter >= actionLockTimer) {
+                Random rand = new Random();
+                int i = rand.nextInt(100) + 1;
+
+                if (i <= 25) {
+                    direction = "up";
+                } else if (i <= 50) {
+                    direction = "down";
+                } else if (i <= 75) {
+                    direction = "left";
+                } else {
+                    direction = "right";
+                }
+                actionLockCounter = 0;
+            }
+        }
+    }
+    public void attack(){
+        gp.playSoundEffect(26);
+        upAttackingAnimator.resetAnimation();
+        downAttackingAnimator.resetAnimation();
+        leftAttackingAnimator.resetAnimation();
+        rightAttackingAnimator.resetAnimation();
+        entityStatus = attacking;
+        hitOn = false;
+        gp.collisionChecker.checkAttack(this , gp.player);
+        System.out.println(hitOn);
+        if(hitOn){
+            gp.player.takeDamage(10);
+            gp.playSoundEffect(15);
+        }
+        hitOn = false;
     }
 
 }

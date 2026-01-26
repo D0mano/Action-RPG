@@ -52,7 +52,7 @@ public class GamePanel extends JPanel implements Runnable {
     // ENTITY AND PLAYER
     public Player player = new Player(this,this.keyH);
     public SuperObject[]  obj = new SuperObject[10];
-    public Entity[] monster = new Entity[20];
+    public ArrayList<Entity> monster = new ArrayList<>();
     public ArrayList<Entity> entitiesList = new ArrayList<Entity>();
 
     public UI ui = new UI(this,player);
@@ -142,9 +142,15 @@ public class GamePanel extends JPanel implements Runnable {
 
             for (Entity entity : monster) {
                 if (entity != null) {
-                    entity.update();
+                    if (entity.alive && !entity.dying){
+                        entity.update();
+                    }
                 }
             }
+
+            monster.removeIf(e -> !e.alive);
+
+
         }
         if (gameState == pauseState){
             // NOTHING

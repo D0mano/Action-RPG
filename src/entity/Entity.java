@@ -12,8 +12,15 @@ public class Entity {
     public int worldX, worldY;
     public int speed;
 
-    public BufferedImage up, down, left, right;
+    // Animation
     public Animator downAnimator, upAnimator, leftAnimator, rightAnimator;
+    public Animator downAttackingAnimator,upAttackingAnimator,leftAttackingAnimator,rightAttackingAnimator;
+
+    // Image Animation
+    public BufferedImage up, down, left, right;
+    public BufferedImage downAttacking,upAttacking,leftAttacking,rightAttacking;
+
+
     public String direction;
 
 
@@ -26,85 +33,241 @@ public class Entity {
     public Rectangle attackingAreaHorizontal = new Rectangle(0,0,0,0);
     public Rectangle attackingAreaVertical = new Rectangle(0,0,0,0);
 
-    public boolean hitOn = false;
+    public int deathSoundIndex;
+
+    // CHARACTER STATUS
+    public int entityStatus;
+    final public int idle = 0;
+    final public int walking = 1;
+    final public int rolling = 2;
+    final public int attacking = 3;
+
 
     // CHARACTER SETTINGS
     public int maxHealth;
     public int health;
 
-    public int actionLockCounter = 0;
+    // CHARACTER STATE
+    public boolean alive = true;
+    public boolean dying = false;
     public boolean invisible = false;
+    public boolean damageTaken = false;
+    public boolean hitOn = false;
+    public boolean hpBarOn = false;
+    public boolean onPath = false;
+    public boolean canAttack = true;
+
+
+    // COUNTER
+    public int dyingCounter = 0;
+    public int actionLockCounter = 0;
     public int invisibleCounter = 0;
+    public int damageTakenCounter = 0;
+    public int hpBarCounter = 0;
+    public int attackCounter = 0;
+    public int canAttackCounter =0;
+
+
+
+    // TIMER
+    public int actionLockTimer = 120;
     public int invisibleTimer;
+    public int damageTakenTimer ;
+    public int hpBarTimer = 600;
+    public int attackDuration = 40;
+    public int attackCooldownTimer = 90;
 
     public Entity(GamePanel gp) {
         this.gp = gp;
         direction = "down";
+        entityStatus = walking;
+
     }
 
     public void setAction() {
     }
 
     public void update() {
-        setAction();
+
+        if (damageTaken) {
+            damageTakenCounter++;
+            if (damageTakenCounter > damageTakenTimer) {
+                damageTaken = false;
+                damageTakenCounter = 0;
+            }
+        }if (entityStatus == walking) {
+            setAction();
+        }
+
+
+        if (entityStatus == attacking) {
+            canAttack = false;
+
+            attackCounter++;
+
+            switch (direction) {
+                case "up":
+                    upAttackingAnimator.update();
+                    break;
+                case "down":
+                    downAttackingAnimator.update();
+                    break;
+                case "left":
+                    leftAttackingAnimator.update();
+                    break;
+                case "right":
+                    rightAttackingAnimator.update();
+                    break;
+            }
+            if (attackCounter >= attackDuration) {
+                attackCounter = 0;
+                entityStatus = walking;
+            }
+
+            return;
+        }
+        if (!canAttack){
+            canAttackCounter++;
+            if (canAttackCounter > attackCooldownTimer){
+                canAttack = true;
+                canAttackCounter = 0;
+            }
+
+        }
         collisionOn = false;
         gp.collisionChecker.checkTile(this);
         gp.collisionChecker.checkPlayer(this);
         gp.collisionChecker.checkEntity(this ,gp.monster);
-        if (!collisionOn) {
-            switch (direction) {
-                case "up":
-                    worldY -= speed;
-                    upAnimator.update();
-                    break;
-                case "down":
-                    worldY += speed;
-                    downAnimator.update();
-                    break;
-                case "left":
-                    worldX -= speed;
-                    leftAnimator.update();
-                    break;
-                case "right":
-                    worldX += speed;
-                    rightAnimator.update();
-                    break;
+        if (entityStatus == walking) {
+            if (!collisionOn) {
+                switch (direction) {
+                    case "up":
+                        worldY -= speed;
+                        upAnimator.update();
+                        break;
+                    case "down":
+                        worldY += speed;
+                        downAnimator.update();
+                        break;
+                    case "left":
+                        worldX -= speed;
+                        leftAnimator.update();
+                        break;
+                    case "right":
+                        worldX += speed;
+                        rightAnimator.update();
+                        break;
+                }
+            } else {
+                upAnimator.resetAnimation();
+                downAnimator.resetAnimation();
+                leftAnimator.resetAnimation();
+                rightAnimator.resetAnimation();
             }
-        } else {
-            upAnimator.resetAnimation();
-            downAnimator.resetAnimation();
-            leftAnimator.resetAnimation();
-            rightAnimator.resetAnimation();
 
         }
+
     }
 
+
     public void draw(Graphics2D g) {
+
+        if (damageTaken){
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
+        }
+        if (dying){
+            dyingAnimation(g);
+        }
 
         int screenX = worldX - gp.player.worldX + gp.player.screenX;
         int screenY = worldY - gp.player.worldY + gp.player.screenY;
         if (((-gp.tileSize) <= screenX && screenX <= (gp.worldWidth + gp.tileSize)) &&
                 ((-gp.tileSize) <= screenY && screenY <= (gp.worldHeight + gp.tileSize))) {
+
             switch (direction) {
                 case "up":
-                    upAnimator.draw(g, screenX, screenY, gp.tileSize, gp.tileSize);
+                    if (entityStatus == walking) {
+                        upAnimator.draw(g, screenX, screenY, gp.tileSize, gp.tileSize);
+                    }else if (entityStatus == attacking) {
+                        upAttackingAnimator.draw(g,screenX, screenY-gp.tileSize, gp.tileSize, 2*gp.tileSize);
+                    }
                     break;
                 case "down":
-                    downAnimator.draw(g, screenX, screenY, gp.tileSize, gp.tileSize);
+                    if (entityStatus == walking) {
+                        downAnimator.draw(g, screenX, screenY, gp.tileSize, gp.tileSize);
+                    }else if (entityStatus == attacking) {
+                        downAttackingAnimator.draw(g,screenX, screenY, gp.tileSize, 2*gp.tileSize);
+                    }
                     break;
                 case "left":
-                    leftAnimator.draw(g, screenX, screenY, gp.tileSize, gp.tileSize);
+                    if (entityStatus == walking) {
+                        leftAnimator.draw(g, screenX, screenY, gp.tileSize, gp.tileSize);
+                    }else if (entityStatus == attacking) {
+                        leftAttackingAnimator.draw(g,screenX-gp.tileSize, screenY, 2*gp.tileSize, gp.tileSize);
+                    }
                     break;
                 case "right":
-                    rightAnimator.draw(g, screenX, screenY, gp.tileSize, gp.tileSize);
+                    if (entityStatus == walking) {
+                        rightAnimator.draw(g, screenX, screenY, gp.tileSize, gp.tileSize);
+                    }else if (entityStatus == attacking) {
+                        rightAttackingAnimator.draw(g,screenX, screenY, 2*gp.tileSize, gp.tileSize);
+                    }
                     break;
 
 
             }
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+            if(hpBarOn){
+                g.setColor(Color.black);
+                g.fillRect(screenX-1, screenY-16, gp.tileSize+2, 7);
+                g.setColor(new Color(250, 110, 150));
+                g.fillRect(screenX, screenY-15, (int)(gp.tileSize* ((float)health/(float)maxHealth)), 5);
+                hpBarCounter++;
+
+                if (hpBarCounter > hpBarTimer) {
+                    hpBarCounter = 0;
+                    hpBarOn = false;
+                }
+
+            }
+
+
 
             if (gp.debugMode) {
                 g.setColor(Color.RED);
                 g.drawRect(screenX + solidArea.x, screenY + solidArea.y, solidArea.width, solidArea.height);
+                if (entityStatus == attacking) {
+
+                    g.setColor(Color.GREEN);
+
+                    switch(direction){
+                        case "up":
+                            attackingArea = attackingAreaVertical;
+                            attackingArea.y -= gp.tileSize;
+                            break;
+                        case "down":
+                            attackingArea = attackingAreaVertical;
+                            attackingArea.y += gp.tileSize;
+                            break;
+                        case "left":
+                            attackingArea = attackingAreaHorizontal;
+                            attackingArea.x -= gp.tileSize;
+                            break;
+                        case "right":
+                            attackingArea = attackingAreaHorizontal;
+                            attackingArea.x += gp.tileSize;
+                            break;
+
+                    }
+
+                    g.drawRect(screenX+attackingArea.x,screenY+attackingArea.y,attackingArea.width,attackingArea.height);
+                    attackingAreaHorizontal.x = attackingAreaDefaultHX;
+                    attackingAreaHorizontal.y = attackingAreaDefaultHY;
+                    attackingAreaVertical.x = attackingAreaDefaultVX;
+                    attackingAreaVertical.y = attackingAreaDefaultVY;
+
+
+                }
             }
 
 
@@ -112,7 +275,62 @@ public class Entity {
 
     }
 
-    public int getY(){return worldY;}
+    public void dyingAnimation(Graphics2D g) {
+        dyingCounter++;
+        if (dyingCounter <= 5){
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0f));
+        }else if (dyingCounter <= 10){
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+        }else if (dyingCounter <= 15){
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0f));
+        }else if (dyingCounter <= 20){
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+
+        }else if (dyingCounter <= 25){
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0f));
+        }else if (dyingCounter <= 30){
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+        }else if (dyingCounter <= 35){
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0f));
+        }else if (dyingCounter <= 40){
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+        }else{
+            dying = false;
+            alive = false;
+
+        }
+
+    }
+
+    public void takeDamage(int damage){
+        damageTaken = true;
+        hpBarOn = true;
+        if(health-damage > 0){
+            health -= damage;
+        }
+        else{
+            gp.playSoundEffect(deathSoundIndex);
+            health=0;
+            dying = true;
+
+        }
+
+    }
+
+    public void heal(int heal){
+        if (heal < maxHealth){
+            gp.playSoundEffect(29);
+        }
+        if(health+heal < maxHealth){
+            health += heal;
+        }else{
+            health = maxHealth;}
+    }
+
+    public boolean isAlive(){
+        return health > 0;
+
+    }
 }
 
 

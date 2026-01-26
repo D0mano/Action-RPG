@@ -37,18 +37,20 @@ public class AssetSetter {
 
     public void setMonster(){
 
-        gp.monster[0] = new MON_Blob(gp);
-        gp.monster[0].worldX =40 * gp.tileSize;
-        gp.monster[0].worldY = 27 * gp.tileSize;
+        Entity monster = new MON_Blob(gp);
+        monster.worldX = 40 * gp.tileSize;
+        monster.worldY = 27 * gp.tileSize;
+        gp.monster.add(monster);
 
+        Entity monster2 = new MON_Blob(gp);
+        monster2 .worldX = 49 * gp.tileSize;
+        monster2 .worldY = 16 * gp.tileSize;
+        gp.monster.add(monster2);
 
-        gp.monster[1] = new MON_Blob(gp);
-        gp.monster[1].worldX =49 * gp.tileSize;
-        gp.monster[1].worldY = 16 * gp.tileSize;
-
-        gp.monster[2] = new MON_Blob(gp);
-        gp.monster[2].worldX =37 * gp.tileSize;
-        gp.monster[2].worldY = 44 * gp.tileSize;
+        Entity monster3 = new MON_Blob(gp);
+        monster3.worldX = 37 * gp.tileSize;
+        monster3.worldY = 44 * gp.tileSize;
+        gp.monster.add(monster3);
 
     }
 }
