@@ -3,6 +3,7 @@ import main.Animator;
 import main.GamePanel;
 import main.KeyHandler;
 import main.UtilityTool;
+import object.FireBall;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -16,7 +17,12 @@ public class Player extends Entity {
 
     public int maxEndurance;
     public int endurance;
+    public int enduranceCost;
     public float displayedEndurance = 0;
+
+    public float displayedMana = 0;
+
+
 
     public boolean useEndurance = false;
     public int enduranceCounter;
@@ -25,8 +31,6 @@ public class Player extends Entity {
     int rollCounter ;
     int rollDuration;
     int rollSpeed;
-    int normalSpeed;
-
 
 
     // ANIMATION
@@ -44,6 +48,7 @@ public class Player extends Entity {
     public boolean attackKeyProcessed=false;
     public boolean healKeyProcessed = false;
     public boolean parryKeyProcessed = false;
+    public boolean magicAttackKeyProcessed = false;
     public boolean interactionKeyProcessed= false;
 
     public Player(GamePanel gp, KeyHandler keyH) {
@@ -55,7 +60,7 @@ public class Player extends Entity {
 
         setDefaultsValues();
         getPlayerImage();
-
+        projectile = new FireBall(gp);
 
 
 
@@ -109,28 +114,39 @@ public class Player extends Entity {
     public void setDefaultsValues(){
         worldX = gp.tileSize*40;
         worldY = gp.tileSize*44;
-        speed = gp.tileSize/10;
+        normalSpeed = gp.tileSize/10;
+        speed = normalSpeed;
         direction = "down";
+        attackPower = 30;
 
         //PLAYER STATUS
         maxHealth = 100;
         health = 100;
+        maxMana = 100;
+        mana = 100;
+
+        maxPotion = 3;
+        potionNotUsed = maxPotion;
 
         maxEndurance = 100;
         endurance = 100;
         enduranceDuration = 120;
         enduranceCounter = 0;
+        enduranceCost = 40;
 
 
         entityStatus = idle;
         rollCounter = 0;
         rollDuration = 30;
-        normalSpeed = speed;
         rollSpeed = 2*normalSpeed;
 
         attackCounter = 0;
         attackDuration = 40;
         invisibleTimer = 15;
+
+        deathSoundIndex = 10;
+
+
 
     }
 
@@ -174,6 +190,7 @@ public class Player extends Entity {
 
         displayedHealth += (health-displayedHealth)*0.15f;
         displayedEndurance += (endurance-displayedEndurance)*0.15f;
+        displayedMana += (mana-displayedMana)*0.15f;
 
         if (entityStatus == attacking){
 
@@ -285,6 +302,7 @@ public class Player extends Entity {
             return;
 
         }
+
         if (useEndurance) {
             enduranceCounter++;
             if (enduranceCounter > enduranceDuration) {
@@ -415,14 +433,13 @@ public class Player extends Entity {
             }
 
         }else{healKeyProcessed = false;}
+
         if(keyH.interactionPressed){
             if (!interactionKeyProcessed){
                 pickUpObject(objIndex);
                 interactionKeyProcessed=true;
             }
         }else{interactionKeyProcessed = false;}
-
-
 
         if (keyH.spacePressed){
             if (endurance > 0){
@@ -432,11 +449,20 @@ public class Player extends Entity {
                     case "left":gp.playSoundEffect(13);break;
                     case "right":gp.playSoundEffect(14);break;
                 }
-                consumeEndurance(40);
+                consumeEndurance(enduranceCost);
                 entityStatus = rolling;
                 speed = rollSpeed;
             }
 
+        }
+
+        if (keyH.magicAttackPressed){
+            if (!magicAttackKeyProcessed){
+                shotProjectile();
+                magicAttackKeyProcessed = true;
+            }
+        }else{
+            magicAttackKeyProcessed = false;
         }
 
     }
@@ -547,6 +573,21 @@ public class Player extends Entity {
             endurance = maxEndurance;}
     }
 
+    public void consumeMana(int amount){
+        if(mana-amount > 0){
+            mana -= amount;
+        }
+        else{mana=0;}
+
+    }
+
+    public void rechargeMana(int amount){
+        if(mana+amount < maxMana){
+            mana += amount;
+        }else{
+            mana = maxMana;}
+    }
+
     public void showHitbox(Graphics2D g2){
 
         g2.setColor(Color.RED);
@@ -604,7 +645,8 @@ public class Player extends Entity {
                 hitOn = false;
                 gp.collisionChecker.checkAttack(this ,e);
                 if(hitOn){
-                    e.takeDamage(30);
+                    knockBack(e,10);
+                    e.takeDamage(attackPower);
                     monsterHit++;
                 }
             }
@@ -613,5 +655,15 @@ public class Player extends Entity {
             gp.playSoundEffect(8);
         }
         hitOn = false;
+    }
+
+    public void shotProjectile(){
+        if (!projectile.alive && mana - projectile.useCost > 0){
+            projectile.set(worldX,worldY,direction,true,this);
+            gp.projectileList.add(projectile);
+            consumeMana(projectile.useCost);
+
+        }
+
     }
 }

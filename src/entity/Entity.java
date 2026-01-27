@@ -8,9 +8,23 @@ import java.awt.image.BufferedImage;
 
 public class Entity {
     public GamePanel gp;
+
+    // Entity Attributes
     public String name;
     public int worldX, worldY;
     public int speed;
+    public int normalSpeed;
+    public String direction;
+    public int maxHealth;
+    public int health;
+    public int maxMana;
+    public int mana;
+    public int attackPower;
+    public Projectile projectile;
+    public int useCost;
+    public int maxPotion;
+    public int potionNotUsed;
+
 
     // Animation
     public Animator downAnimator, upAnimator, leftAnimator, rightAnimator;
@@ -21,12 +35,10 @@ public class Entity {
     public BufferedImage downAttacking,upAttacking,leftAttacking,rightAttacking;
 
 
-    public String direction;
 
-
+    // Hit Boxes
     public Rectangle solidArea;
     public int solideAreaDefaultX, solideAreaDefaultY;
-    public boolean collisionOn = false;
 
     public Rectangle attackingArea = new Rectangle(0,0,0,0);
     public int attackingAreaDefaultHX, attackingAreaDefaultHY,attackingAreaDefaultVX, attackingAreaDefaultVY;
@@ -41,11 +53,10 @@ public class Entity {
     final public int walking = 1;
     final public int rolling = 2;
     final public int attacking = 3;
+    final public int knockBacking = 4;
 
 
-    // CHARACTER SETTINGS
-    public int maxHealth;
-    public int health;
+
 
     // CHARACTER STATE
     public boolean alive = true;
@@ -53,9 +64,11 @@ public class Entity {
     public boolean invisible = false;
     public boolean damageTaken = false;
     public boolean hitOn = false;
+    public boolean collisionOn = false;
     public boolean hpBarOn = false;
     public boolean onPath = false;
     public boolean canAttack = true;
+
 
 
     // COUNTER
@@ -65,7 +78,8 @@ public class Entity {
     public int damageTakenCounter = 0;
     public int hpBarCounter = 0;
     public int attackCounter = 0;
-    public int canAttackCounter =0;
+    public int canAttackCounter = 0;
+    public int knockBackCounter = 0;
 
 
 
@@ -76,11 +90,13 @@ public class Entity {
     public int hpBarTimer = 600;
     public int attackDuration = 40;
     public int attackCooldownTimer = 90;
+    public int knockBacTimer = 10;
 
     public Entity(GamePanel gp) {
         this.gp = gp;
         direction = "down";
         entityStatus = walking;
+
 
     }
 
@@ -95,7 +111,33 @@ public class Entity {
                 damageTaken = false;
                 damageTakenCounter = 0;
             }
-        }if (entityStatus == walking) {
+        }
+
+        if (entityStatus == knockBacking){
+            collisionOn = false;
+            gp.collisionChecker.checkTile(this);
+            gp.collisionChecker.checkPlayer(this);
+            if (collisionOn) {
+                knockBackCounter = 0;
+                entityStatus = walking;
+                speed =normalSpeed;
+            }else{
+                switch (direction) {
+                    case "up": worldY -= speed;break;
+                    case "down": worldY += speed;break;
+                    case "left": worldX -= speed;break;
+                    case "right": worldX += speed;break;
+                }
+            }
+            knockBackCounter++;
+            if (knockBackCounter > knockBacTimer){
+                knockBackCounter = 0;
+                entityStatus = walking;
+                speed =normalSpeed;
+            }
+
+        }
+        if (entityStatus == walking) {
             setAction();
         }
 
@@ -138,6 +180,7 @@ public class Entity {
         gp.collisionChecker.checkTile(this);
         gp.collisionChecker.checkPlayer(this);
         gp.collisionChecker.checkEntity(this ,gp.monster);
+
         if (entityStatus == walking) {
             if (!collisionOn) {
                 switch (direction) {
@@ -186,28 +229,28 @@ public class Entity {
 
             switch (direction) {
                 case "up":
-                    if (entityStatus == walking) {
+                    if (entityStatus == walking || entityStatus == knockBacking) {
                         upAnimator.draw(g, screenX, screenY, gp.tileSize, gp.tileSize);
                     }else if (entityStatus == attacking) {
                         upAttackingAnimator.draw(g,screenX, screenY-gp.tileSize, gp.tileSize, 2*gp.tileSize);
                     }
                     break;
                 case "down":
-                    if (entityStatus == walking) {
+                    if (entityStatus == walking|| entityStatus == knockBacking) {
                         downAnimator.draw(g, screenX, screenY, gp.tileSize, gp.tileSize);
                     }else if (entityStatus == attacking) {
                         downAttackingAnimator.draw(g,screenX, screenY, gp.tileSize, 2*gp.tileSize);
                     }
                     break;
                 case "left":
-                    if (entityStatus == walking) {
+                    if (entityStatus == walking || entityStatus == knockBacking) {
                         leftAnimator.draw(g, screenX, screenY, gp.tileSize, gp.tileSize);
                     }else if (entityStatus == attacking) {
                         leftAttackingAnimator.draw(g,screenX-gp.tileSize, screenY, 2*gp.tileSize, gp.tileSize);
                     }
                     break;
                 case "right":
-                    if (entityStatus == walking) {
+                    if (entityStatus == walking || entityStatus == knockBacking)  {
                         rightAnimator.draw(g, screenX, screenY, gp.tileSize, gp.tileSize);
                     }else if (entityStatus == attacking) {
                         rightAttackingAnimator.draw(g,screenX, screenY, 2*gp.tileSize, gp.tileSize);
@@ -297,6 +340,7 @@ public class Entity {
         }else{
             dying = false;
             alive = false;
+            gp.player.rechargeMana(20);
 
         }
 
@@ -318,18 +362,23 @@ public class Entity {
     }
 
     public void heal(int heal){
-        if (heal < maxHealth){
-            gp.playSoundEffect(29);
+        if (potionNotUsed > 0){
+            if (health < maxHealth){
+                gp.playSoundEffect(29);
+                potionNotUsed--;
+            }
+            if(health+heal < maxHealth){
+                health += heal;
+            }else{
+                health = maxHealth;}
         }
-        if(health+heal < maxHealth){
-            health += heal;
-        }else{
-            health = maxHealth;}
+
     }
 
-    public boolean isAlive(){
-        return health > 0;
-
+    public void knockBack(Entity entity,int knockBackPower){
+        entity.direction = direction;
+        entity.speed += knockBackPower;
+        entity.entityStatus = knockBacking;
     }
 }
 

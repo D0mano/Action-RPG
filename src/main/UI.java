@@ -24,6 +24,7 @@ public class UI {
     BufferedImage menuSelection ,menuSelectionOrange,menuSelectionOrange2;
     BufferedImage messageWindow;
     BufferedImage optionWindow;
+    BufferedImage potionFull, potionEmpty;
     int commandNumber = 0;
 
      public String[] pauseCommand = {"Return to Game","Options","Quit"};
@@ -87,6 +88,10 @@ public class UI {
 
         optionWindow = setup("/menu/optionOverlay",gp.scale);
 
+        potionFull = setup("/player/potion_full",gp.scale);
+        potionEmpty = setup("/player/potion_empty",gp.scale);
+
+
 
     }
 
@@ -144,6 +149,8 @@ public class UI {
         if (gp.gameState == gp.playState){
             drawPlayerHealth();
             drawPlayerEndurance();
+            drawPlayerMana();
+            drawPlayerPotion();
 
         }
         if (gp.gameState == gp.pauseState){
@@ -453,6 +460,45 @@ public class UI {
         while( y >= (int)stopY){
             g2.drawImage(enduranceMiddle,x,y,null);
             y--;
+        }
+    }
+
+    public void drawPlayerMana(){
+        int x = gp.screenWidth/10 +100;
+        int topY = gp.screenHeight*2/3;
+        g2.drawImage(manaOverlay,x,topY,null);
+
+        int healthBarHeight = manaOverlay.getHeight();
+        int midHeight = manaMiddle.getHeight();
+        float ed = player.displayedMana/player.maxMana;
+
+        float stopY = topY +((1-ed) * (healthBarHeight-manaTop.getHeight()));
+        int botY = topY + healthBarHeight;
+        if (stopY >= botY-manaTop.getHeight()){
+            g2.drawImage(manaTop,x,(botY-manaTop.getHeight()),null);
+        }
+        else{
+            g2.drawImage(manaTop,x,(int)(stopY),null);
+
+
+        }
+        int y = botY - midHeight;
+        while( y >= (int)stopY){
+            g2.drawImage(manaMiddle,x,y,null);
+            y--;
+        }
+    }
+
+    public void drawPlayerPotion(){
+        int x = (gp.maxScreenCol -2)*gp.tileSize;
+        int y = 2*gp.tileSize;
+        for (int i =0; i< gp.player.potionNotUsed ;i++){
+            g2.drawImage(potionFull,x,y,null);
+            x-=gp.tileSize;
+        }
+        for (int i =0; i< gp.player.maxPotion - gp.player.potionNotUsed ;i++){
+            g2.drawImage(potionEmpty,x,y,null);
+            x-=gp.tileSize;
         }
     }
 

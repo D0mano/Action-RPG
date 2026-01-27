@@ -19,7 +19,9 @@ public class MON_Blob  extends Entity {
     public MON_Blob(GamePanel gp) {
         super(gp);
         name = "Blob";
-        speed = 1;
+        normalSpeed = 1;
+        speed = normalSpeed;
+        attackPower = 10;
 
         maxHealth = 100;
         health = maxHealth;
@@ -39,7 +41,7 @@ public class MON_Blob  extends Entity {
         attackingAreaDefaultVX = attackingAreaVertical.x;
         attackingAreaDefaultVY = attackingAreaVertical.y;
         attackingAreaVertical.width = (int)(gp.tileSize * 3/4f);
-        attackingAreaVertical.height = gp.tileSize;
+        attackingAreaVertical.height = (3 * gp.tileSize) / 4;
 
         attackingAreaHorizontal.x =  attackingAreaVertical.y;
         attackingAreaHorizontal.y = attackingAreaVertical.x;
@@ -150,8 +152,8 @@ public class MON_Blob  extends Entity {
         hitOn = false;
         gp.collisionChecker.checkAttack(this , gp.player);
         System.out.println(hitOn);
-        if(hitOn){
-            gp.player.takeDamage(10);
+        if(hitOn && !gp.player.invisible){
+            gp.player.takeDamage(attackPower);
             gp.playSoundEffect(15);
         }
         hitOn = false;

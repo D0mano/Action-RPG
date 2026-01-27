@@ -8,7 +8,7 @@ public class KeyHandler implements KeyListener {
 
     public boolean upPressed, downPressed, leftPressed, rightPressed, spacePressed;
     boolean debugKeyPressed = false;
-    public boolean healPressed,attackPressed,parryPressed,interactionPressed;
+    public boolean healPressed,attackPressed,parryPressed,interactionPressed,magicAttackPressed;
     GamePanel gp;
     Random random = new Random();
 
@@ -267,6 +267,9 @@ public class KeyHandler implements KeyListener {
             if(code == KeyEvent.VK_SPACE){
                 spacePressed = true;
             }
+            if (code == KeyEvent.VK_L){
+                magicAttackPressed = true;
+            }
 
 
         }
@@ -368,6 +371,9 @@ public class KeyHandler implements KeyListener {
         }
         if(code == KeyEvent.VK_SPACE){
             spacePressed = false;
+        }
+        if (code == KeyEvent.VK_L){
+            magicAttackPressed = false;
         }
 
 
