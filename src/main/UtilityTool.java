@@ -13,4 +13,14 @@ public class UtilityTool {
         return scaleImage;
 
     }
+
+    public String oppositeDirection(String direction){
+        return switch (direction) {
+            case "right" -> "left";
+            case "left" -> "right";
+            case "up" -> "down";
+            case "down" -> "up";
+            default -> null;
+        };
+    }
 }

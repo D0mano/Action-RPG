@@ -143,7 +143,7 @@ public class KeyHandler implements KeyListener {
                     gp.ui.commandNumberAudio++;
                 }
             }
-            if (code == KeyEvent.VK_D || code == KeyEvent.VK_LEFT){
+            if (code == KeyEvent.VK_D || code == KeyEvent.VK_RIGHT){
                 if (gp.ui.commandNumberAudio == 0) {
                     if(gp.music.currentVolume < 1){
                         gp.music.currentVolume += 0.1f;
@@ -159,7 +159,7 @@ public class KeyHandler implements KeyListener {
                     }
                 }
             }
-            if (code == KeyEvent.VK_Q || code == KeyEvent.VK_RIGHT){
+            if (code == KeyEvent.VK_Q || code == KeyEvent.VK_LEFT){
                 if (gp.ui.commandNumberAudio == 0) {
                     if(gp.music.currentVolume > 0){
                         gp.music.currentVolume -= 0.1;
@@ -363,6 +363,9 @@ public class KeyHandler implements KeyListener {
         }
         if (code == KeyEvent.VK_K){
             parryPressed = false;
+            if(gp.player.entityStatus ==gp.player.parrying){
+                gp.playSoundEffect(31);
+            }
 
         }
         if(code == KeyEvent.VK_F){

@@ -54,6 +54,7 @@ public class Entity {
     final public int rolling = 2;
     final public int attacking = 3;
     final public int knockBacking = 4;
+    final public int parrying = 5;
 
 
 
@@ -115,11 +116,16 @@ public class Entity {
 
         if (entityStatus == knockBacking){
             collisionOn = false;
+            gp.collisionChecker.checkEntity(this,gp.monster);
             gp.collisionChecker.checkTile(this);
             gp.collisionChecker.checkPlayer(this);
             if (collisionOn) {
                 knockBackCounter = 0;
-                entityStatus = walking;
+                if (name.equals("Rudeling")) {
+                    entityStatus = parrying;
+                }else{
+                    entityStatus = walking;
+                }
                 speed =normalSpeed;
             }else{
                 switch (direction) {
@@ -132,12 +138,16 @@ public class Entity {
             knockBackCounter++;
             if (knockBackCounter > knockBacTimer){
                 knockBackCounter = 0;
-                entityStatus = walking;
+                if (name.equals("Rudeling")) {
+                    entityStatus = parrying;
+                }else{
+                    entityStatus = walking;
+                }
                 speed =normalSpeed;
             }
 
         }
-        if (entityStatus == walking) {
+        if (entityStatus == walking || entityStatus == parrying) {
             setAction();
         }
 
@@ -163,7 +173,11 @@ public class Entity {
             }
             if (attackCounter >= attackDuration) {
                 attackCounter = 0;
-                entityStatus = walking;
+                if (name.equals("Rudeling")) {
+                    entityStatus = parrying;
+                }else{
+                    entityStatus = walking;
+                }
             }
 
             return;
@@ -181,7 +195,7 @@ public class Entity {
         gp.collisionChecker.checkPlayer(this);
         gp.collisionChecker.checkEntity(this ,gp.monster);
 
-        if (entityStatus == walking) {
+        if (entityStatus == walking || entityStatus == parrying) {
             if (!collisionOn) {
                 switch (direction) {
                     case "up":
@@ -374,6 +388,17 @@ public class Entity {
         }
 
     }
+    public void shotProjectile(){
+        if (!projectile.alive && mana - projectile.useCost > 0){
+            gp.playSoundEffect(33);
+            projectile.set(worldX,worldY,direction,true,this);
+            gp.projectileList.add(projectile);
+
+
+        }
+
+    }
+
 
     public void knockBack(Entity entity,int knockBackPower){
         entity.direction = direction;

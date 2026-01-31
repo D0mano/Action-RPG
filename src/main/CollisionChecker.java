@@ -2,7 +2,9 @@ package main;
 
 import entity.Entity;
 
+import java.util.List;
 import java.util.ArrayList;
+import java.awt.Point;
 
 public class CollisionChecker {
     GamePanel gp;
@@ -298,6 +300,64 @@ public class CollisionChecker {
         }
 
     }
+
+    public List<Point> checkCanCut(Entity entity){
+
+        List<Point> bushHit = new ArrayList<>();
+        // We get the entity attackArea
+        entity.attackingAreaVertical.x += entity.worldX;
+        entity.attackingAreaHorizontal.x +=entity.worldX;
+        entity.attackingAreaVertical.y += entity.worldY;
+        entity.attackingAreaHorizontal.y +=entity.worldY;
+
+
+        switch(entity.direction){
+            case "up":
+                entity.attackingArea = entity.attackingAreaVertical;
+                entity.attackingArea.y -= gp.tileSize;
+                break;
+            case "down":
+                entity.attackingArea = entity.attackingAreaVertical;
+                entity.attackingArea.y += gp.tileSize;
+                break;
+            case "left":
+                entity.attackingArea = entity.attackingAreaHorizontal;
+                entity.attackingArea.x -= gp.tileSize;
+                break;
+            case "right":
+                entity.attackingArea = entity.attackingAreaHorizontal;
+                entity.attackingArea.x += gp.tileSize;
+                break;
+
+        }
+
+        int entityLeftAttCol = entity.attackingArea.x / gp.tileSize;
+        int entityRightAttCol = (entity.attackingArea.x +entity.attackingArea.width)/gp.tileSize;
+        int entityTopAttRow = entity.attackingArea.y / gp.tileSize;
+        int entityBottomAttRow = (entity.attackingArea.y + entity.attackingArea.height)/  gp.tileSize;
+
+        if (gp.tileM.mapTileNum1[entityTopAttRow][entityRightAttCol] == 61){ // 61 is the id of the bush
+            bushHit.add(new Point(entityRightAttCol, entityTopAttRow));
+        }
+        if (gp.tileM.mapTileNum1[entityTopAttRow][entityLeftAttCol] == 61){
+            bushHit.add(new Point(entityLeftAttCol, entityTopAttRow));
+        }
+        if (gp.tileM.mapTileNum1[entityBottomAttRow][entityRightAttCol] == 61){
+            bushHit.add(new Point(entityRightAttCol, entityBottomAttRow));
+        }
+        if (gp.tileM.mapTileNum1[entityBottomAttRow][entityLeftAttCol] == 61){
+            bushHit.add(new Point(entityLeftAttCol, entityBottomAttRow));
+        }
+
+        entity.attackingAreaHorizontal.x = entity.attackingAreaDefaultHX;
+        entity.attackingAreaHorizontal.y = entity.attackingAreaDefaultHY;
+        entity.attackingAreaVertical.x = entity.attackingAreaDefaultVX;
+        entity.attackingAreaVertical.y = entity.attackingAreaDefaultVY;
+
+        return bushHit;
+    }
+
+
 
     public int checkObject(Entity entity,boolean player){
 

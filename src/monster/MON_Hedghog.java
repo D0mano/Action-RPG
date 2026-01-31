@@ -4,6 +4,7 @@ import entity.Entity;
 import main.Animator;
 import main.GamePanel;
 import main.UtilityTool;
+import object.FireBall;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -11,22 +12,23 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Random;
 
-public class MON_Blob  extends Entity {
+public class MON_Hedghog  extends Entity {
 
+    boolean shotTaken = false;
+    int shotCounter = 0;
+    int shotTimer = 90;
 
-
-
-    public MON_Blob(GamePanel gp) {
+    public MON_Hedghog(GamePanel gp){
         super(gp);
-        name = "Blob";
-        normalSpeed = 1;
+        name = "Hedghog";
+        normalSpeed= 1;
         speed = normalSpeed;
-        attackPower = 10;
-
-        maxHealth = 20;
+        attackPower = 20;
+        entityStatus = walking;
+        maxHealth = 70;
         health = maxHealth;
-
-        deathSoundIndex = 27;
+        maxMana = 100;
+        mana =maxMana;
 
         solidArea = new Rectangle();
         solidArea.x = 0;
@@ -51,10 +53,7 @@ public class MON_Blob  extends Entity {
         attackingAreaHorizontal.height = attackingAreaVertical.width;
 
         damageTakenTimer = 15;
-
-
         getImage();
-
 
         downAnimator = new Animator(down,gp.tileSize,gp.tileSize,12,true);
         upAnimator = new Animator(up,gp.tileSize,gp.tileSize,12,true);
@@ -66,13 +65,17 @@ public class MON_Blob  extends Entity {
         leftAttackingAnimator = new Animator(leftAttacking,gp.tileSize*2,gp.tileSize,10,false);
         rightAttackingAnimator = new Animator(rightAttacking,gp.tileSize*2,gp.tileSize,10,false);
 
+        projectile = new FireBall(gp);
+
+
+
     }
 
     public BufferedImage setup(String imageName, int scale){
         UtilityTool uTool = new UtilityTool();
         BufferedImage image = null;
         try{
-            image = ImageIO.read(getClass().getResourceAsStream("/monsters/blob/"+imageName+".png"));
+            image = ImageIO.read(getClass().getResourceAsStream("/monsters/Hedghog/"+imageName+".png"));
             image = uTool.scaleImage(image, image.getWidth()*scale,image.getHeight()*scale);
 
         }catch(IOException e){
@@ -80,22 +83,27 @@ public class MON_Blob  extends Entity {
         }
         return image;
     }
-
     public void getImage(){
-        up = setup("walking/blob_up-Sheet",gp.scale);
-        down = setup("walking/blob_down-Sheet",gp.scale);
-        left = setup("walking/blob_left-Sheet",gp.scale);
-        right = setup("walking/blob_right-Sheet",gp.scale);
+        up = setup("walking/player_up-Sheet",gp.scale);
+        down = setup("walking/player_down-Sheet",gp.scale);
+        left = setup("walking/player_left-Sheet",gp.scale);
+        right = setup("walking/player_right-Sheet",gp.scale);
 
-        upAttacking = setup("attacking/blob_up-attack-Sheet",gp.scale);
-        downAttacking = setup("attacking/blob_down-attack-Sheet",gp.scale);
-        leftAttacking = setup("attacking/blob_left-attack-Sheet",gp.scale);
-        rightAttacking =  setup("attacking/blob_right-attack-Sheet",gp.scale);
+        downAttacking = setup("attacking/player_down-slash-Sheet",gp.scale);
+        upAttacking = setup("attacking/player_up-slash-Sheet",gp.scale);
+        leftAttacking = setup("attacking/player_left-slash-Sheet",gp.scale);
+        rightAttacking = setup("attacking/player_right-slash-Sheet",gp.scale);
 
     }
     public void setAction(){
+        System.out.println(shotTaken);
+
         int xDistance = Math.abs(worldX-gp.player.worldX);
         int yDistance = Math.abs(worldY-gp.player.worldY);
+        int playerRow = gp.player.worldY/gp.tileSize;
+        int playerCol = gp.player.worldX/gp.tileSize;
+        int entityCol = worldX/gp.tileSize;
+        int entityRow = worldY/gp.tileSize;
         int tileDistance = (xDistance+yDistance)/gp.tileSize;
 
         if(!onPath && tileDistance < 5){
@@ -108,20 +116,34 @@ public class MON_Blob  extends Entity {
         }
         if (onPath){
             if (tileDistance <= 1 && canAttack){
-               attack();
+                attack();
             }
 
-            if (gp.player.worldX > worldX){
+            if (playerCol > entityCol){
                 direction = "right";
             }
-            else if (gp.player.worldX < worldX){
+            else if (playerCol< entityCol){
                 direction = "left";
             }
-            if (gp.player.worldY > worldY){
+            if (playerRow > entityRow){
                 direction = "down";
             }else if (gp.player.worldY < worldY){
                 direction = "up";
             }
+            if(playerCol == entityCol || playerRow == entityRow){
+                if (!shotTaken){
+                    shotProjectile();
+                    shotTaken = true;
+                }
+            }
+            if (shotTaken){
+                shotCounter++;
+                if(shotCounter>= shotTimer){
+                    shotTaken = false;
+                    shotCounter = 0;
+                }
+            }
+
         }else {
 
             actionLockCounter++;
@@ -167,5 +189,8 @@ public class MON_Blob  extends Entity {
         }
         hitOn = false;
     }
+
+
+
 
 }

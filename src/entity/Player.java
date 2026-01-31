@@ -9,7 +9,9 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-
+import java.util.List;
+import java.util.ArrayList;
+import java.awt.Point;
 public class Player extends Entity {
     KeyHandler keyH;
     int hasKey = 0;
@@ -32,17 +34,21 @@ public class Player extends Entity {
     int rollDuration;
     int rollSpeed;
 
+    int parryingSpeed;
+
 
     // ANIMATION
 
     Animator downRollAnimator,upRollAnimator,leftRollAnimator,rightRollAnimator;
     Animator downIdleAnimator,upIdleAnimator,leftIdleAnimator,rightIdleAnimator;
+    Animator downParryAnimator,upParryAnimator,leftParryAnimator,rightParryAnimator;
     public float displayedHealth = health;
 
     public  int screenX,screenY;
 
     public BufferedImage downRoll,upRoll,leftRoll,rightRoll;
     public BufferedImage downIdle,upIdle,leftIdle,rightIdle;
+    public BufferedImage downParry,upParry,leftParry,rightParry;
 
     // Key Flags
     public boolean attackKeyProcessed=false;
@@ -106,16 +112,21 @@ public class Player extends Entity {
         leftAttackingAnimator = new Animator(leftAttacking,gp.tileSize*2,gp.tileSize*2,10,false);
         rightAttackingAnimator = new Animator(rightAttacking,gp.tileSize*2,gp.tileSize*2,10,false);
 
+        downParryAnimator = new Animator(downParry,gp.tileSize,gp.tileSize,12,true);
+        upParryAnimator = new Animator(upParry,gp.tileSize,gp.tileSize,12,true);
+        leftParryAnimator = new Animator(leftParry,gp.tileSize,gp.tileSize,12,true);
+        rightParryAnimator = new Animator(rightParry,gp.tileSize,gp.tileSize,12,true);
 
 
 
     }
 
     public void setDefaultsValues(){
-        worldX = gp.tileSize*40;
-        worldY = gp.tileSize*44;
+        worldX = gp.tileSize*49;
+        worldY = gp.tileSize*66;
         normalSpeed = gp.tileSize/10;
         speed = normalSpeed;
+        parryingSpeed = normalSpeed/2;
         direction = "down";
         attackPower = 30;
 
@@ -171,6 +182,11 @@ public class Player extends Entity {
         upAttacking = setup("attacking/player_up-slash-Sheet",gp.scale);
         leftAttacking = setup("attacking/player_left-slash-Sheet",gp.scale);
         rightAttacking = setup("attacking/player_right-slash-Sheet",gp.scale);
+
+        downParry = setup("blocking/player_down-shield-Sheet",gp.scale);
+        upParry = setup("blocking/player_up-shield-Sheet",gp.scale);
+        leftParry = setup("blocking/player_left-shield-Sheet",gp.scale);
+        rightParry = setup("blocking/player_right-shield-Sheet",gp.scale);
     }
     public BufferedImage setup(String imageName,int scale){
         UtilityTool uTool = new UtilityTool();
@@ -312,9 +328,7 @@ public class Player extends Entity {
         }else{
             rechargeEndurance(1);
         }
-
-        if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
-            entityStatus = walking;
+        if (entityStatus == walking){
 
             if (keyH.upPressed) {
                 direction = "up";
@@ -328,15 +342,10 @@ public class Player extends Entity {
                 direction = "left";
                 leftAnimator.update();
             }
-            else {
+            else if (keyH.rightPressed) {
                 direction = "right";
                 rightAnimator.update();
             }
-
-
-
-
-
 
             // CHECK TILE COLLISION
             collisionOn = false;
@@ -398,12 +407,7 @@ public class Player extends Entity {
                         break;
                 }
             }
-
-
-
         }
-        else{
-            entityStatus = idle;}
 
         if (entityStatus == idle) {
             switch (direction) {
@@ -414,18 +418,118 @@ public class Player extends Entity {
             }
         }
 
+        if (entityStatus == parrying){
+            useEndurance = true;
+            if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
+
+                if (keyH.upPressed) {
+                    direction = "up";
+                    upParryAnimator.update();
+                } else if (keyH.downPressed) {
+                    direction = "down";
+                    downParryAnimator.update();
+                } else if (keyH.leftPressed) {
+                    direction = "left";
+                    leftParryAnimator.update();
+                } else if (keyH.rightPressed) {
+                    direction = "right";
+                    rightParryAnimator.update();
+                }
+
+                // CHECK TILE COLLISION
+                collisionOn = false;
+                gp.collisionChecker.checkTile(this);
+
+                //CHECK OBJECT COLLISION
+                gp.collisionChecker.checkObject(this, true);
+
+                // CHECK MONSTER COLLISION
+                gp.collisionChecker.checkEntity(this, gp.monster);
+
+
+                //IF COLLISION IS FALSE PLAYER CAN MOVE
+                if (!collisionOn) {
+
+                    switch (direction) {
+                        case "up":
+                            if (worldY - speed > 0) {
+                                worldY -= speed;
+                                if ((worldY + (gp.tileSize / 2) < gp.screenHeight / 2) || (gp.worldHeight - (gp.screenHeight / 2) < worldY + (gp.tileSize / 2) && worldY < gp.worldHeight)) {
+                                    screenY -= speed;
+
+                                } else {
+                                    screenY = (gp.screenHeight / 2) - (gp.tileSize / 2);
+                                }
+                            }
+                            break;
+                        case "down":
+                            if ((worldY + gp.tileSize) + speed < gp.worldHeight) {
+                                worldY += speed;
+                                if ((worldY + (gp.tileSize / 2) < gp.screenHeight / 2) || (gp.worldHeight - (gp.screenHeight / 2) < worldY + (gp.tileSize / 2))) {
+                                    screenY += speed;
+
+                                } else {
+                                    screenY = (gp.screenHeight / 2) - (gp.tileSize / 2);
+                                }
+                            }
+                            break;
+                        case "left":
+                            if (worldX - speed > 0) {
+                                worldX -= speed;
+                                if ((worldX + (gp.tileSize / 2) <= gp.screenWidth / 2) || (gp.worldWidth - (gp.screenWidth / 2) <= worldX + (gp.tileSize / 2))) {
+                                    screenX -= speed;
+                                } else {
+                                    screenX = (gp.screenWidth / 2) - (gp.tileSize / 2);
+                                }
+                            }
+                            break;
+                        case "right":
+                            if (worldX + gp.tileSize + speed < gp.worldWidth) {
+                                worldX += speed;
+                                if ((worldX + (gp.tileSize / 2) <= gp.screenWidth / 2) || (gp.worldWidth - (gp.screenWidth / 2) <= worldX + (gp.tileSize / 2))) {
+                                    screenX += speed;
+                                } else {
+                                    screenX = (gp.screenWidth / 2) - (gp.tileSize / 2);
+                                }
+                            }
+                            break;
+                    }
+                }
+            }
+
+
+
+        }
+
+
 
         //CHECK OBJECT COLLISION
         int objIndex = gp.collisionChecker.checkObject(this,true);
+
+        if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
+            entityStatus = walking;
+        } else{entityStatus = idle;}
+
+        if (keyH.parryPressed){
+            if (endurance > 20) {
+
+                entityStatus = parrying;
+                speed = parryingSpeed;
+                if (!parryKeyProcessed){gp.playSoundEffect(30);parryKeyProcessed=true;}
+            }
+
+
+        } else if (entityStatus != rolling){speed = normalSpeed; parryKeyProcessed=false;}
+        else{parryKeyProcessed=false;}
+
         if (keyH.attackPressed){
             if (!attackKeyProcessed){
                 gp.playSoundEffect(17);
                 attack();
                 attackKeyProcessed = true;
             }
-        }else{
-            attackKeyProcessed = false;
-        }
+        }else{attackKeyProcessed = false;}
+
         if(keyH.healPressed){
             if (!healKeyProcessed){
                 heal(20);
@@ -459,11 +563,12 @@ public class Player extends Entity {
         if (keyH.magicAttackPressed){
             if (!magicAttackKeyProcessed){
                 shotProjectile();
+                consumeMana(projectile.useCost);
                 magicAttackKeyProcessed = true;
             }
-        }else{
-            magicAttackKeyProcessed = false;
-        }
+        }else{magicAttackKeyProcessed = false;}
+
+
 
     }
 
@@ -513,6 +618,8 @@ public class Player extends Entity {
                     upIdleAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
                 }else if(entityStatus == attacking) {
                     upAttackingAnimator.draw(g2d,screenX-gp.tileSize,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
+                }else if(entityStatus == parrying) {
+                    upParryAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
                 }
                 break;
             case "down":
@@ -524,6 +631,8 @@ public class Player extends Entity {
                     downIdleAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
                 }else if (entityStatus == attacking) {
                     downAttackingAnimator.draw(g2d,screenX,screenY,gp.tileSize*2,gp.tileSize*2);
+                }else if(entityStatus == parrying) {
+                    downParryAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
                 }
 
                 break;
@@ -536,6 +645,8 @@ public class Player extends Entity {
                     leftIdleAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
                 }else if (entityStatus == attacking) {
                     leftAttackingAnimator.draw(g2d,screenX-gp.tileSize,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
+                }else if (entityStatus == parrying) {
+                    leftParryAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
                 }
                 break;
             case "right":
@@ -548,6 +659,8 @@ public class Player extends Entity {
                     rightIdleAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
                 }else if (entityStatus == attacking) {
                     rightAttackingAnimator.draw(g2d,screenX,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
+                }else if (entityStatus == parrying) {
+                    rightParryAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
                 }
                 break;
 
@@ -555,7 +668,6 @@ public class Player extends Entity {
 
 
     }
-
 
 
     public void consumeEndurance(int amount){
@@ -634,6 +746,8 @@ public class Player extends Entity {
     }
 
     public void attack(){
+        cutBush(gp.collisionChecker.checkCanCut(this));
+        UtilityTool uTool = new UtilityTool();
         upAttackingAnimator.resetAnimation();
         downAttackingAnimator.resetAnimation();
         leftAttackingAnimator.resetAnimation();
@@ -645,9 +759,14 @@ public class Player extends Entity {
                 hitOn = false;
                 gp.collisionChecker.checkAttack(this ,e);
                 if(hitOn){
+                    if(e.entityStatus == parrying && e.direction.equals(uTool.oppositeDirection(direction))){
+                        e.takeDamage(0);
+                        gp.playSoundEffect(16);
+                    }else{
+                        e.takeDamage(attackPower);
+                        monsterHit++;
+                    }
                     knockBack(e,10);
-                    e.takeDamage(attackPower);
-                    monsterHit++;
                 }
             }
         }
@@ -655,15 +774,15 @@ public class Player extends Entity {
             gp.playSoundEffect(8);
         }
         hitOn = false;
+
     }
 
-    public void shotProjectile(){
-        if (!projectile.alive && mana - projectile.useCost > 0){
-            projectile.set(worldX,worldY,direction,true,this);
-            gp.projectileList.add(projectile);
-            consumeMana(projectile.useCost);
-
+    public void cutBush(List<Point> bushes){
+        if (!bushes.isEmpty()){
+            for (Point p : bushes){
+                gp.tileM.mapTileNum1[p.y][p.x] = 16;
+            }
         }
-
     }
+
 }

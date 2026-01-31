@@ -37,9 +37,14 @@ public class Sound {
         soundUrl[13] = getClass().getResource("/sounds/player/pl_gen_dodge_sidehop_L.wav");
         soundUrl[14] = getClass().getResource("/sounds/player/pl_gen_dodge_sidehop_R.wav");
         soundUrl[15] = getClass().getResource("/sounds/player/pl_gen_hurt_minor.wav");
-        soundUrl[16] = getClass().getResource("/sounds/player/pl_gen_shield_block.wav");
+        soundUrl[16] = getClass().getResource("/sounds/player/pl_gen_shield_block_01.wav");
         soundUrl[17] = getClass().getResource("/sounds/player/pl_itm_wep_sword_com1_01.wav");
         soundUrl[29] = getClass().getResource("/sounds/player/pl_gen_spell_heal.wav");
+        soundUrl[30] = getClass().getResource("/sounds/player/pl_gen_shield_up_01.wav");
+        soundUrl[31] = getClass().getResource("/sounds/player/pl_gen_shield_down_01.wav");
+        soundUrl[32] = getClass().getResource("/sounds/player/pl_itm_wep_techbow_impact_01.wav");
+        soundUrl[33] = getClass().getResource("/sounds/player/pl_itm_wep_techbow_shoot_01.wav");
+
 
         // Monsters Sounds effects
         soundUrl[26] = getClass().getResource("/sounds/monsters/en_blob_attack_vo_01.wav");

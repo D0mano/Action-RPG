@@ -3,6 +3,7 @@ package main;
 import entity.Entity;
 import entity.Player;
 import object.SuperObject;
+import tile.Tile;
 import tile.TileManager;
 
 import javax.swing.JPanel;
@@ -30,8 +31,8 @@ public class GamePanel extends JPanel implements Runnable {
     public final int screenHeight = tileSize * maxScreenRow;    // 576 pixels
 
     // WORLD SETTINGS
-    public final int maxWorldCol = 79;
-    public final int maxWorldRow = 49;
+    public final int maxWorldCol = 95;
+    public final int maxWorldRow = 79;
     public final int worldWidth = tileSize * maxWorldCol;
     public final int worldHeight = tileSize * maxWorldRow;
 
@@ -40,7 +41,7 @@ public class GamePanel extends JPanel implements Runnable {
 
 
     // SYSTEM
-    TileManager tileM = new TileManager(this);
+    public TileManager tileM = new TileManager(this);
     KeyHandler keyH = new KeyHandler(this);
     public AssetSetter assetSetter = new AssetSetter(this);
     Thread gameThread;
@@ -138,6 +139,11 @@ public class GamePanel extends JPanel implements Runnable {
     public void update(){
         if (gameState == playState){
 
+            for (Tile tile :tileM.tile){
+                if (tile != null && tile.animation != null){
+                    tile.animation.update();
+                }
+            }
 
             player.update();
 

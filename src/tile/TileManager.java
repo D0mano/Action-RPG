@@ -1,5 +1,6 @@
 package tile;
 
+import main.Animator;
 import main.GamePanel;
 import main.UtilityTool;
 
@@ -8,6 +9,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class TileManager {
@@ -22,12 +24,12 @@ public class TileManager {
 
     public TileManager(GamePanel gp) {
         this.gp = gp;
-        tile = new Tile[90];
+        tile = new Tile[120];
         mapTileNum1 = new int[gp.maxWorldRow][gp.maxWorldCol];
         mapTileNum2 = new int[gp.maxWorldRow][gp.maxWorldCol];
         loadTileData("/maps/tile_data.txt");
         getTileImageFromTileSet("TunicTilesetV2");
-        loadMap("/maps/World03");
+        loadMap("/maps/Overworld");
     }
 
     public void loadTileData(String filePath) {
@@ -44,6 +46,7 @@ public class TileManager {
                 int id = Integer.parseInt(parts[0].trim());
                 boolean collision = Boolean.parseBoolean(parts[1].trim());
                 int layer = Integer.parseInt(parts[2].trim());
+                boolean animated = Boolean.parseBoolean(parts[4].trim());
 
                 String sidesRaw = parts[3].trim(); // ex: "up;right"
                 ArrayList<String> collisionSide = new ArrayList<>();
@@ -64,7 +67,7 @@ public class TileManager {
                 }
 
 
-                tileDataMap.put(id, new TileData(collision, layer, collisionSide));
+                tileDataMap.put(id, new TileData(collision, layer, collisionSide,animated,id));
             }
             br.close();
 
@@ -84,8 +87,9 @@ public class TileManager {
             int index = 0;
             for(int i = 0; i < nbrow; i++){
                 for(int j = 0; j < nbcol; j++){
-                    boolean collision ;
-                    int layer;
+                    boolean collision,animated ;
+                    int layer,id;
+
                     ArrayList<String> collisionSide;
                     BufferedImage tile = tileset.getSubimage(j*gp.originalTileSize,i*gp.originalTileSize,gp.originalTileSize,gp.originalTileSize);
                     if (tileDataMap.containsKey(index)) {
@@ -95,8 +99,13 @@ public class TileManager {
 
                         layer = data.layer;
 
+                        id = data.id;
+
+                        animated = data.animated;
+
+
                         collisionSide = new ArrayList<>(data.collisionSide);
-                        setup(index,tile,collision,layer,collisionSide);
+                        setup(index,tile,collision,layer,collisionSide,id,animated);
                         index++;
                     }
 
@@ -142,9 +151,19 @@ public class TileManager {
             for(int row = 0; row < gp.maxWorldRow; row++){
                 String line = br.readLine();
                 for( int col = 0; col < gp.maxWorldCol; col++){
-                    String[] numbers = line.split(",");
-
-                    int num = Integer.parseInt(numbers[col]);
+                    String[] numbers;
+                    if (line != null) {
+                        numbers = line.split(",");
+                    }else{
+                        numbers = new String[gp.maxWorldCol];
+                        Arrays.fill(numbers, "-1");
+                    }
+                    int num;
+                    if (col < numbers.length) {
+                        num = Integer.parseInt(numbers[col]);
+                    }else{
+                        num = -1;
+                    }
 
                     mapTileNum2[row][col] = num;
 
@@ -157,14 +176,24 @@ public class TileManager {
         }
     }
 
-    public void setup(int index,BufferedImage image,boolean collision,int layer,ArrayList<String>collisionSide){
+    public void setup(int index,BufferedImage image,boolean collision,int layer,ArrayList<String>collisionSide,int id,Boolean animated){
         UtilityTool uTool = new UtilityTool();
         tile[index] = new Tile();
+        tile[index].id = id;
         tile[index].image = image;
         tile[index].image = uTool.scaleImage(tile[index].image, gp.tileSize,  gp.tileSize);
         tile[index].collision = collision;
         tile[index].layer = layer;
         tile[index].collisionSide = collisionSide;
+        if(animated){
+            BufferedImage spriteSheet;
+            try{
+                spriteSheet = ImageIO.read(getClass().getResourceAsStream("/tiles/"+id+"-Sheet.png"));
+                spriteSheet = uTool.scaleImage(spriteSheet, spriteSheet.getWidth()*gp.scale,spriteSheet.getHeight()*gp.scale);
+                tile[index].animation =new Animator(spriteSheet,gp.tileSize,gp.tileSize,10,true);
+
+            }catch(Exception e){e.printStackTrace();}
+        }
 
     }
 
@@ -184,12 +213,20 @@ public class TileManager {
                        ((- gp.tileSize) <= screenY &&  screenY <= (gp.worldHeight + gp.tileSize))){
                    if (layer==1){
                        if( tileNum != -1 && tile[tileNum].layer == layer){
-                           g2d.drawImage(tile[tileNum].image, screenX, screenY, null);
+                           if (tile[tileNum].animation == null){
+                               g2d.drawImage(tile[tileNum].image, screenX, screenY, null);
+                           }else{
+                               tile[tileNum].animation.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
+                           }
                        }
                    }
                    else if (layer==2){
                        if(tileNum2 != -1 && tile[tileNum2].layer == layer){
-                           g2d.drawImage(tile[tileNum2].image, screenX, screenY, null);
+                           if (tile[tileNum2].animation == null){
+                               g2d.drawImage(tile[tileNum2].image, screenX, screenY, null);
+                           }else{
+                               tile[tileNum2].animation.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
+                           }
 
                        }
 

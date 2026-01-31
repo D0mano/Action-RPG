@@ -45,11 +45,18 @@ public class Projectile extends Entity{
     }
 
     public void update(){
+        UtilityTool uTool = new UtilityTool();
 
         if (user == gp.player){
             int monsterIndex = gp.collisionChecker.checkEntity(this,gp.monster);
             if (monsterIndex != 999){
-                gp.monster.get(monsterIndex).takeDamage(attackPower);
+                if(gp.monster.get(monsterIndex).entityStatus == parrying && gp.monster.get(monsterIndex).direction.equals(uTool.oppositeDirection(direction))){
+                    gp.monster.get(monsterIndex).takeDamage(0);
+                    gp.playSoundEffect(16);
+
+                }else{
+                    gp.monster.get(monsterIndex).takeDamage(attackPower);
+                    gp.playSoundEffect(32);}
                 knockBack(gp.monster.get(monsterIndex),5);
                 alive = false;
             }
@@ -58,7 +65,13 @@ public class Projectile extends Entity{
             collisionOn = false;
             gp.collisionChecker.checkPlayer(this);
             if (collisionOn){
-                gp.player.takeDamage(attackPower);
+                if (gp.player.entityStatus == parrying && gp.player.direction.equals(uTool.oppositeDirection(direction))){
+                    gp.player.takeDamage(attackPower/4);
+                    gp.playSoundEffect(16);
+                }else{
+                    gp.player.takeDamage(attackPower);
+                    gp.playSoundEffect(15);
+                }
                 alive = false;
             }
         }
