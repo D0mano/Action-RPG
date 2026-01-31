@@ -59,6 +59,7 @@ public class Entity {
 
 
 
+
     // CHARACTER STATE
     public boolean alive = true;
     public boolean dying = false;

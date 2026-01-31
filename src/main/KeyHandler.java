@@ -206,6 +206,24 @@ public class KeyHandler implements KeyListener {
                     gp.ui.commandNumberGraphic++;
                 }
             }
+            if(code == KeyEvent.VK_D || code == KeyEvent.VK_RIGHT){
+                if(gp.ui.commandNumberGraphic == 0){
+                    if(gp.displayMode.equals(gp.windowMode)  ){
+                        gp.displayMode = gp.fullScreenMode;
+
+                    }
+                    else{gp.displayMode = gp.windowMode;}
+                }
+            }
+            if(code == KeyEvent.VK_Q || code == KeyEvent.VK_LEFT){
+                if(gp.ui.commandNumberGraphic == 0){
+                    if(gp.displayMode.equals(gp.windowMode)  ){
+                        gp.displayMode = gp.fullScreenMode;
+
+                    }
+                    else{gp.displayMode = gp.windowMode;}
+                }
+            }
             if (code == KeyEvent.VK_ENTER) {
 
                 if (gp.ui.commandNumberGraphic == 0) {
@@ -219,6 +237,8 @@ public class KeyHandler implements KeyListener {
                 if (gp.ui.commandNumberGraphic == 2) {
                     gp.playSoundEffect(25);
                     gp.gameState = gp.optionState;
+                    gp.toggleScreenMode();
+
 
 
 
@@ -248,6 +268,10 @@ public class KeyHandler implements KeyListener {
                 gp.previousState = gp.gameState;
                 gp.gameState = gp.pauseState;
 
+            }
+            if (code == KeyEvent.VK_TAB){
+                gp.previousState = gp.gameState;
+                gp.gameState = gp.inInventory;
             }
 
             if (code == KeyEvent.VK_U){
@@ -318,6 +342,12 @@ public class KeyHandler implements KeyListener {
                     gp.gameState = gp.titleState;
                     gp.playMusic(18);
                 }
+            }
+        }
+        else if(gp.gameState == gp.inInventory){
+            if(code == KeyEvent.VK_ESCAPE || code == KeyEvent.VK_TAB){
+                gp.previousState = gp.gameState;
+                gp.gameState = gp.playState;
             }
         }
         else if(gp.gameState== gp.dialogueState){

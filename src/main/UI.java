@@ -11,7 +11,7 @@ import java.io.InputStream;
 public class UI {
     GamePanel gp;
     Graphics2D g2;
-    Font lilliput_40,trunic,lilliput_20;
+    Font lilliput_40,trunic,lilliput_20,lilliput_15;
     public boolean messageOn = false;
     public String message = "";
     int messageCounter = 0;
@@ -58,6 +58,7 @@ public class UI {
             // On redimensionne
             lilliput_40 = lilliputFont.deriveFont(Font.PLAIN, gp.tileSize);
             lilliput_20 = lilliputFont.deriveFont(Font.PLAIN,(gp.tileSize*(2/3f)));
+            lilliput_15 = lilliputFont.deriveFont(Font.PLAIN,(gp.tileSize*(1/2f)));
             trunic = Trunic.deriveFont(Font.BOLD, gp.tileSize);
 
         } catch (FontFormatException | IOException e) {
@@ -119,6 +120,9 @@ public class UI {
         g2.setFont(lilliput_40);
         g2.setColor(Color.white);
         if(gp.gameState == gp.titleState){
+            g2.setColor(Color.BLACK);
+            g2.fillRect(0,0,gp.screenWidth,gp.screenHeight);
+
             drawTitleScreen();
 
         }
@@ -160,7 +164,14 @@ public class UI {
         if(gp.gameState == gp.dialogueState){
             drawDialogueScreen();
         }
+        if (gp.gameState == gp.inInventory){
+            gp.player.screenX = (2*gp.screenWidth)/3;
+
+            drawInventoryScreen();
+        }
     }
+
+    public void drawInventoryScreen(){}
 
     public void drawPauseScreen(){
         RadialGradientPaint vignette = new RadialGradientPaint(
@@ -186,7 +197,7 @@ public class UI {
 
         for (int i = 0; i < pauseCommand.length; i++) {
             int buttonX = (gp.screenWidth - buttonWidth) / 2;
-            int buttonY = startY + (i * (buttonHeight + 10));
+            int buttonY = startY + (i * (buttonHeight + (int)(gp.screenHeight /57.6f)));
 
             if (i == commandNumberPause) {
                 if (menuSelectionOrange != null) {
@@ -203,13 +214,14 @@ public class UI {
             }
 
             int textX = buttonX + (buttonWidth - metrics.stringWidth(pauseCommand[i])) / 2;
-            int textY = buttonY + 38;
+            int textY = buttonY + (int)(gp.screenHeight /15.15f);
             g2.drawString(pauseCommand[i], textX, textY);
         }
 
     }
 
     public void drawTitleScreen(){
+
         Color myOrange = new Color(206, 157, 58);
         int titleX = gp.screenWidth/12;
         int titleY = gp.screenHeight/2 -  whiteTitle.getHeight()/2;
@@ -217,6 +229,7 @@ public class UI {
 //        g2.fillRect(0,0, gp.screenWidth, gp.screenHeight);
         g2.drawImage(whiteTitle,titleX,titleY,null);
         int x = gp.screenWidth * 3/4;
+        g2.setColor(Color.white);
         if (commandNumber == 0){
             g2.setColor(myOrange);
         }
@@ -225,12 +238,12 @@ public class UI {
         if (commandNumber == 1){
             g2.setColor(myOrange);
         }
-        g2.drawString("Load Game",getXForCenteredTextAroundX("Load Game",x),titleY+100);
+        g2.drawString("Load Game",getXForCenteredTextAroundX("Load Game",x),titleY+gp.screenHeight /5.76f);
         g2.setColor(Color.white);
         if (commandNumber == 2){
             g2.setColor(myOrange);
         }
-        g2.drawString("Options",getXForCenteredTextAroundX("Options",x),titleY+200);
+        g2.drawString("Options",getXForCenteredTextAroundX("Options",x),titleY+ gp.screenHeight /2.8f);
 
     }
 
@@ -274,7 +287,7 @@ public class UI {
 
         for (int i = 0; i < optionCommand.length; i++) {
             int buttonX = (gp.screenWidth - buttonWidth) / 2;
-            int buttonY = startY + (i * (buttonHeight + 10));
+            int buttonY = startY + (i * (buttonHeight + (int)(gp.screenHeight /57.6f)));
 
             if (i == commandNumberOption) {
                 if (menuSelectionOrange != null) {
@@ -291,7 +304,7 @@ public class UI {
             }
 
             int textX = buttonX + (buttonWidth - metrics.stringWidth(optionCommand[i])) / 2;
-            int textY = buttonY + 38;
+            int textY = buttonY + (int)(gp.screenHeight /15.15f);
             g2.drawString(optionCommand[i], textX, textY);
         }
 
@@ -322,7 +335,7 @@ public class UI {
 
         for (int i = 0; i < audioCommand.length; i++) {
             int buttonX = (gp.screenWidth - buttonWidth) / 2;
-            int buttonY = startY + (i * (buttonHeight + 10));
+            int buttonY = startY + (i * (buttonHeight + (int)(gp.screenHeight /57.6f)));
 
             if (i == commandNumberAudio) {
                 if (i == 2 && menuSelectionOrange != null){
@@ -341,16 +354,16 @@ public class UI {
             }
 
             int textX = buttonX + (buttonWidth ) / 8;
-            int textY = buttonY + 38;
+            int textY = buttonY + (int)(gp.screenHeight /15.15f);
             g2.drawString(audioCommand[i], textX, textY);
             if (i ==0){
                 g2.setColor(new Color(196, 148, 62));
-                textX += 7*gp.tileSize;
+                textX += 7*gp.tileSize + gp.tileSize/2;
                 g2.drawString(Math.round(gp.music.currentVolume * 100)+"%", textX, textY);
             }
             if (i == 1){
                 g2.setColor(new Color(196, 148, 62));
-                textX += 7*gp.tileSize;
+                textX += 7*gp.tileSize + gp.tileSize/2;
                 g2.drawString(Math.round(gp.soundEffects.currentVolume * 100)+"%", textX, textY);
 
             }
@@ -372,14 +385,14 @@ public class UI {
         int y = 2*gp.tileSize;
         g2.drawString("Graphics",x,y);
 
-        g2.setFont(lilliput_20);
+        g2.setFont(lilliput_15);
         int buttonWidth =(int)(1.3f*menuSelection.getWidth());
         int buttonHeight = menuSelection.getHeight();
         int startY = gp.screenHeight / 2 - (graphicCommand.length * buttonHeight) / 2;
 
         for (int i = 0; i < graphicCommand.length; i++) {
             int buttonX = (gp.screenWidth - buttonWidth) / 2;
-            int buttonY = startY + (i * (buttonHeight + 10));
+            int buttonY = startY + (i * (buttonHeight + (int)(gp.screenHeight /57.6f)));
 
             if (i == commandNumberGraphic) {
                 if (i == 2 && menuSelectionOrange != null){
@@ -398,9 +411,21 @@ public class UI {
             }
 
             int textX = buttonX + (buttonWidth ) / 8;
-            int textY = buttonY + 38;
+            int textY = buttonY + (int)(gp.screenHeight /15.15f);
             g2.drawString(graphicCommand[i], textX, textY);
+
+            if (i ==0){
+                g2.setColor(new Color(196, 148, 62));
+                textX += 5*gp.tileSize + gp.tileSize/2;
+                g2.drawString(gp.displayMode, textX, textY);
+            }
+            if (i ==1){
+                g2.setColor(new Color(196, 148, 62));
+                textX += 5*gp.tileSize + gp.tileSize/2;
+                g2.drawString(gp.screenWidth+"x"+gp.screenHeight, textX, textY);
+            }
         }
+
 
     }
 
@@ -438,7 +463,7 @@ public class UI {
     }
 
     public void drawPlayerEndurance(){
-        int x = gp.screenWidth/10 +50;
+        int x = gp.screenWidth/10 +(int)(gp.screenHeight /11.52f);
         int topY = gp.screenHeight*2/3;
         g2.drawImage(enduranceOverlay,x,topY,null);
 
@@ -464,7 +489,7 @@ public class UI {
     }
 
     public void drawPlayerMana(){
-        int x = gp.screenWidth/10 +100;
+        int x = gp.screenWidth/10 +(int)(gp.screenHeight /5.76f);
         int topY = gp.screenHeight*2/3;
         g2.drawImage(manaOverlay,x,topY,null);
 
