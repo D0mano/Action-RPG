@@ -120,10 +120,77 @@ public class Player extends Entity {
 
 
     }
+    public void reload(){
+        worldX = gp.tileSize * worldCol;
+        worldY = gp.tileSize * worldRow;
+        screenX = (gp.screenWidth / 2) - (gp.tileSize / 2);
+        screenY = (gp.screenHeight / 2) - (gp.tileSize / 2);
+
+        normalSpeed = gp.tileSize/10;
+        speed = normalSpeed;
+        parryingSpeed = normalSpeed/2;
+        rollSpeed = 2*normalSpeed;
+
+        getPlayerImage();
+
+        projectile.reload();
+
+        solidArea = new Rectangle();
+        solidArea.x = gp.tileSize / 6;
+        solidArea.y = gp.tileSize / 3;
+        solideAreaDefaultX = solidArea.x;
+        solideAreaDefaultY = solidArea.y;
+        solidArea.width = (2 * gp.tileSize) / 3;
+        solidArea.height = (2 * gp.tileSize) / 3;
+
+        attackingAreaVertical.x = gp.tileSize/ 8;
+        attackingAreaVertical.y = 0;
+        attackingAreaDefaultVX = attackingAreaVertical.x;
+        attackingAreaDefaultVY = attackingAreaVertical.y;
+        attackingAreaVertical.width = (int)(gp.tileSize * 3/4f);
+        attackingAreaVertical.height = gp.tileSize;
+
+        attackingAreaHorizontal.x =  attackingAreaVertical.y;
+        attackingAreaHorizontal.y = attackingAreaVertical.x;
+        attackingAreaDefaultHX = attackingAreaHorizontal.x;
+        attackingAreaDefaultHY = attackingAreaHorizontal.y;
+        attackingAreaHorizontal.width = attackingAreaVertical.height;
+        attackingAreaHorizontal.height = attackingAreaVertical.width;
+
+        downAnimator.reload(down,gp.tileSize,gp.tileSize);
+        upAnimator.reload(up,gp.tileSize,gp.tileSize);
+        leftAnimator.reload(left,gp.tileSize,gp.tileSize);
+        rightAnimator.reload(right,gp.tileSize,gp.tileSize);
+
+        downRollAnimator.reload(downRoll,gp.tileSize,gp.tileSize);
+        upRollAnimator.reload(upRoll,gp.tileSize,gp.tileSize);
+        leftRollAnimator.reload(leftRoll,gp.tileSize,gp.tileSize);
+        rightRollAnimator.reload(rightRoll,gp.tileSize,gp.tileSize);
+
+        downIdleAnimator.reload(downIdle,gp.tileSize,gp.tileSize);
+        upIdleAnimator.reload(upIdle,gp.tileSize,gp.tileSize);
+        leftIdleAnimator.reload(leftIdle,gp.tileSize,gp.tileSize);
+        rightIdleAnimator.reload(rightIdle,gp.tileSize,gp.tileSize);
+
+        downAttackingAnimator.reload(downAttacking,gp.tileSize*2,gp.tileSize*2);
+        upAttackingAnimator.reload(upAttacking,gp.tileSize*2,gp.tileSize*2);
+        leftAttackingAnimator.reload(leftAttacking,gp.tileSize*2,gp.tileSize*2);
+        rightAttackingAnimator.reload(rightAttacking,gp.tileSize*2,gp.tileSize*2);
+
+        downParryAnimator.reload(downParry,gp.tileSize,gp.tileSize);
+        upParryAnimator.reload(upParry,gp.tileSize,gp.tileSize);
+        leftParryAnimator.reload(leftParry,gp.tileSize,gp.tileSize);
+        rightParryAnimator.reload(rightParry,gp.tileSize,gp.tileSize);
+
+
+
+    }
 
     public void setDefaultsValues(){
-        worldX = gp.tileSize*49;
-        worldY = gp.tileSize*66;
+        worldCol= 49;
+        worldRow= 66;
+        worldX = gp.tileSize * worldCol;
+        worldY = gp.tileSize * worldRow;
         normalSpeed = gp.tileSize/10;
         speed = normalSpeed;
         parryingSpeed = normalSpeed/2;
@@ -567,6 +634,9 @@ public class Player extends Entity {
                 magicAttackKeyProcessed = true;
             }
         }else{magicAttackKeyProcessed = false;}
+
+        worldCol = worldX/gp.tileSize;
+        worldRow = worldY/gp.tileSize;
 
 
 

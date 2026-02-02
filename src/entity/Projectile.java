@@ -13,6 +13,9 @@ public class Projectile extends Entity{
     public Projectile(GamePanel gp) {
         super(gp);
     }
+    public void reload(){
+
+    }
     public BufferedImage setup(String imageName, int scale){
         UtilityTool uTool = new UtilityTool();
         BufferedImage image = null;
@@ -25,6 +28,8 @@ public class Projectile extends Entity{
         }
         return image;
     }
+
+
 
 
     public void set(int worldX, int worldY,String direction,boolean alive ,Entity user){
@@ -100,6 +105,9 @@ public class Projectile extends Entity{
         if (health <= 0) {
             alive = false;
         }
+
+        worldCol = worldX/gp.tileSize;
+        worldRow = worldY/gp.tileSize;
     }
 
 

@@ -95,6 +95,53 @@ public class UI {
 
 
     }
+    public void reload(){
+        try {
+            // Tu changes juste l'extension du fichier ici
+            InputStream is = getClass().getResourceAsStream("/fonts/Lilliput Steps.otf");
+            InputStream is2 = getClass().getResourceAsStream("/fonts/Trunic-Bold.otf");
+
+            // IMPORTANT : Tu gardes "TRUETYPE_FONT", ça marche pour les .otf aussi
+            Font lilliputFont = Font.createFont(Font.TRUETYPE_FONT, is);
+            Font Trunic = Font.createFont(Font.TRUETYPE_FONT, is2);
+
+            // On redimensionne
+            lilliput_40 = lilliputFont.deriveFont(Font.PLAIN, gp.tileSize);
+            lilliput_20 = lilliputFont.deriveFont(Font.PLAIN,(gp.tileSize*(2/3f)));
+            lilliput_15 = lilliputFont.deriveFont(Font.PLAIN,(gp.tileSize*(1/2f)));
+            trunic = Trunic.deriveFont(Font.BOLD, gp.tileSize);
+
+        } catch (FontFormatException | IOException e) {
+            e.printStackTrace();
+        }
+
+        healthOverlay = setup("/player/health_overlay",(int)(gp.scale*(2/3f)));
+        healthMiddle = setup("/player/health_mid",(int)(gp.scale*(2/3f)));
+        healthTop = setup("/player/health_top",(int)(gp.scale*(2/3f)));
+
+        enduranceTop = setup("/player/endurance_top",(int)(gp.scale*(2/3f)));
+        enduranceMiddle = setup("/player/endurance_mid",(int)(gp.scale*(2/3f)));
+        enduranceOverlay = healthOverlay;
+
+        manaTop = setup("/player/mana_top",(int)(gp.scale*(2/3f)));
+        manaMiddle = setup("/player/mana_mid",(int)(gp.scale*(2/3f)));
+        manaOverlay = healthOverlay;
+
+        whiteTitle = setup("/titleScreen/tunic_logo_white",(int)(gp.scale*(5/3f)));
+        blackTitle = setup("/titleScreen/tunic_logo_black",1);
+
+        menuSelection = setup("/menu/menuOverlayWhite",gp.scale);
+        menuSelectionOrange = setup("/menu/menuOverlayOrange",gp.scale);
+        menuSelectionOrange2 = setup("/menu/menuOverlayOrange2",gp.scale);
+
+        messageWindow = setup("/menu/window1",gp.scale);
+
+        optionWindow = setup("/menu/optionOverlay",gp.scale);
+
+        potionFull = setup("/player/potion_full",gp.scale);
+        potionEmpty = setup("/player/potion_empty",gp.scale);
+
+    }
 
     public BufferedImage setup(String imageName, float scale) {
         UtilityTool uTool = new UtilityTool();
@@ -434,6 +481,7 @@ public class UI {
     }
 
     public void drawPlayerHealth(){
+
         int x = gp.screenWidth/10;
         int topY = gp.screenHeight*2/3;
         g2.drawImage(healthOverlay,x,topY,null);

@@ -31,5 +31,12 @@ public class OBJ_Door extends SuperObject{
 
 
     }
+    public void reload(){
+        solidArea.width = gp.tileSize;
+        solidArea.height = gp.tileSize;
+        image = uTool.scaleImage(image,gp.tileSize,gp.tileSize);
+
+
+    }
 
 }

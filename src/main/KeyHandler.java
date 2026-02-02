@@ -214,6 +214,14 @@ public class KeyHandler implements KeyListener {
                     }
                     else{gp.displayMode = gp.windowMode;}
                 }
+                if(gp.ui.commandNumberGraphic == 1){
+                    if(gp.scale == 4){
+                        gp.scale = 2;
+                    }else{
+                        gp.scale ++;
+                    }
+                    gp.updateSetting();
+                }
             }
             if(code == KeyEvent.VK_Q || code == KeyEvent.VK_LEFT){
                 if(gp.ui.commandNumberGraphic == 0){
@@ -222,6 +230,14 @@ public class KeyHandler implements KeyListener {
 
                     }
                     else{gp.displayMode = gp.windowMode;}
+                }
+                if(gp.ui.commandNumberGraphic == 1){
+                    if(gp.scale == 2){
+                        gp.scale = 4;
+                    }else{
+                        gp.scale --;
+                    }
+                    gp.updateSetting();
                 }
             }
             if (code == KeyEvent.VK_ENTER) {
@@ -237,7 +253,8 @@ public class KeyHandler implements KeyListener {
                 if (gp.ui.commandNumberGraphic == 2) {
                     gp.playSoundEffect(25);
                     gp.gameState = gp.optionState;
-                    gp.toggleScreenMode();
+                    gp.updateSetting();
+
 
 
 

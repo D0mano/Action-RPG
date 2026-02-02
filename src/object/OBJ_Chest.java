@@ -22,4 +22,9 @@ public class OBJ_Chest extends SuperObject {
             e.printStackTrace();}
         collision = true;
     }
+    public void reload(){
+        solidArea.width = gp.tileSize;
+        solidArea.height = gp.tileSize;
+        image = uTool.scaleImage(image,gp.tileSize,gp.tileSize);
+    }
 }

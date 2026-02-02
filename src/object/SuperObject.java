@@ -19,6 +19,9 @@ public class SuperObject {
 
     UtilityTool uTool = new UtilityTool();
 
+    public void reload(){}
+
+
     public void draw(Graphics2D g2d, GamePanel gp){
 
         int screenX = worldX - gp.player.worldX + gp.player.screenX;

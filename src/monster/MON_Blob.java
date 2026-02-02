@@ -16,12 +16,16 @@ public class MON_Blob  extends Entity {
 
 
 
-    public MON_Blob(GamePanel gp) {
+    public MON_Blob(GamePanel gp,int worldCol,int worldRow) {
         super(gp);
         name = "Blob";
         normalSpeed = 1;
         speed = normalSpeed;
         attackPower = 10;
+        this.worldCol = worldCol;
+        this.worldRow = worldRow;
+        worldX = worldCol*gp.tileSize;
+        worldY = worldRow*gp.tileSize;
 
         maxHealth = 20;
         health = maxHealth;
@@ -65,6 +69,44 @@ public class MON_Blob  extends Entity {
         upAttackingAnimator = new Animator(upAttacking,gp.tileSize,2*gp.tileSize,10,true);
         leftAttackingAnimator = new Animator(leftAttacking,gp.tileSize*2,gp.tileSize,10,false);
         rightAttackingAnimator = new Animator(rightAttacking,gp.tileSize*2,gp.tileSize,10,false);
+
+    }
+    public void reload(){
+        worldX = worldCol*gp.tileSize;
+        worldY = worldRow*gp.tileSize;
+        solidArea = new Rectangle();
+        solidArea.x = 0;
+        solidArea.y = gp.tileSize / 8;
+        solidArea.width = gp.tileSize;
+        solidArea.height = (int)(gp.tileSize * (7/8f));
+        solideAreaDefaultX = solidArea.x;
+        solideAreaDefaultY = solidArea.y;
+
+        attackingAreaVertical.x = gp.tileSize/ 8;
+        attackingAreaVertical.y = 0;
+        attackingAreaDefaultVX = attackingAreaVertical.x;
+        attackingAreaDefaultVY = attackingAreaVertical.y;
+        attackingAreaVertical.width = (int)(gp.tileSize * 3/4f);
+        attackingAreaVertical.height = (3 * gp.tileSize) / 4;
+
+        attackingAreaHorizontal.x =  attackingAreaVertical.y;
+        attackingAreaHorizontal.y = attackingAreaVertical.x;
+        attackingAreaDefaultHX = attackingAreaHorizontal.x;
+        attackingAreaDefaultHY = attackingAreaHorizontal.y;
+        attackingAreaHorizontal.width = attackingAreaVertical.height;
+        attackingAreaHorizontal.height = attackingAreaVertical.width;
+
+        getImage();
+        downAnimator.reload(down,gp.tileSize,gp.tileSize);
+        upAnimator.reload(up,gp.tileSize,gp.tileSize);
+        leftAnimator.reload(left,gp.tileSize,gp.tileSize);
+        rightAnimator.reload(right,gp.tileSize,gp.tileSize);
+
+        downAttackingAnimator.reload(downAttacking,gp.tileSize,2*gp.tileSize);
+        upAttackingAnimator.reload(upAttacking,gp.tileSize,2*gp.tileSize);
+        leftAttackingAnimator.reload(leftAttacking,gp.tileSize*2,gp.tileSize);
+        rightAttackingAnimator.reload(rightAttacking,gp.tileSize*2,gp.tileSize);
+
 
     }
 
@@ -152,7 +194,6 @@ public class MON_Blob  extends Entity {
         entityStatus = attacking;
         hitOn = false;
         gp.collisionChecker.checkAttack(this , gp.player);
-        System.out.println(hitOn);
         if(hitOn && !gp.player.invisible){
             if(gp.player.entityStatus == parrying && gp.player.direction.equals(uTool.oppositeDirection(direction))){
                 gp.player.takeDamage(attackPower/4);

@@ -11,12 +11,17 @@ public class Animator {
     public int counter = 0;
     public int animationSpeed;
     public boolean repeatAnimation = true;
+    ;
 
     public Animator(BufferedImage spriteSheet ,int spriteWidth,int spriteHeight,int speed,boolean repeatAnimation)  {
         sprites = new ArrayList<>();
         loadSprites(spriteSheet,spriteWidth,spriteHeight);
         this.repeatAnimation = repeatAnimation;
         animationSpeed = speed;
+
+    }
+    public void reload(BufferedImage newSpriteSheet,int newSpriteWidth,int newSpriteHeight ) {
+        loadSprites(newSpriteSheet,newSpriteWidth,newSpriteHeight);
 
     }
 

@@ -2,16 +2,27 @@ package main;
 
 import entity.Entity;
 import monster.MON_Blob;
-import monster.MON_Hedghog;
+import monster.MON_FoxZombie;
 import monster.MON_Rudeling;
-import object.OBJ_Chest;
-import object.OBJ_Door;
-import object.OBJ_Key;
+import object.SuperObject;
 
 public class AssetSetter {
     GamePanel gp;
     public AssetSetter(GamePanel gp) {
         this.gp = gp;
+    }
+
+    public void reload(){
+        for (SuperObject obj : gp.obj){
+            if (obj != null){
+                obj.reload();
+            }
+        }
+        for (Entity entity : gp.monster){
+            if (entity != null){
+                entity.reload();
+            }
+        }
     }
 
     public void setObject(){
@@ -38,37 +49,37 @@ public class AssetSetter {
     }
 
     public void setMonster(){
+        // Blob spawn
+        createMonster("blob",52,32);
+        createMonster("blob",34,27);
+        createMonster("blob",75,32);
+        createMonster("blob",80,27);
 
-//        Entity monster = new MON_Blob(gp);
-//        monster.worldX = 40 * gp.tileSize;
-//        monster.worldY = 27 * gp.tileSize;
-//        gp.monster.add(monster);
-//
-//        Entity monster2 = new MON_Blob(gp);
-//        monster2 .worldX = 49 * gp.tileSize;
-//        monster2 .worldY = 16 * gp.tileSize;
-//        gp.monster.add(monster2);
-//
-//        Entity monster3 = new MON_Blob(gp);
-//        monster3.worldX = 37 * gp.tileSize;
-//        monster3.worldY = 44 * gp.tileSize;
-//        gp.monster.add(monster3);
-//
-//        Entity monster4 = new MON_Rudeling(gp);
-//        monster4.worldX = 40 * gp.tileSize;
-//        monster4.worldY = 25 * gp.tileSize;
-//        gp.monster.add(monster4);
-//
-//        Entity monster5 = new MON_Rudeling(gp);
-//        monster5.worldX = 37 * gp.tileSize;
-//        monster5.worldY = 25 * gp.tileSize;
-//        gp.monster.add(monster5);
-//
-//        Entity monster6 = new MON_Hedghog(gp);
-//        monster6.worldX = 35 * gp.tileSize;
-//        monster6.worldY = 25 * gp.tileSize;
-//        gp.monster.add(monster6);
+        //Hedghog spawn
+        createMonster("foxZombie",16,25);
+        createMonster("foxZombie",13,12);
+        createMonster("foxZombie",73,16);
+        createMonster("foxZombie",86,14);
+
+        // Rudeling spawn
+        createMonster("rudeling",16,17);
+        createMonster("rudeling",56,11);
 
 
+    }
+
+    public void createMonster(String monsterName,int worldCol,int worldRow){
+        Entity monster;
+        if (monsterName.equals("rudeling")){
+            monster = new MON_Rudeling(gp,worldCol,worldRow);
+        }
+        else if (monsterName.equals("foxZombie")){
+            monster = new MON_FoxZombie(gp,worldCol,worldRow);
+        }
+        else{
+            monster = new MON_Blob(gp,worldCol,worldRow);
+        }
+
+        gp.monster.add(monster);
     }
 }

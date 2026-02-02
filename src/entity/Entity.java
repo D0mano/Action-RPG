@@ -12,6 +12,7 @@ public class Entity {
     // Entity Attributes
     public String name;
     public int worldX, worldY;
+    public int worldCol, worldRow;
     public int speed;
     public int normalSpeed;
     public String direction;
@@ -98,6 +99,10 @@ public class Entity {
         this.gp = gp;
         direction = "down";
         entityStatus = walking;
+
+
+    }
+    public void reload(){
 
 
     }
@@ -224,6 +229,9 @@ public class Entity {
             }
 
         }
+
+        worldCol = worldX/gp.tileSize;
+        worldRow = worldY/gp.tileSize;
 
     }
 
@@ -389,6 +397,7 @@ public class Entity {
         }
 
     }
+
     public void shotProjectile(){
         if (!projectile.alive && mana - projectile.useCost > 0){
             gp.playSoundEffect(33);
@@ -399,7 +408,6 @@ public class Entity {
         }
 
     }
-
 
     public void knockBack(Entity entity,int knockBackPower){
         entity.direction = direction;

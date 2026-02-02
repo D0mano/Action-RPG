@@ -19,4 +19,11 @@ public class OBJ_Key extends SuperObject{
         }catch(IOException e){
             e.printStackTrace();}
     }
+    public void reload(){
+        solidArea.width = gp.tileSize;
+        solidArea.height = gp.tileSize;
+        image = uTool.scaleImage(image,gp.tileSize,gp.tileSize);
+
+
+    }
 }

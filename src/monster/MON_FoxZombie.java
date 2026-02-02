@@ -4,6 +4,7 @@ import entity.Entity;
 import main.Animator;
 import main.GamePanel;
 import main.UtilityTool;
+import object.FireBall;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -11,34 +12,41 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Random;
 
-public class MON_Rudeling extends Entity {
-    public MON_Rudeling(GamePanel gp,int worldCol,int worldRow){
+public class MON_FoxZombie extends Entity {
+
+    boolean shotTaken = false;
+    int shotCounter = 0;
+    int shotTimer = 90;
+
+    public MON_FoxZombie(GamePanel gp, int worldCol, int worldRow){
         super(gp);
-        name = "Rudeling";
-        normalSpeed =1;
+        name = "FoxZombie";
+        normalSpeed = 1;
         speed = normalSpeed;
-        attackPower = 30;
+        attackPower = 20;
         this.worldCol = worldCol;
         this.worldRow = worldRow;
-        worldX = worldCol*gp.tileSize;
-        worldY = worldRow*gp.tileSize;
-        entityStatus = parrying;
+        worldX = worldCol * gp.tileSize;
+        worldY = worldRow * gp.tileSize;
+        entityStatus = walking;
         maxHealth = 70;
         health = maxHealth;
+        maxMana = 100;
+        mana =maxMana;
 
         solidArea = new Rectangle();
         solidArea.x = 0;
-        solidArea.y = 0;
-        solidArea.width = (3*gp.tileSize)/2;
-        solidArea.height = (3*gp.tileSize)/2;
+        solidArea.y = gp.tileSize / 8;
+        solidArea.width = gp.tileSize;
+        solidArea.height = (int)(gp.tileSize * (7/8f));
         solideAreaDefaultX = solidArea.x;
         solideAreaDefaultY = solidArea.y;
 
-        attackingAreaVertical.x = 0;
-        attackingAreaVertical.y = gp.tileSize / 4;
+        attackingAreaVertical.x = gp.tileSize/ 8;
+        attackingAreaVertical.y = 0;
         attackingAreaDefaultVX = attackingAreaVertical.x;
         attackingAreaDefaultVY = attackingAreaVertical.y;
-        attackingAreaVertical.width = (gp.tileSize*3)/2;
+        attackingAreaVertical.width = (int)(gp.tileSize * 3/4f);
         attackingAreaVertical.height = (3 * gp.tileSize) / 4;
 
         attackingAreaHorizontal.x =  attackingAreaVertical.y;
@@ -49,39 +57,39 @@ public class MON_Rudeling extends Entity {
         attackingAreaHorizontal.height = attackingAreaVertical.width;
 
         damageTakenTimer = 15;
-
         getImage();
 
-        downAnimator = new Animator(down,(3*gp.tileSize)/2,(3*gp.tileSize)/2,12,true);
-        upAnimator = new Animator(up,(3*gp.tileSize)/2,(3*gp.tileSize)/2,12,true);
-        leftAnimator = new Animator(left,(3*gp.tileSize)/2,(3*gp.tileSize)/2,12,true);
-        rightAnimator = new Animator(right,(3*gp.tileSize)/2,(3*gp.tileSize)/2,12,true);
+        downAnimator = new Animator(down,gp.tileSize,gp.tileSize,12,true);
+        upAnimator = new Animator(up,gp.tileSize,gp.tileSize,12,true);
+        leftAnimator = new Animator(left,gp.tileSize,gp.tileSize,12,true);
+        rightAnimator = new Animator(right,gp.tileSize,gp.tileSize,12,true);
 
-        downAttackingAnimator = new Animator(downAttacking,gp.tileSize*2,gp.tileSize*2,10,false);
-        upAttackingAnimator = new Animator(upAttacking,gp.tileSize*2,gp.tileSize*2,10,false);
-        leftAttackingAnimator = new Animator(leftAttacking,gp.tileSize*2,gp.tileSize*2,10,false);
-        rightAttackingAnimator = new Animator(rightAttacking,gp.tileSize*2,gp.tileSize*2,10,false);
+        downAttackingAnimator = new Animator(downAttacking,2*gp.tileSize,2*gp.tileSize,10,false);
+        upAttackingAnimator = new Animator(upAttacking,2*gp.tileSize,2*gp.tileSize,10,true);
+        leftAttackingAnimator = new Animator(leftAttacking,gp.tileSize*2,2*gp.tileSize,10,false);
+        rightAttackingAnimator = new Animator(rightAttacking,gp.tileSize*2,2*gp.tileSize,10,false);
+
+        projectile = new FireBall(gp);
+
 
 
     }
-
     public void reload(){
         worldX = worldCol*gp.tileSize;
         worldY = worldRow*gp.tileSize;
-
         solidArea = new Rectangle();
         solidArea.x = 0;
-        solidArea.y = 0;
-        solidArea.width = (3*gp.tileSize)/2;
-        solidArea.height = (3*gp.tileSize)/2;
+        solidArea.y = gp.tileSize / 8;
+        solidArea.width = gp.tileSize;
+        solidArea.height = (int)(gp.tileSize * (7/8f));
         solideAreaDefaultX = solidArea.x;
         solideAreaDefaultY = solidArea.y;
 
-        attackingAreaVertical.x = 0;
-        attackingAreaVertical.y = gp.tileSize / 4;
+        attackingAreaVertical.x = gp.tileSize/ 8;
+        attackingAreaVertical.y = 0;
         attackingAreaDefaultVX = attackingAreaVertical.x;
         attackingAreaDefaultVY = attackingAreaVertical.y;
-        attackingAreaVertical.width = (gp.tileSize*3)/2;
+        attackingAreaVertical.width = (int)(gp.tileSize * 3/4f);
         attackingAreaVertical.height = (3 * gp.tileSize) / 4;
 
         attackingAreaHorizontal.x =  attackingAreaVertical.y;
@@ -93,17 +101,15 @@ public class MON_Rudeling extends Entity {
 
         getImage();
 
-        downAnimator.reload(down,(3*gp.tileSize)/2,(3*gp.tileSize)/2);
-        upAnimator.reload(up,(3*gp.tileSize)/2,(3*gp.tileSize)/2);
-        leftAnimator.reload(left,(3*gp.tileSize)/2,(3*gp.tileSize)/2);
-        rightAnimator.reload(right,(3*gp.tileSize)/2,(3*gp.tileSize)/2);
+        downAnimator.reload(down,gp.tileSize,gp.tileSize);
+        upAnimator.reload(up,gp.tileSize,gp.tileSize);
+        leftAnimator.reload(left,gp.tileSize,gp.tileSize);
+        rightAnimator.reload(right,gp.tileSize,gp.tileSize);
 
-        downAttackingAnimator.reload(downAttacking,gp.tileSize*2,gp.tileSize*2);
-        upAttackingAnimator.reload(upAttacking,gp.tileSize*2,gp.tileSize*2);
-        leftAttackingAnimator.reload(leftAttacking,gp.tileSize*2,gp.tileSize*2);
-        rightAttackingAnimator.reload(rightAttacking,gp.tileSize*2,gp.tileSize*2);
-
-
+        downAttackingAnimator.reload(downAttacking,2*gp.tileSize,2*gp.tileSize);
+        upAttackingAnimator.reload(upAttacking,2*gp.tileSize,2*gp.tileSize);
+        leftAttackingAnimator.reload(leftAttacking,gp.tileSize*2,2*gp.tileSize);
+        rightAttackingAnimator.reload(rightAttacking,gp.tileSize*2,2*gp.tileSize);
 
     }
 
@@ -111,7 +117,7 @@ public class MON_Rudeling extends Entity {
         UtilityTool uTool = new UtilityTool();
         BufferedImage image = null;
         try{
-            image = ImageIO.read(getClass().getResourceAsStream("/monsters/Rudeling/"+imageName+".png"));
+            image = ImageIO.read(getClass().getResourceAsStream("/monsters/FoxZombie/"+imageName+".png"));
             image = uTool.scaleImage(image, image.getWidth()*scale,image.getHeight()*scale);
 
         }catch(IOException e){
@@ -119,27 +125,26 @@ public class MON_Rudeling extends Entity {
         }
         return image;
     }
-
     public void getImage(){
-        up = setup("walking/rudeling_up-Sheet",gp.scale);
-        down = setup("walking/rudeling_down-Sheet",gp.scale);
-        left = setup("walking/rudeling_left-Sheet",gp.scale);
-        right = setup("walking/rudeling_right-Sheet",gp.scale);
+        up = setup("walking/foxZombie_up-Sheet",gp.scale);
+        down = setup("walking/foxZombie_down-Sheet",gp.scale);
+        left = setup("walking/foxZombie_left-Sheet",gp.scale);
+        right = setup("walking/foxZombie_right-Sheet",gp.scale);
 
-        downAttacking = setup("attacking/player_down-slash-Sheet",gp.scale);
-        upAttacking = setup("attacking/player_up-slash-Sheet",gp.scale);
-        leftAttacking = setup("attacking/player_left-slash-Sheet",gp.scale);
-        rightAttacking = setup("attacking/player_right-slash-Sheet",gp.scale);
+        downAttacking = setup("attacking/foxZombie_down-slash-Sheet",gp.scale);
+        upAttacking = setup("attacking/foxZombie_up-slash-Sheet",gp.scale);
+        leftAttacking = setup("attacking/foxZombie_left-slash-Sheet",gp.scale);
+        rightAttacking = setup("attacking/foxZombie_right-slash-Sheet",gp.scale);
 
     }
-
     public void setAction(){
+
+        int xDistance = Math.abs(worldX-gp.player.worldX);
+        int yDistance = Math.abs(worldY-gp.player.worldY);
         int playerRow = gp.player.worldY/gp.tileSize;
         int playerCol = gp.player.worldX/gp.tileSize;
         int entityCol = worldX/gp.tileSize;
         int entityRow = worldY/gp.tileSize;
-        int xDistance = Math.abs(worldX-gp.player.worldX);
-        int yDistance = Math.abs(worldY-gp.player.worldY);
         int tileDistance = (xDistance+yDistance)/gp.tileSize;
 
         if(!onPath && tileDistance < 5){
@@ -147,7 +152,7 @@ public class MON_Rudeling extends Entity {
         }
         if(onPath && tileDistance > 10){
             onPath = false;
-            entityStatus = parrying;
+            entityStatus = walking;
 
         }
         if (onPath){
@@ -158,7 +163,7 @@ public class MON_Rudeling extends Entity {
             if (playerCol > entityCol){
                 direction = "right";
             }
-            else if (playerCol < entityCol){
+            else if (playerCol< entityCol){
                 direction = "left";
             }
             if (playerRow > entityRow){
@@ -166,6 +171,20 @@ public class MON_Rudeling extends Entity {
             }else if (gp.player.worldY < worldY){
                 direction = "up";
             }
+            if(playerCol == entityCol || playerRow == entityRow){
+                if (!shotTaken){
+                    shotProjectile();
+                    shotTaken = true;
+                }
+            }
+            if (shotTaken){
+                shotCounter++;
+                if(shotCounter>= shotTimer){
+                    shotTaken = false;
+                    shotCounter = 0;
+                }
+            }
+
         }else {
 
             actionLockCounter++;
@@ -227,29 +246,29 @@ public class MON_Rudeling extends Entity {
 
             switch (direction) {
                 case "up":
-                    if (entityStatus == parrying || entityStatus == knockBacking) {
-                        upAnimator.draw(g, screenX, screenY, (3*gp.tileSize)/2, (3*gp.tileSize)/2);
+                    if (entityStatus == walking || entityStatus == knockBacking) {
+                        upAnimator.draw(g, screenX, screenY, gp.tileSize,gp.tileSize);
                     }else if (entityStatus == attacking) {
                         upAttackingAnimator.draw(g,screenX-gp.tileSize,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
                     }
                     break;
                 case "down":
-                    if (entityStatus == parrying|| entityStatus == knockBacking) {
-                        downAnimator.draw(g, screenX, screenY, (3*gp.tileSize)/2, (3*gp.tileSize)/2);
+                    if (entityStatus == walking|| entityStatus == knockBacking) {
+                        downAnimator.draw(g,screenX,screenY,gp.tileSize,gp.tileSize);
                     }else if (entityStatus == attacking) {
                         downAttackingAnimator.draw(g,screenX,screenY,gp.tileSize*2,gp.tileSize*2);
                     }
                     break;
                 case "left":
-                    if (entityStatus == parrying || entityStatus == knockBacking) {
-                        leftAnimator.draw(g, screenX, screenY, (3*gp.tileSize)/2, (3*gp.tileSize)/2);
+                    if (entityStatus == walking || entityStatus == knockBacking) {
+                        leftAnimator.draw(g,screenX,screenY,gp.tileSize,gp.tileSize);
                     }else if (entityStatus == attacking) {
                         leftAttackingAnimator.draw(g,screenX-gp.tileSize,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
                     }
                     break;
                 case "right":
-                    if (entityStatus == parrying || entityStatus == knockBacking)  {
-                        rightAnimator.draw(g, screenX, screenY, (3*gp.tileSize)/2, (3*gp.tileSize)/2);
+                    if (entityStatus == walking || entityStatus == knockBacking)  {
+                        rightAnimator.draw(g,screenX,screenY,gp.tileSize,gp.tileSize);
                     }else if (entityStatus == attacking) {
                         rightAttackingAnimator.draw(g,screenX,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
                     }
@@ -315,6 +334,7 @@ public class MON_Rudeling extends Entity {
         }
 
     }
+
 
 
 

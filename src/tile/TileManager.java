@@ -32,6 +32,12 @@ public class TileManager {
         loadMap("/maps/Overworld");
     }
 
+    public void reload(){
+        getTileImageFromTileSet("TunicTilesetV2");
+    }public void reloadMap(){
+        loadMap("/maps/Overworld");
+    }
+
     public void loadTileData(String filePath) {
         try {
             InputStream is = getClass().getResourceAsStream(filePath);
