@@ -5,21 +5,19 @@ import main.GamePanel;
 import javax.imageio.ImageIO;
 import java.io.IOException;
 
-public class OBJ_Key extends SuperObject{
-    GamePanel gp;
-    public OBJ_Key(GamePanel gp) {
+public class OBJ_Shield extends SuperObject
+{
+	public OBJ_Shield(GamePanel gp) {
         super(gp);
+        this.gp = gp;
         solidArea.width = gp.tileSize;
         solidArea.height = gp.tileSize;
-        name = "key";
-        objectType = singleUse;
-        this.gp = gp;
+        name = "shield";
+        objectType = gear;
         try{
-            image = ImageIO.read(getClass().getResourceAsStream("/objects/key.png"));
+            image = ImageIO.read(getClass().getResourceAsStream("/objects/shield.png"));
             image = uTool.scaleImage(image, gp.tileSize,  gp.tileSize);
 
         }catch(IOException e){
-            e.printStackTrace();}
-    }
-
+            e.printStackTrace();}}
 }

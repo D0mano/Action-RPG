@@ -7,9 +7,11 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Objects;
 
 public class Projectile extends Entity{
     Entity user;
+    public int freezeTime;
     public Projectile(GamePanel gp) {
         super(gp);
     }
@@ -59,10 +61,17 @@ public class Projectile extends Entity{
                     gp.monster.get(monsterIndex).takeDamage(0);
                     gp.playSoundEffect(16);
 
-                }else{
+                }else if (Objects.equals(name, "FireBall")){
                     gp.monster.get(monsterIndex).takeDamage(attackPower);
-                    gp.playSoundEffect(32);}
-                knockBack(gp.monster.get(monsterIndex),5);
+                    gp.playSoundEffect(32);
+                    knockBack(gp.monster.get(monsterIndex),5);
+                }
+                else if (Objects.equals(name, "IceBall")){
+                    gp.monster.get(monsterIndex).freezingTimer = freezeTime;
+                    gp.monster.get(monsterIndex).entityStatus = freezing;
+
+                }
+
                 alive = false;
             }
 

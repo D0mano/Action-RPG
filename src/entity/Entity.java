@@ -56,6 +56,7 @@ public class Entity {
     final public int attacking = 3;
     final public int knockBacking = 4;
     final public int parrying = 5;
+    final public int freezing = 6;
 
 
 
@@ -83,6 +84,7 @@ public class Entity {
     public int attackCounter = 0;
     public int canAttackCounter = 0;
     public int knockBackCounter = 0;
+    public int freezingCounter = 0;
 
 
 
@@ -94,6 +96,7 @@ public class Entity {
     public int attackDuration = 40;
     public int attackCooldownTimer = 90;
     public int knockBacTimer = 10;
+    public int freezingTimer;
 
     public Entity(GamePanel gp) {
         this.gp = gp;
@@ -120,6 +123,18 @@ public class Entity {
             }
         }
 
+        if(entityStatus == freezing){
+            freezingCounter++;
+            if (freezingCounter > freezingTimer){
+                freezingCounter = 0;
+                if (name.equals("Rudeling")) {
+                    entityStatus = parrying;
+                }else{
+                    entityStatus = walking;
+                }
+                return;
+            }
+        }
         if (entityStatus == knockBacking){
             collisionOn = false;
             gp.collisionChecker.checkEntity(this,gp.monster);
@@ -256,6 +271,9 @@ public class Entity {
                         upAnimator.draw(g, screenX, screenY, gp.tileSize, gp.tileSize);
                     }else if (entityStatus == attacking) {
                         upAttackingAnimator.draw(g,screenX, screenY-gp.tileSize, gp.tileSize, 2*gp.tileSize);
+                    }else if (entityStatus == freezing) {
+
+                       drawFreezeOverlay(g,upAnimator.currentsprite,screenX,screenY,gp.tileSize,gp.tileSize);
                     }
                     break;
                 case "down":
@@ -263,6 +281,9 @@ public class Entity {
                         downAnimator.draw(g, screenX, screenY, gp.tileSize, gp.tileSize);
                     }else if (entityStatus == attacking) {
                         downAttackingAnimator.draw(g,screenX, screenY, gp.tileSize, 2*gp.tileSize);
+                    }else if (entityStatus == freezing) {
+
+                        drawFreezeOverlay(g,downAnimator.currentsprite,screenX,screenY,gp.tileSize,gp.tileSize);
                     }
                     break;
                 case "left":
@@ -270,6 +291,9 @@ public class Entity {
                         leftAnimator.draw(g, screenX, screenY, gp.tileSize, gp.tileSize);
                     }else if (entityStatus == attacking) {
                         leftAttackingAnimator.draw(g,screenX-gp.tileSize, screenY, 2*gp.tileSize, gp.tileSize);
+                    }else if (entityStatus == freezing) {
+
+                        drawFreezeOverlay(g,leftAnimator.currentsprite,screenX,screenY,gp.tileSize,gp.tileSize);
                     }
                     break;
                 case "right":
@@ -277,6 +301,9 @@ public class Entity {
                         rightAnimator.draw(g, screenX, screenY, gp.tileSize, gp.tileSize);
                     }else if (entityStatus == attacking) {
                         rightAttackingAnimator.draw(g,screenX, screenY, 2*gp.tileSize, gp.tileSize);
+                    }else if (entityStatus == freezing) {
+
+                        drawFreezeOverlay(g,rightAnimator.currentsprite,screenX,screenY,gp.tileSize,gp.tileSize);
                     }
                     break;
 
@@ -398,9 +425,9 @@ public class Entity {
 
     }
 
-    public void shotProjectile(){
+    public void shootProjectile(){
         if (!projectile.alive && mana - projectile.useCost > 0){
-            gp.playSoundEffect(33);
+
             projectile.set(worldX,worldY,direction,true,this);
             gp.projectileList.add(projectile);
 
@@ -413,6 +440,31 @@ public class Entity {
         entity.direction = direction;
         entity.speed += knockBackPower;
         entity.entityStatus = knockBacking;
+    }
+
+    public void drawFreezeOverlay(Graphics2D g,BufferedImage image,int x,int y,int width,int height){
+        // First we draw the original image
+        g.drawImage(image,x,y,width,height,null);
+
+        Composite old = g.getComposite();
+
+        // We add the blue Overlay
+        float alpha = 0.35f + 0.1f *
+                (float) Math.sin(System.currentTimeMillis() / 200.0);
+
+        g.setComposite(AlphaComposite.getInstance(
+                AlphaComposite.SRC_OVER, alpha
+        ));
+        g.setColor(new Color(100, 150, 255));
+        g.fillRect(x, y, width, height);
+
+        g.setComposite(AlphaComposite.getInstance(
+                AlphaComposite.SRC_OVER, 0.8f
+        ));
+        g.setColor(new Color(180, 220, 255));
+        g.setStroke(new BasicStroke(2));
+        g.drawRect(x, y, width, height);
+        g.setComposite(old);
     }
 }
 

@@ -3,7 +3,7 @@ import main.Animator;
 import main.GamePanel;
 import main.KeyHandler;
 import main.UtilityTool;
-import object.FireBall;
+import object.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -45,17 +45,29 @@ public class Player extends Entity {
     public float displayedHealth = health;
 
     public  int screenX,screenY;
+    public int previousScreenX,previousScreenY;
 
     public BufferedImage downRoll,upRoll,leftRoll,rightRoll;
     public BufferedImage downIdle,upIdle,leftIdle,rightIdle;
     public BufferedImage downParry,upParry,leftParry,rightParry;
 
     // Key Flags
-    public boolean attackKeyProcessed=false;
+    public boolean jEquipKeyProcessed =false;
+    public boolean kEquipKeyProcessed =false;
     public boolean healKeyProcessed = false;
     public boolean parryKeyProcessed = false;
-    public boolean magicAttackKeyProcessed = false;
+    public boolean lEquipKeyProcessed = false;
     public boolean interactionKeyProcessed= false;
+
+    // INVENTORY
+    public ArrayList<SuperObject>[] inventory = new ArrayList[3];
+    public final int gearSize = 6;
+    public final int singleUseSize = 12;
+    public final int equipmentSize = 6;
+
+    public SuperObject jEquip;
+    public SuperObject kEquip;
+    public SuperObject lEquip;
 
     public Player(GamePanel gp, KeyHandler keyH) {
         super(gp);
@@ -66,7 +78,11 @@ public class Player extends Entity {
 
         setDefaultsValues();
         getPlayerImage();
-        projectile = new FireBall(gp);
+        for (int i = 0;i<inventory.length;i++) {
+            inventory[i] = new ArrayList<>();
+        }
+        setInventory();
+        projectile = new IceBall(gp);
 
 
 
@@ -116,6 +132,8 @@ public class Player extends Entity {
         upParryAnimator = new Animator(upParry,gp.tileSize,gp.tileSize,12,true);
         leftParryAnimator = new Animator(leftParry,gp.tileSize,gp.tileSize,12,true);
         rightParryAnimator = new Animator(rightParry,gp.tileSize,gp.tileSize,12,true);
+
+
 
 
 
@@ -181,6 +199,8 @@ public class Player extends Entity {
         upParryAnimator.reload(upParry,gp.tileSize,gp.tileSize);
         leftParryAnimator.reload(leftParry,gp.tileSize,gp.tileSize);
         rightParryAnimator.reload(rightParry,gp.tileSize,gp.tileSize);
+
+        reloadInventory();
 
 
 
@@ -577,7 +597,7 @@ public class Player extends Entity {
             entityStatus = walking;
         } else{entityStatus = idle;}
 
-        if (keyH.parryPressed){
+        if (hasObj("shield")&&keyH.parryPressed){
             if (endurance > 20) {
 
                 entityStatus = parrying;
@@ -589,13 +609,22 @@ public class Player extends Entity {
         } else if (entityStatus != rolling){speed = normalSpeed; parryKeyProcessed=false;}
         else{parryKeyProcessed=false;}
 
-        if (keyH.attackPressed){
-            if (!attackKeyProcessed){
-                gp.playSoundEffect(17);
-                attack();
-                attackKeyProcessed = true;
+        if ( jEquip != null && keyH.jEquipPressed){
+            if (!jEquipKeyProcessed){
+                gp.playSoundEffect(jEquip.soundEffectIndex);
+                jEquip.use();
+                jEquipKeyProcessed = true;
             }
-        }else{attackKeyProcessed = false;}
+        }else{
+            jEquipKeyProcessed = false;}
+        if ( kEquip != null && keyH.kEquipPressed){
+            if (!kEquipKeyProcessed){
+                gp.playSoundEffect(kEquip.soundEffectIndex);
+                kEquip.use();
+                kEquipKeyProcessed = true;
+            }
+        }else{
+            kEquipKeyProcessed = false;}
 
         if(keyH.healPressed){
             if (!healKeyProcessed){
@@ -627,13 +656,14 @@ public class Player extends Entity {
 
         }
 
-        if (keyH.magicAttackPressed){
-            if (!magicAttackKeyProcessed){
-                shotProjectile();
-                consumeMana(projectile.useCost);
-                magicAttackKeyProcessed = true;
+        if (lEquip != null && keyH.lEquipPressed){
+            if (!lEquipKeyProcessed){
+                gp.playSoundEffect(lEquip.soundEffectIndex);
+                lEquip.use();
+                lEquipKeyProcessed = true;
             }
-        }else{magicAttackKeyProcessed = false;}
+        }else{
+            lEquipKeyProcessed = false;}
 
         worldCol = worldX/gp.tileSize;
         worldRow = worldY/gp.tileSize;
@@ -647,29 +677,39 @@ public class Player extends Entity {
 
 
             String objName = gp.obj[index].name;
-            switch (objName) {
-                case "key":
+            addObjToInventory(gp.obj[index]);
+
+            if (objName.equals("door")){
+                if (hasKey > 0){
+                    gp.obj[index] = null;
+                    hasKey--;
+                }else{
                     gp.playSoundEffect(2);
-                    gp.ui.currentDialogue = "You pick up a key !";
+                    gp.ui.currentDialogue = "Doors is locked !";
                     gp.previousState = gp.gameState;
                     gp.gameState = gp.dialogueState;
-                    gp.obj[index] = null;
-                    hasKey++;
-                    break;
-                case "door":
-                    if (hasKey > 0){
-                        gp.obj[index] = null;
-                        hasKey--;
-                    }else{
-                        gp.playSoundEffect(2);
-                        gp.ui.currentDialogue = "Doors is locked !";
-                        gp.previousState = gp.gameState;
-                        gp.gameState = gp.dialogueState;
 
-                    }
-                    break;
-
+                }
             }
+            else if (objName.equals("chest")){}
+            else{
+                gp.playSoundEffect(2);
+                gp.ui.currentDialogue = "You pick up a "+objName+" !";
+                gp.previousState = gp.gameState;
+                gp.gameState = gp.dialogueState;
+                gp.obj[index] = null;
+                if (objName.equals("key")) {
+                    hasKey++;
+                }
+            }
+
+
+
+
+
+
+
+
         }
     }
 
@@ -853,6 +893,85 @@ public class Player extends Entity {
                 gp.tileM.mapTileNum1[p.y][p.x] = 16;
             }
         }
+    }
+
+    public void addObjToInventory(SuperObject obj){
+        if (obj != null && obj.objectType != obj.props){
+            switch (obj.objectType){
+                case 0:
+                    if (inventory[0].size() < gearSize){
+                        inventory[obj.objectType].add(obj);
+                    }
+                    break;
+                case 1:
+                    if (inventory[1].size() < singleUseSize){
+                        inventory[obj.objectType].add(obj);
+                    }
+                    break;
+                case 2:
+                    if (inventory[2].size() < equipmentSize){
+                        inventory[obj.objectType].add(obj);
+                    }
+                    break;
+            }
+
+
+        }
+    }
+
+    public void setInventory(){
+//        addObjToInventory(new OBJ_Sword(gp));
+//        addObjToInventory(new OBJ_Shield(gp));
+//        addObjToInventory(new OBJ_Lantern(gp));
+//        addObjToInventory(new OBJ_Key(gp));
+//        addObjToInventory(new OBJ_Key(gp));
+//        addObjToInventory(new OBJ_Key(gp));
+    }
+
+    public void reloadInventory(){
+        for(ArrayList<SuperObject> type : inventory){
+            for(SuperObject obj : type){
+                obj.reload();
+            }
+        }
+    }
+
+    public boolean hasObj(String objName){
+        for(ArrayList<SuperObject> type : inventory){
+            for(SuperObject obj : type){
+                if (obj.name.equals(objName)){
+                    return true;
+                }
+            }
+        }
+        return false;
+
+    }
+
+    public SuperObject getObjInInventory(int slotRow, int slotCol){
+        SuperObject obj = null;
+        if(slotRow == 0){
+            if(!inventory[0].isEmpty()){
+                obj = inventory[0].get(slotCol);
+            }
+
+        }
+        else if(slotRow == 1){
+            if(!inventory[1].isEmpty()){
+                obj = inventory[1].get(slotCol);
+            }
+        }else if(slotRow == 2){
+            if (!inventory[1].isEmpty()){
+                obj= inventory[1].get((singleUseSize/2)+slotCol);
+            }
+
+        }else if(slotRow == 3){
+            if (!inventory[2].isEmpty()){
+                obj =  inventory[2].get(slotCol);
+            }
+
+        }
+       return obj;
     }
 
 }

@@ -27,6 +27,15 @@ public class Sound {
         soundUrl[23] =  getClass().getResource("/sounds/ui/ui_main_button_options.wav");
         soundUrl[24] =  getClass().getResource("/sounds/ui/ui_main_nav_backtotitle_A.wav");
         soundUrl[25] =  getClass().getResource("/sounds/ui/ui_main_rollover.wav");
+        soundUrl[34] = getClass().getResource("/sounds/ui/ui_inv_slide_in.wav");
+        soundUrl[35] = getClass().getResource("/sounds/ui/ui_inv_slide_out.wav");
+        soundUrl[36] = getClass().getResource("/sounds/ui/ui_inventory_rollover.wav");
+        soundUrl[37] = getClass().getResource("/sounds/ui/ui_inventory_assign_invalid.wav");
+        soundUrl[38] = getClass().getResource("/sounds/ui/ui_inventory_assign_left.wav");
+        soundUrl[39] = getClass().getResource("/sounds/ui/ui_inventory_assign_right.wav");
+        soundUrl[40] = getClass().getResource("/sounds/ui/ui_inventory_assign_top.wav");
+
+
 
         // Player Sounds effects
         soundUrl[8] = getClass().getResource("/sounds/player/en_shared_hit_02.wav");

@@ -1,5 +1,7 @@
 package main;
 
+import object.SuperObject;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Random;
@@ -8,7 +10,7 @@ public class KeyHandler implements KeyListener {
 
     public boolean upPressed, downPressed, leftPressed, rightPressed, spacePressed;
     boolean debugKeyPressed = false;
-    public boolean healPressed,attackPressed,parryPressed,interactionPressed,magicAttackPressed;
+    public boolean healPressed, jEquipPressed,parryPressed,interactionPressed, lEquipPressed, kEquipPressed;
     GamePanel gp;
     Random random = new Random();
 
@@ -287,7 +289,10 @@ public class KeyHandler implements KeyListener {
 
             }
             if (code == KeyEvent.VK_TAB){
+                gp.playSoundEffect(34);
                 gp.previousState = gp.gameState;
+                gp.player.previousScreenX = gp.player.screenX;
+                gp.player.previousScreenY = gp.player.screenY;
                 gp.gameState = gp.inInventory;
             }
 
@@ -295,9 +300,15 @@ public class KeyHandler implements KeyListener {
                 healPressed = true;
             }
             if (code == KeyEvent.VK_J){
-                attackPressed = true;
+                jEquipPressed = true;
             }
-            if (code == KeyEvent.VK_K){
+            if(code == KeyEvent.VK_K){
+                kEquipPressed = true;
+            }
+            if (code == KeyEvent.VK_L){
+                lEquipPressed = true;
+            }
+            if (code == KeyEvent.VK_N){
                 parryPressed = true;
 
             }
@@ -308,9 +319,7 @@ public class KeyHandler implements KeyListener {
             if(code == KeyEvent.VK_SPACE){
                 spacePressed = true;
             }
-            if (code == KeyEvent.VK_L){
-                magicAttackPressed = true;
-            }
+
 
 
         }
@@ -365,6 +374,86 @@ public class KeyHandler implements KeyListener {
             if(code == KeyEvent.VK_ESCAPE || code == KeyEvent.VK_TAB){
                 gp.previousState = gp.gameState;
                 gp.gameState = gp.playState;
+                gp.player.screenX = gp.player.previousScreenX;
+                gp.player.screenY = gp.player.previousScreenY;
+                gp.playSoundEffect(35);
+            }
+
+            if(code == KeyEvent.VK_UP || code == KeyEvent.VK_Z){
+                gp.playSoundEffect(36);
+                if (gp.ui.slotRow == 0){
+                    gp.ui.slotRow = 3;
+                }else{
+                    gp.ui.slotRow--;
+                }
+            }
+            if(code == KeyEvent.VK_DOWN || code == KeyEvent.VK_S){
+                gp.playSoundEffect(36);
+                if (gp.ui.slotRow == 3){
+                    gp.ui.slotRow = 0;
+                }else{
+                    gp.ui.slotRow++;
+                }
+            }
+            if(code == KeyEvent.VK_LEFT || code == KeyEvent.VK_Q){
+                gp.playSoundEffect(36);
+                if (gp.ui.slotCol == 0){
+                    gp.ui.slotCol = 5;
+                }else{
+                    gp.ui.slotCol--;
+                }
+            }
+            if(code == KeyEvent.VK_RIGHT || code == KeyEvent.VK_D){
+                gp.playSoundEffect(36);
+                if (gp.ui.slotCol == 5){
+                    gp.ui.slotCol = 0;
+                }else{
+                    gp.ui.slotCol++;
+                }
+            }
+
+            if (code == KeyEvent.VK_J){
+                SuperObject obj = gp.player.getObjInInventory(gp.ui.slotRow, gp.ui.slotCol);
+                if (obj != null && obj.objectType != obj.gear) {
+                    if (obj == gp.player.kEquip){
+                        gp.player.kEquip = null;
+                    }else if (obj == gp.player.lEquip){
+                        gp.player.lEquip = null;
+                    }
+                    gp.player.jEquip = obj;
+                    gp.playSoundEffect(38);
+
+                }else{
+                    gp.playSoundEffect(37);
+                }
+            }
+            if (code == KeyEvent.VK_K){
+                SuperObject obj = gp.player.getObjInInventory(gp.ui.slotRow, gp.ui.slotCol);
+                if (obj != null && obj.objectType != obj.gear) {
+                    if (obj == gp.player.jEquip) {
+                        gp.player.jEquip = null;
+                    } else if (obj == gp.player.lEquip) {
+                        gp.player.lEquip = null;
+                    }
+                    gp.player.kEquip = obj;
+                    gp.playSoundEffect(40);
+                }else{
+                    gp.playSoundEffect(37);
+                }
+            }
+            if (code == KeyEvent.VK_L){
+                SuperObject obj = gp.player.getObjInInventory(gp.ui.slotRow, gp.ui.slotCol);
+                if (obj != null && obj.objectType != obj.gear) {
+                    if (obj == gp.player.jEquip) {
+                        gp.player.jEquip = null;
+                    } else if (obj == gp.player.kEquip) {
+                        gp.player.kEquip = null;
+                    }
+                    gp.player.lEquip = obj;
+                    gp.playSoundEffect(39);
+                }else{
+                    gp.playSoundEffect(37);
+                }
             }
         }
         else if(gp.gameState== gp.dialogueState){
@@ -406,9 +495,15 @@ public class KeyHandler implements KeyListener {
             healPressed = false;
         }
         if (code == KeyEvent.VK_J){
-            attackPressed = false;
+            jEquipPressed = false;
         }
         if (code == KeyEvent.VK_K){
+            kEquipPressed = false;
+        }
+        if (code == KeyEvent.VK_L){
+            lEquipPressed = false;
+        }
+        if (code == KeyEvent.VK_N){
             parryPressed = false;
             if(gp.player.entityStatus ==gp.player.parrying){
                 gp.playSoundEffect(31);
@@ -422,9 +517,7 @@ public class KeyHandler implements KeyListener {
         if(code == KeyEvent.VK_SPACE){
             spacePressed = false;
         }
-        if (code == KeyEvent.VK_L){
-            magicAttackPressed = false;
-        }
+
 
 
     }

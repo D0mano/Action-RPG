@@ -4,7 +4,7 @@ import entity.Entity;
 import monster.MON_Blob;
 import monster.MON_FoxZombie;
 import monster.MON_Rudeling;
-import object.SuperObject;
+import object.*;
 
 public class AssetSetter {
     GamePanel gp;
@@ -26,26 +26,23 @@ public class AssetSetter {
     }
 
     public void setObject(){
-//        gp.obj[0] = new OBJ_Key(gp);
-//        gp.obj[0].worldX = 7 * gp.tileSize;
-//        gp.obj[0].worldY = 15 * gp.tileSize;
-//
-//        gp.obj[1] = new OBJ_Key(gp);
-//        gp.obj[1].worldX = 24 * gp.tileSize;
-//        gp.obj[1].worldY = 38 * gp.tileSize;
-//
-//        gp.obj[2] = new OBJ_Door(gp);
-//        gp.obj[2].worldX = 3 * gp.tileSize;
-//        gp.obj[2].worldY = 39 * gp.tileSize;
-//
-//
-//        gp.obj[3] = new OBJ_Door(gp);
-//        gp.obj[3].worldX = 5 * gp.tileSize;
-//        gp.obj[3].worldY = 34 * gp.tileSize;
-//
-//        gp.obj[4] = new OBJ_Chest(gp);
-//        gp.obj[4].worldX = 4 * gp.tileSize;
-//        gp.obj[4].worldY = 31 * gp.tileSize;
+        gp.obj[0] = new OBJ_Sword(gp);
+        gp.obj[0].worldX = 48  * gp.tileSize;
+        gp.obj[0].worldY = 53 * gp.tileSize;
+
+        gp.obj[1] = new OBJ_Shield(gp);
+        gp.obj[1].worldX = 16  * gp.tileSize;
+        gp.obj[1].worldY = 17 * gp.tileSize;
+
+        gp.obj[2] = new OBJ_FireWand(gp);
+        gp.obj[2].worldX = 56  * gp.tileSize;
+        gp.obj[2].worldY = 11 * gp.tileSize;
+
+        gp.obj[3] = new OBJ_IceWand(gp);
+        gp.obj[3].worldX = 48  * gp.tileSize;
+        gp.obj[3].worldY = 27 * gp.tileSize;
+
+
     }
 
     public void setMonster(){

@@ -1,6 +1,7 @@
 package main;
 
 import entity.Player;
+import object.SuperObject;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -17,6 +18,7 @@ public class UI {
     int messageCounter = 0;
     public String currentDialogue = "";
     public boolean gameFinished = false;
+    Color myOrange = new Color(206, 157, 58);
     Player player;
     BufferedImage healthTop,healthOverlay, healthMiddle;
     BufferedImage enduranceTop,enduranceOverlay,enduranceMiddle;
@@ -25,18 +27,22 @@ public class UI {
     BufferedImage messageWindow;
     BufferedImage optionWindow;
     BufferedImage potionFull, potionEmpty;
+    BufferedImage inventoryFrame;
     int commandNumber = 0;
 
-     public String[] pauseCommand = {"Return to Game","Options","Quit"};
-     public int commandNumberPause = 0;
-     public String[] optionCommand = {"Audio","Graphics","Return"};
-     public int commandNumberOption = 0;
+    public String[] pauseCommand = {"Return to Game","Options","Quit"};
+    public int commandNumberPause = 0;
+    public String[] optionCommand = {"Audio","Graphics","Return"};
+    public int commandNumberOption = 0;
 
-     public String[] audioCommand = {"Musics","Sounds Effects","Return"};
-     public int commandNumberAudio = 0;
+    public String[] audioCommand = {"Musics","Sounds Effects","Return"};
+    public int commandNumberAudio = 0;
 
-     public String[] graphicCommand = {"Display Mode","Resolution","Return"};
-     public int commandNumberGraphic = 0;
+    public String[] graphicCommand = {"Display Mode","Resolution","Return"};
+    public int commandNumberGraphic = 0;
+
+    public int slotRow = 0;
+    public int slotCol = 0;
 
 
 
@@ -85,12 +91,17 @@ public class UI {
         menuSelectionOrange = setup("/menu/menuOverlayOrange",gp.scale);
         menuSelectionOrange2 = setup("/menu/menuOverlayOrange2",gp.scale);
 
+        inventoryFrame = setup("/menu/inventoryFrame",gp.scale);
+
+
         messageWindow = setup("/menu/window1",gp.scale);
 
         optionWindow = setup("/menu/optionOverlay",gp.scale);
 
         potionFull = setup("/player/potion_full",gp.scale);
         potionEmpty = setup("/player/potion_empty",gp.scale);
+
+
 
 
 
@@ -133,6 +144,9 @@ public class UI {
         menuSelection = setup("/menu/menuOverlayWhite",gp.scale);
         menuSelectionOrange = setup("/menu/menuOverlayOrange",gp.scale);
         menuSelectionOrange2 = setup("/menu/menuOverlayOrange2",gp.scale);
+
+        inventoryFrame = setup("/menu/inventoryFrame",gp.scale);
+
 
         messageWindow = setup("/menu/window1",gp.scale);
 
@@ -202,6 +216,7 @@ public class UI {
             drawPlayerEndurance();
             drawPlayerMana();
             drawPlayerPotion();
+            drawPlayerEquipment();
 
         }
         if (gp.gameState == gp.pauseState){
@@ -212,13 +227,89 @@ public class UI {
             drawDialogueScreen();
         }
         if (gp.gameState == gp.inInventory){
-            gp.player.screenX = (2*gp.screenWidth)/3;
 
-            drawInventoryScreen();
+            int tempScreenX = (2*gp.screenWidth)/3;
+            if (gp.player.screenX < tempScreenX){
+                gp.player.screenX += gp.tileSize;
+            }
+            if (gp.player.screenX >= tempScreenX){
+                gp.player.screenX = tempScreenX ;
+                drawInventoryScreen();
+            }
+
         }
     }
 
-    public void drawInventoryScreen(){}
+    public void drawInventoryScreen(){
+        GradientPaint vignette = new GradientPaint(
+                0,0,new Color(0,0,0,240),
+                9*gp.tileSize,0,new Color(0,0,0,0)
+        );
+        g2.setPaint(vignette);
+        g2.fillRect(0,0,9*gp.tileSize,gp.screenHeight);
+
+        g2.drawImage(inventoryFrame,0,0,null);
+        g2.setFont(trunic);
+        g2.setFont(g2.getFont().deriveFont(Font.BOLD, gp.tileSize/3f));
+        g2.setColor(Color.white);
+        g2.drawString("Gear",gp.tileSize/4,(3*gp.tileSize)/2);
+        g2.drawString("Single use",gp.tileSize/4,(7*gp.tileSize)/2);
+        g2.drawString("Equipment",gp.tileSize/4,(14*gp.tileSize)/2);
+        // SLOTS
+        int slotStartX = gp.tileSize/2;
+        int slotStartY1 = 2*gp.tileSize;
+        int slotStartY2 = 4*gp.tileSize;
+        int slotStartY3 = (15*gp.tileSize)/2;
+        int slotOffset = 3*gp.tileSize/2;
+        int slotX = slotStartX;
+        int slotY = slotStartY1;
+
+        // DRAW PLAYER'S ITEMS
+        for (int i = 0;i<3 ;i++){
+            slotX = slotStartX;
+            slotY = switch (i) {
+                case 0 -> slotStartY1;
+                case 1 -> slotStartY2;
+                case 2 -> slotStartY3;
+                default -> slotY;
+            };
+            for (int j = 0; j<gp.player.inventory[i].size();j++){
+                if (j >5){slotY +=slotOffset;}
+                g2.drawImage(gp.player.inventory[i].get(j).image,slotX,slotY,null);
+                slotX += slotOffset;
+
+
+            }
+
+
+        }
+
+
+        // Cursor
+        int cursorX = (slotStartX + (slotOffset)* slotCol) - gp.tileSize/16;
+        int cursorY;
+
+        int cursorWidth = (9*gp.tileSize)/8;
+        int cursorHeight = (9*gp.tileSize)/8;
+        if (slotRow == 0){
+            cursorY = (slotStartY1 ) - gp.tileSize/16;
+
+        }else if (slotRow == 1){
+            cursorY = (slotStartY2 ) - gp.tileSize/16;
+        }else if (slotRow == 2){
+            cursorY = (slotStartY2 + slotOffset) - gp.tileSize/16;
+        }
+        else{
+            cursorY = (slotStartY3 ) -  gp.tileSize/16;
+        }
+        // DRAW CURSOR
+        g2.setColor(myOrange);
+        g2.setStroke(new BasicStroke(4));
+        g2.drawRoundRect(cursorX,cursorY,cursorWidth,cursorHeight,5,5);
+
+
+
+    }
 
     public void drawPauseScreen(){
         RadialGradientPaint vignette = new RadialGradientPaint(
@@ -269,7 +360,7 @@ public class UI {
 
     public void drawTitleScreen(){
 
-        Color myOrange = new Color(206, 157, 58);
+
         int titleX = gp.screenWidth/12;
         int titleY = gp.screenHeight/2 -  whiteTitle.getHeight()/2;
 //        g2.setColor(new Color(155,240,253));
@@ -404,12 +495,12 @@ public class UI {
             int textY = buttonY + (int)(gp.screenHeight /15.15f);
             g2.drawString(audioCommand[i], textX, textY);
             if (i ==0){
-                g2.setColor(new Color(196, 148, 62));
+                g2.setColor(myOrange);
                 textX += 7*gp.tileSize + gp.tileSize/2;
                 g2.drawString(Math.round(gp.music.currentVolume * 100)+"%", textX, textY);
             }
             if (i == 1){
-                g2.setColor(new Color(196, 148, 62));
+                g2.setColor(myOrange);
                 textX += 7*gp.tileSize + gp.tileSize/2;
                 g2.drawString(Math.round(gp.soundEffects.currentVolume * 100)+"%", textX, textY);
 
@@ -462,12 +553,12 @@ public class UI {
             g2.drawString(graphicCommand[i], textX, textY);
 
             if (i ==0){
-                g2.setColor(new Color(196, 148, 62));
+                g2.setColor(myOrange);
                 textX += 5*gp.tileSize + gp.tileSize/2;
                 g2.drawString(gp.displayMode, textX, textY);
             }
             if (i ==1){
-                g2.setColor(new Color(196, 148, 62));
+                g2.setColor(myOrange);
                 textX += 5*gp.tileSize + gp.tileSize/2;
                 g2.drawString(gp.screenWidth+"x"+gp.screenHeight, textX, textY);
             }
@@ -484,9 +575,9 @@ public class UI {
 
         int x = gp.screenWidth/10;
         int topY = gp.screenHeight*2/3;
-        g2.drawImage(healthOverlay,x,topY,null);
+        int healthBarHeight = (int)(gp.screenHeight/3.5f);
+        g2.drawImage(healthOverlay,x,topY,healthOverlay.getWidth(),healthBarHeight,null);
 
-        int healthBarHeight = healthOverlay.getHeight();
         int midHeight = healthMiddle.getHeight();
         float hp = player.displayedHealth/player.maxHealth;
 
@@ -513,9 +604,9 @@ public class UI {
     public void drawPlayerEndurance(){
         int x = gp.screenWidth/10 +(int)(gp.screenHeight /11.52f);
         int topY = gp.screenHeight*2/3;
-        g2.drawImage(enduranceOverlay,x,topY,null);
+        int healthBarHeight = (int)(gp.screenHeight/3.5f);
+        g2.drawImage(enduranceOverlay,x,topY,enduranceOverlay.getWidth(),healthBarHeight,null);
 
-        int healthBarHeight = enduranceOverlay.getHeight();
         int midHeight = enduranceMiddle.getHeight();
         float ed = player.displayedEndurance/player.maxEndurance;
 
@@ -539,9 +630,9 @@ public class UI {
     public void drawPlayerMana(){
         int x = gp.screenWidth/10 +(int)(gp.screenHeight /5.76f);
         int topY = gp.screenHeight*2/3;
-        g2.drawImage(manaOverlay,x,topY,null);
+        int healthBarHeight = (int)(gp.screenHeight/3.5f);
+        g2.drawImage(manaOverlay,x,topY,manaOverlay.getWidth(),healthBarHeight,null);
 
-        int healthBarHeight = manaOverlay.getHeight();
         int midHeight = manaMiddle.getHeight();
         float ed = player.displayedMana/player.maxMana;
 
@@ -572,6 +663,29 @@ public class UI {
         for (int i =0; i< gp.player.maxPotion - gp.player.potionNotUsed ;i++){
             g2.drawImage(potionEmpty,x,y,null);
             x-=gp.tileSize;
+        }
+    }
+
+    public void drawPlayerEquipment(){
+        UtilityTool uT = new UtilityTool();
+        int jX = ((gp.maxScreenCol -4)*gp.tileSize);
+        int kX = ((gp.maxScreenCol -3)*gp.tileSize);
+        int lX = ((gp.maxScreenCol -2)*gp.tileSize);
+        int y = (2*gp.tileSize/3) ;
+        SuperObject jEquip = gp.player.jEquip;
+        SuperObject kEquip = gp.player.kEquip;
+        SuperObject lEquip = gp.player.lEquip;
+        g2.setColor(new Color(47,47,47,200));
+        g2.fillOval(jX,y,gp.tileSize,gp.tileSize);
+        g2.fillOval(kX,y,gp.tileSize,gp.tileSize);
+        g2.fillOval(lX,y,gp.tileSize,gp.tileSize);
+        if (jEquip != null){
+            g2.drawImage(uT.scaleImage(jEquip.image,(2*gp.tileSize/3),(2*gp.tileSize/3)),jX + gp.tileSize/6,y + gp.tileSize/6,null);
+        }
+        if (kEquip != null){
+            g2.drawImage(uT.scaleImage(kEquip.image,(2*gp.tileSize/3),(2*gp.tileSize/3)),kX + gp.tileSize/6,y + gp.tileSize/6,null);
+        }if (lEquip != null){
+            g2.drawImage(uT.scaleImage(lEquip.image,(2*gp.tileSize/3),(2*gp.tileSize/3)),lX + gp.tileSize/6,y + gp.tileSize/6,null);
         }
     }
 

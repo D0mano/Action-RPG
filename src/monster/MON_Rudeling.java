@@ -231,6 +231,9 @@ public class MON_Rudeling extends Entity {
                         upAnimator.draw(g, screenX, screenY, (3*gp.tileSize)/2, (3*gp.tileSize)/2);
                     }else if (entityStatus == attacking) {
                         upAttackingAnimator.draw(g,screenX-gp.tileSize,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
+                    }else if (entityStatus == freezing) {
+
+                        drawFreezeOverlay(g,upAnimator.currentsprite,screenX,screenY,(3*gp.tileSize)/2, (3*gp.tileSize)/2);
                     }
                     break;
                 case "down":
@@ -238,6 +241,9 @@ public class MON_Rudeling extends Entity {
                         downAnimator.draw(g, screenX, screenY, (3*gp.tileSize)/2, (3*gp.tileSize)/2);
                     }else if (entityStatus == attacking) {
                         downAttackingAnimator.draw(g,screenX,screenY,gp.tileSize*2,gp.tileSize*2);
+                    }else if (entityStatus == freezing) {
+
+                        drawFreezeOverlay(g,downAnimator.currentsprite,screenX,screenY,(3*gp.tileSize)/2, (3*gp.tileSize)/2);
                     }
                     break;
                 case "left":
@@ -245,6 +251,9 @@ public class MON_Rudeling extends Entity {
                         leftAnimator.draw(g, screenX, screenY, (3*gp.tileSize)/2, (3*gp.tileSize)/2);
                     }else if (entityStatus == attacking) {
                         leftAttackingAnimator.draw(g,screenX-gp.tileSize,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
+                    }else if (entityStatus == freezing) {
+
+                        drawFreezeOverlay(g,leftAnimator.currentsprite,screenX,screenY,(3*gp.tileSize)/2, (3*gp.tileSize)/2);
                     }
                     break;
                 case "right":
@@ -252,6 +261,9 @@ public class MON_Rudeling extends Entity {
                         rightAnimator.draw(g, screenX, screenY, (3*gp.tileSize)/2, (3*gp.tileSize)/2);
                     }else if (entityStatus == attacking) {
                         rightAttackingAnimator.draw(g,screenX,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
+                    }else if (entityStatus == freezing) {
+
+                        drawFreezeOverlay(g,rightAnimator.currentsprite,screenX,screenY,(3*gp.tileSize)/2, (3*gp.tileSize)/2);
                     }
                     break;
 

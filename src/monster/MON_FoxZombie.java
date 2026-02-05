@@ -173,7 +173,7 @@ public class MON_FoxZombie extends Entity {
             }
             if(playerCol == entityCol || playerRow == entityRow){
                 if (!shotTaken){
-                    shotProjectile();
+                    shootProjectile();
                     shotTaken = true;
                 }
             }
@@ -250,6 +250,9 @@ public class MON_FoxZombie extends Entity {
                         upAnimator.draw(g, screenX, screenY, gp.tileSize,gp.tileSize);
                     }else if (entityStatus == attacking) {
                         upAttackingAnimator.draw(g,screenX-gp.tileSize,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
+                    }else if (entityStatus == freezing) {
+
+                        drawFreezeOverlay(g,upAnimator.currentsprite,screenX,screenY,gp.tileSize,gp.tileSize);
                     }
                     break;
                 case "down":
@@ -257,6 +260,9 @@ public class MON_FoxZombie extends Entity {
                         downAnimator.draw(g,screenX,screenY,gp.tileSize,gp.tileSize);
                     }else if (entityStatus == attacking) {
                         downAttackingAnimator.draw(g,screenX,screenY,gp.tileSize*2,gp.tileSize*2);
+                    }else if (entityStatus == freezing) {
+
+                        drawFreezeOverlay(g,downAnimator.currentsprite,screenX,screenY,gp.tileSize,gp.tileSize);
                     }
                     break;
                 case "left":
@@ -264,6 +270,9 @@ public class MON_FoxZombie extends Entity {
                         leftAnimator.draw(g,screenX,screenY,gp.tileSize,gp.tileSize);
                     }else if (entityStatus == attacking) {
                         leftAttackingAnimator.draw(g,screenX-gp.tileSize,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
+                    }else if (entityStatus == freezing) {
+
+                        drawFreezeOverlay(g,leftAnimator.currentsprite,screenX,screenY,gp.tileSize,gp.tileSize);
                     }
                     break;
                 case "right":
@@ -271,6 +280,9 @@ public class MON_FoxZombie extends Entity {
                         rightAnimator.draw(g,screenX,screenY,gp.tileSize,gp.tileSize);
                     }else if (entityStatus == attacking) {
                         rightAttackingAnimator.draw(g,screenX,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
+                    }else if (entityStatus == freezing) {
+
+                        drawFreezeOverlay(g,rightAnimator.currentsprite,screenX,screenY,gp.tileSize,gp.tileSize);
                     }
                     break;
 

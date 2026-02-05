@@ -9,9 +9,11 @@ public class OBJ_Door extends SuperObject{
     GamePanel gp;
 
     public OBJ_Door(GamePanel gp) {
+        super(gp);
         solidArea.width = gp.tileSize;
         solidArea.height = gp.tileSize;
         name = "door";
+        objectType = props;
         this.gp = gp;
         try{
             image = ImageIO.read(getClass().getResourceAsStream("/objects/doors.png"));
@@ -31,12 +33,6 @@ public class OBJ_Door extends SuperObject{
 
 
     }
-    public void reload(){
-        solidArea.width = gp.tileSize;
-        solidArea.height = gp.tileSize;
-        image = uTool.scaleImage(image,gp.tileSize,gp.tileSize);
 
-
-    }
 
 }
