@@ -513,5 +513,37 @@ public class CollisionChecker {
 
     }
 
+    public Point findNextFreeTile(int worldCol,int worldRow,String direction){
+        int tileIndex;
+        int worldForwardCol,worldForwardRow;
+        switch(direction){
+            case "up":
+                worldForwardCol = worldCol;
+                worldForwardRow = worldRow+1;
+                break;
+            case "down":
+                worldForwardCol = worldCol;
+                worldForwardRow = worldRow-1;
+                break;
+            case "left":
+                worldForwardCol = worldCol+1;
+                worldForwardRow = worldRow;
+                break;
+            case "right":
+                worldForwardCol = worldCol-1;
+                worldForwardRow = worldRow;
+                break;
+            default:
+                worldForwardCol = worldCol;
+                worldForwardRow = worldRow;
+
+        }
+        tileIndex = gp.tileM.mapTileNum1[worldForwardRow][worldForwardCol];
+        if (gp.tileM.tile[tileIndex].collision){
+            return findNextFreeTile(worldForwardCol,worldForwardRow,direction);
+        }
+        return new Point(worldForwardCol,worldForwardRow);
+    }
+
 }
 

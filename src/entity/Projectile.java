@@ -75,7 +75,7 @@ public class Projectile extends Entity{
                 }
                 else if (Objects.equals(name, "Hook")){
                     gp.monster.get(monsterIndex).entityStatus = grabbed;
-                    gp.monster.get(monsterIndex).direction = direction;
+                    gp.monster.get(monsterIndex).direction = uTool.oppositeDirection(direction);
 
                 }
 

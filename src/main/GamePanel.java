@@ -338,6 +338,7 @@ public class GamePanel extends JPanel implements Runnable {
                 g2.setFont(new Font("Serif", Font.BOLD, (int)(screenHeight/19.2f)));
                 g2.drawString("Draw Time: " + passedTime , (screenHeight /57.6f), (screenHeight /1.92f));
                 g2.drawString("Coordinate :" + player.worldX+","+player.worldY , (screenHeight /57.6f), (screenHeight /1.74f));
+                g2.drawString("Tile Coordinate :"+ player.worldCol +","+player.worldRow,(screenHeight /57.6f), (screenHeight /1.60f));
                 player.showHitbox(g2);
 
             }
@@ -350,8 +351,8 @@ public class GamePanel extends JPanel implements Runnable {
 
         Graphics2D g2d = (Graphics2D) g;
         g2d.drawImage(tempScreen, 0, 0,screenWidth2,screenHeight2, null);
-        System.out.println("Screen width: " + screenWidth2+ " Screen height: " + screenHeight2);
-        System.out.println("Panel width: " + screenWidth+ " Panel height: " + screenHeight);
+//        System.out.println("Screen width: " + screenWidth2+ " Screen height: " + screenHeight2);
+//        System.out.println("Panel width: " + screenWidth+ " Panel height: " + screenHeight);
 
         g2d.dispose();
     }

@@ -26,6 +26,7 @@ public class OBJ_GrapplingHook extends SuperObject{
         gp.player.projectile = projectile;
         gp.player.shootProjectile();
         gp.player.consumeMana(projectile.useCost);
+        gp.player.entityStatus = gp.player.grappling;
         return projectile.alive;
     }
 }

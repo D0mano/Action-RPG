@@ -312,6 +312,18 @@ public class Player extends Entity {
 
             return;
         }
+        if (entityStatus == grappling){
+            switch (direction) {
+                case "up": upIdleAnimator.update();break;
+                case "down": downIdleAnimator.update();break;
+                case "left": leftIdleAnimator.update();break;
+                case "right": rightIdleAnimator.update();break;
+            }
+            if (!projectile.alive){
+                entityStatus = idle;
+            }
+            return;
+        }
 
         if (entityStatus == rolling){
 
@@ -741,7 +753,7 @@ public class Player extends Entity {
 
                 }else if (entityStatus == walking) {
                     upAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
-                }else if (entityStatus == idle) {
+                }else if (entityStatus == idle || entityStatus == grappling) {
                     upIdleAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
                 }else if(entityStatus == attacking) {
                     upAttackingAnimator.draw(g2d,screenX-gp.tileSize,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
@@ -754,7 +766,7 @@ public class Player extends Entity {
                     downAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
                 }else if (entityStatus == rolling) {
                     downRollAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
-                }else if (entityStatus == idle) {
+                }else if (entityStatus == idle || entityStatus == grappling) {
                     downIdleAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
                 }else if (entityStatus == attacking) {
                     downAttackingAnimator.draw(g2d,screenX,screenY,gp.tileSize*2,gp.tileSize*2);
@@ -768,7 +780,7 @@ public class Player extends Entity {
                     leftRollAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
                 }else if (entityStatus == walking) {
                     leftAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
-                }else if (entityStatus == idle) {
+                }else if (entityStatus == idle || entityStatus == grappling) {
                     leftIdleAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
                 }else if (entityStatus == attacking) {
                     leftAttackingAnimator.draw(g2d,screenX-gp.tileSize,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
@@ -782,7 +794,7 @@ public class Player extends Entity {
 
                 }else if (entityStatus == walking) {
                     rightAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
-                }else if (entityStatus == idle) {
+                }else if (entityStatus == idle || entityStatus == grappling) {
                     rightIdleAnimator.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
                 }else if (entityStatus == attacking) {
                     rightAttackingAnimator.draw(g2d,screenX,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
@@ -954,6 +966,7 @@ public class Player extends Entity {
 
         addObjToInventory(new OBJ_BlueFruit(gp));
         addObjToInventory(new OBJ_RedFruit(gp));
+        addObjToInventory(new OBJ_GrapplingHook(gp));
     }
 
     public void reloadInventory(){

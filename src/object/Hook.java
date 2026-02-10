@@ -14,7 +14,7 @@ public class Hook extends Projectile {
         name = "Hook";
         normalSpeed = gp.tileSize/5;
         speed = normalSpeed;
-        maxHealth = 80;
+        maxHealth = 60;
         attackPower = 0;
         health = maxHealth;
         useCost = 10;

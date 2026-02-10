@@ -142,18 +142,16 @@ public class Entity {
             }
         }
         if (entityStatus == grabbed) {
+            int worldCol, worldRow;
+            worldCol = (gp.player.worldX+gp.player.solidArea.x)/gp.tileSize;
+            worldRow = (gp.player.worldY+gp.player.solidArea.y)/gp.tileSize;
+            System.out.println("Player coord :"+worldCol * gp.tileSize + " " + worldRow * gp.tileSize);
+            System.out.println("Entity coord :"+worldX+" "+worldY);
+            Point forwardTile = gp.collisionChecker.findNextFreeTile(worldCol,worldRow,direction);
+            int offset = gp.tileSize/4;
             switch (direction){
                 case "up":
-                    if (gp.player.worldY-gp.tileSize >worldY+solidArea.height){
-                        worldY += gp.tileSize/4;
-                    }else if (name.equals("Rudeling")) {
-                        entityStatus = parrying;
-                    }else{
-                        entityStatus = walking;
-                    }
-                    break;
-                case "down":
-                    if (gp.player.worldY+gp.player.solidArea.height+gp.tileSize < worldY){
+                    if (forwardTile.y * gp.tileSize  <= worldY - offset){
                         worldY -= gp.tileSize/4;
                     }else if (name.equals("Rudeling")) {
                         entityStatus = parrying;
@@ -161,9 +159,18 @@ public class Entity {
                         entityStatus = walking;
                     }
                     break;
+                case "down":
+                    if (forwardTile.y * gp.tileSize-offset >= worldY + offset){
+                        worldY += gp.tileSize/4;
+                    }else if (name.equals("Rudeling")) {
+                        entityStatus = parrying;
+                    }else{
+                        entityStatus = walking;
+                    }
+                    break;
                 case "left":
-                    if (gp.player.worldX-gp.tileSize > worldX+solidArea.width){
-                        worldX += gp.tileSize/4;
+                    if (forwardTile.x * gp.tileSize + offset <= worldX - offset){
+                        worldX -= gp.tileSize/4;
                     }else if (name.equals("Rudeling")) {
                         entityStatus = parrying;
                     }else{
@@ -171,8 +178,8 @@ public class Entity {
                     }
                     break;
                 case "right":
-                    if (gp.player.worldX+gp.tileSize < worldX){
-                        worldX -= gp.tileSize/4;
+                    if (forwardTile.x * gp.tileSize - offset >= worldX  + offset){
+                        worldX += gp.tileSize/4;
                     }else if (name.equals("Rudeling")) {
                         entityStatus = parrying;
                     }else{
