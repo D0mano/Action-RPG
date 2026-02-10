@@ -164,14 +164,14 @@ public class KeyHandler implements KeyListener {
             if (code == KeyEvent.VK_Q || code == KeyEvent.VK_LEFT){
                 if (gp.ui.commandNumberAudio == 0) {
                     if(gp.music.currentVolume > 0){
-                        gp.music.currentVolume -= 0.1;
+                        gp.music.currentVolume -= 0.1F;
                         gp.music.currentVolume = Math.max(0f, gp.music.currentVolume);
                         gp.updateMusicVolume(gp.music.currentVolume);
                     }
                 }
                 if (gp.ui.commandNumberAudio == 1) {
                     if(gp.soundEffects.currentVolume > 0){
-                        gp.soundEffects.currentVolume -= 0.1;
+                        gp.soundEffects.currentVolume -= 0.1f;
                         gp.soundEffects.currentVolume = Math.max(0f, gp.soundEffects.currentVolume);
                         gp.updateSoundVolume(gp.soundEffects.currentVolume);
                     }
@@ -217,7 +217,7 @@ public class KeyHandler implements KeyListener {
                     else{gp.displayMode = gp.windowMode;}
                 }
                 if(gp.ui.commandNumberGraphic == 1){
-                    if(gp.scale == 4){
+                    if(gp.scale == 5){
                         gp.scale = 2;
                     }else{
                         gp.scale ++;
@@ -235,7 +235,7 @@ public class KeyHandler implements KeyListener {
                 }
                 if(gp.ui.commandNumberGraphic == 1){
                     if(gp.scale == 2){
-                        gp.scale = 4;
+                        gp.scale = 5;
                     }else{
                         gp.scale --;
                     }
@@ -458,7 +458,15 @@ public class KeyHandler implements KeyListener {
         }
         else if(gp.gameState== gp.dialogueState){
             if(code == KeyEvent.VK_ENTER){
-                gp.playSoundEffect(22);
+                if (gp.ui.messageOn){
+                    gp.playSoundEffect(22);
+                    gp.ui.messageOn = false;
+                }else if(gp.ui.itemOn){
+                    gp.playSoundEffect(22);
+                    gp.ui.itemOn = false;
+
+                }
+
                 gp.previousState = gp.gameState;
                 gp.gameState = gp.playState;
             }

@@ -187,16 +187,20 @@ public class MON_Rudeling extends Entity {
         }
     }
     public void attack(){
-        UtilityTool uTool = new UtilityTool();
         gp.playSoundEffect(26);
         upAttackingAnimator.resetAnimation();
         downAttackingAnimator.resetAnimation();
         leftAttackingAnimator.resetAnimation();
         rightAttackingAnimator.resetAnimation();
         entityStatus = attacking;
+        attackHitDealt = false;
+
+    }
+
+    public void dealDamage(){
         hitOn = false;
         gp.collisionChecker.checkAttack(this , gp.player);
-        if(hitOn && !gp.player.invisible){
+        if(hitOn && !gp.player.invincible){
             if(gp.player.entityStatus == parrying && gp.player.direction.equals(uTool.oppositeDirection(direction))){
                 gp.player.takeDamage(attackPower/4);
                 gp.playSoundEffect(16);
@@ -232,8 +236,9 @@ public class MON_Rudeling extends Entity {
                     }else if (entityStatus == attacking) {
                         upAttackingAnimator.draw(g,screenX-gp.tileSize,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
                     }else if (entityStatus == freezing) {
-
                         drawFreezeOverlay(g,upAnimator.currentsprite,screenX,screenY,(3*gp.tileSize)/2, (3*gp.tileSize)/2);
+                    }else if (entityStatus == grabbed) {
+                        g.drawImage(upAnimator.currentsprite,screenX,screenY,(3*gp.tileSize)/2, (3*gp.tileSize)/2,null);
                     }
                     break;
                 case "down":
@@ -242,8 +247,9 @@ public class MON_Rudeling extends Entity {
                     }else if (entityStatus == attacking) {
                         downAttackingAnimator.draw(g,screenX,screenY,gp.tileSize*2,gp.tileSize*2);
                     }else if (entityStatus == freezing) {
-
                         drawFreezeOverlay(g,downAnimator.currentsprite,screenX,screenY,(3*gp.tileSize)/2, (3*gp.tileSize)/2);
+                    }else if (entityStatus == grabbed) {
+                        g.drawImage(downAnimator.currentsprite,screenX,screenY,(3*gp.tileSize)/2, (3*gp.tileSize)/2,null);
                     }
                     break;
                 case "left":
@@ -252,8 +258,9 @@ public class MON_Rudeling extends Entity {
                     }else if (entityStatus == attacking) {
                         leftAttackingAnimator.draw(g,screenX-gp.tileSize,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
                     }else if (entityStatus == freezing) {
-
                         drawFreezeOverlay(g,leftAnimator.currentsprite,screenX,screenY,(3*gp.tileSize)/2, (3*gp.tileSize)/2);
+                    }else if (entityStatus == grabbed) {
+                        g.drawImage(leftAnimator.currentsprite,screenX,screenY,(3*gp.tileSize)/2, (3*gp.tileSize)/2,null);
                     }
                     break;
                 case "right":
@@ -262,8 +269,9 @@ public class MON_Rudeling extends Entity {
                     }else if (entityStatus == attacking) {
                         rightAttackingAnimator.draw(g,screenX,screenY-gp.tileSize,gp.tileSize*2,gp.tileSize*2);
                     }else if (entityStatus == freezing) {
-
                         drawFreezeOverlay(g,rightAnimator.currentsprite,screenX,screenY,(3*gp.tileSize)/2, (3*gp.tileSize)/2);
+                    }else if (entityStatus == grabbed) {
+                        g.drawImage(rightAnimator.currentsprite,screenX,screenY,(3*gp.tileSize)/2, (3*gp.tileSize)/2,null);
                     }
                     break;
 

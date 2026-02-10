@@ -11,7 +11,7 @@ public class Animator {
     public int counter = 0;
     public int animationSpeed;
     public boolean repeatAnimation = true;
-    ;
+
 
     public Animator(BufferedImage spriteSheet ,int spriteWidth,int spriteHeight,int speed,boolean repeatAnimation)  {
         sprites = new ArrayList<>();
@@ -56,7 +56,6 @@ public class Animator {
                 index = 0;
                 counter = 0;
             }else{
-
                 return;
             }
         }

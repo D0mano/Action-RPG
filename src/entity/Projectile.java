@@ -10,8 +10,10 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class Projectile extends Entity{
-    Entity user;
+    public Entity user;
     public int freezeTime;
+    public BufferedImage tailsV;
+    public BufferedImage tailsH;
     public Projectile(GamePanel gp) {
         super(gp);
     }
@@ -71,6 +73,11 @@ public class Projectile extends Entity{
                     gp.monster.get(monsterIndex).entityStatus = freezing;
 
                 }
+                else if (Objects.equals(name, "Hook")){
+                    gp.monster.get(monsterIndex).entityStatus = grabbed;
+                    gp.monster.get(monsterIndex).direction = direction;
+
+                }
 
                 alive = false;
             }
@@ -117,6 +124,40 @@ public class Projectile extends Entity{
 
         worldCol = worldX/gp.tileSize;
         worldRow = worldY/gp.tileSize;
+    }
+    public void drawTrails(Graphics2D g){}
+
+    public void draw(Graphics2D g){
+        int screenX = worldX - gp.player.worldX + gp.player.screenX;
+        int screenY = worldY - gp.player.worldY + gp.player.screenY;
+        if (((-gp.tileSize) <= screenX && screenX <= (gp.worldWidth + gp.tileSize)) &&
+                ((-gp.tileSize) <= screenY && screenY <= (gp.worldHeight + gp.tileSize))) {
+
+            switch (direction) {
+                case "up":
+                    if (entityStatus == walking) {
+                        upAnimator.draw(g, screenX, screenY, gp.tileSize, gp.tileSize);
+                    }
+                    break;
+                case "down":
+                    if (entityStatus == walking) {
+                        downAnimator.draw(g, screenX, screenY, gp.tileSize, gp.tileSize);
+                    }
+                    break;
+                case "left":
+                    if (entityStatus == walking) {
+                        leftAnimator.draw(g, screenX, screenY, gp.tileSize, gp.tileSize);
+                    }
+                    break;
+                case "right":
+                    if (entityStatus == walking) {
+                        rightAnimator.draw(g, screenX, screenY, gp.tileSize, gp.tileSize);
+                    }
+                    break;
+            }
+            drawTrails(g);
+
+        }
     }
 
 

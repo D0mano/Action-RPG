@@ -13,7 +13,6 @@ import java.util.*;
 
 public class GamePanel extends JPanel implements Runnable {
 
-    Random random = new Random();
 
     public boolean running = false;
 
@@ -57,6 +56,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     public Sound music = new Sound();
     public Sound soundEffects = new Sound();
+    public Config config = new Config(this);
 
     // ENTITY AND PLAYER
     public Player player = new Player(this,this.keyH);
@@ -92,47 +92,48 @@ public class GamePanel extends JPanel implements Runnable {
         this.setFocusTraversalKeysEnabled(false);
 
     }
-    public void toggleScreenMode(){
-        createTempScreen();
+    public void setScreenMode() {
 
-        //GET LOCAL SCREEN DEVICE
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice gd = ge.getDefaultScreenDevice();
+        GraphicsDevice gd = GraphicsEnvironment
+                .getLocalGraphicsEnvironment()
+                .getDefaultScreenDevice();
 
-        if (Objects.equals(displayMode, windowMode)){
+        if (displayMode.equals(windowMode)) {
+
+            // SORTIE FULLSCREEN
+            gd.setFullScreenWindow(null);
 
             screenWidth2 = screenWidth;
             screenHeight2 = screenHeight;
 
-            // 3. On redimensionne la fenêtre Windows proprement
             this.setPreferredSize(new Dimension(screenWidth2, screenHeight2));
-            Main.window.setResizable(true);       // Permettre temporairement le redimensionnement
-            Main.window.pack();                   // Ajuste la fenêtre à la taille du Panel
-            Main.window.setResizable(false);      // Revenir à non-redimensionnable
-            Main.window.setLocationRelativeTo(null);
 
-
-
-
-        }else{
-//            gd.setFullScreenWindow(Main.window);
-            // GET FULLSCREEN WIDTH AND HEIGHT
-            screenWidth2 = 1600;
-            screenHeight2 = 1000;
-            this.setPreferredSize(new Dimension(screenWidth2, screenHeight2));
+            Main.window.setResizable(true);
             Main.window.pack();
             Main.window.setLocationRelativeTo(null);
+            Main.window.setResizable(false);
 
+        } else {
+
+            // FULLSCREEN
+            Main.window.dispose(); // IMPORTANT
+            Main.window.setUndecorated(true);
+            gd.setFullScreenWindow(Main.window);
+
+            screenWidth2 = 1600;
+            screenHeight2 = 1000;
+
+            this.setPreferredSize(new Dimension(screenWidth2, screenHeight2));
+            Main.window.setVisible(true);
         }
 
-
-
-
-
+        createTempScreen(); // OBLIGATOIRE
+        this.revalidate();
+        this.repaint();
     }
     public void updateSetting(){
         reload();
-        toggleScreenMode();
+        setScreenMode();
 
     }
     public void reload(){
@@ -152,7 +153,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void createTempScreen() {
-        tempScreen = new BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_ARGB);
+        tempScreen = new BufferedImage(screenWidth2, screenHeight2, BufferedImage.TYPE_INT_ARGB);
         g2 = (Graphics2D)tempScreen.getGraphics();
     }
 
@@ -162,6 +163,7 @@ public class GamePanel extends JPanel implements Runnable {
         assetSetter.setMonster();
         gameState = titleState;
         createTempScreen();
+        updateSetting();
     }
     public void startGameThread() {
         if (gameThread==null){
@@ -263,8 +265,10 @@ public class GamePanel extends JPanel implements Runnable {
         if (gameState == pauseState){
             // NOTHING
         }
+        ui.update();
 
     }
+
     public void drawToTempScreen(){
         if (tempScreen == null || g2 == null) {
 
@@ -302,10 +306,10 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
 
-            Collections.sort(entitiesList,new Comparator<Entity>() {
+            entitiesList.sort(new Comparator<Entity>() {
                 @Override
                 public int compare(Entity e1, Entity e2) {
-                    return Integer.compare(e1.worldY,e2.worldY);
+                    return Integer.compare(e1.worldY, e2.worldY);
                 }
             });
             for (Entity e : entitiesList){

@@ -4,8 +4,10 @@ import entity.Entity;
 import main.GamePanel;
 import main.UtilityTool;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 public class SuperObject extends Entity {
     public GamePanel gp;
@@ -36,9 +38,27 @@ public class SuperObject extends Entity {
     public void reload(){
         solidArea.width = gp.tileSize;
         solidArea.height = gp.tileSize;
+        setWorldCoordinate();
         image = uTool.scaleImage(image,gp.tileSize,gp.tileSize);
 
 
+    }
+    public void setWorldCoordinate(){
+        worldX = worldCol * gp.tileSize;
+        worldY = worldRow * gp.tileSize;
+    }
+
+    public BufferedImage setup(String imageName, int scale){
+        UtilityTool uTool = new UtilityTool();
+        BufferedImage image = null;
+        try{
+            image = ImageIO.read(getClass().getResourceAsStream("/objects/"+imageName+".png"));
+            image = uTool.scaleImage(image, image.getWidth()*scale,image.getHeight()*scale);
+
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        return image;
     }
 
 
@@ -56,7 +76,9 @@ public class SuperObject extends Entity {
 
     public void speak(int i) {
     }
-    public void use(){}
+    public boolean use(){
+        return false;
+    }
 }
 
 

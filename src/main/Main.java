@@ -1,6 +1,7 @@
 package main;
 
 import javax.swing.JFrame;
+import java.awt.*;
 
 public class Main {
     public static JFrame window;
@@ -10,6 +11,11 @@ public class Main {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setResizable(false);
         window.setTitle("2D Adventure");
+        Image icon = Toolkit.getDefaultToolkit().getImage(
+                Main.class.getResource("/UI/titleScreen/Secret_Legend-icon.png")
+        );
+
+        window.setIconImage(icon);
         window.setUndecorated(true);
 
         GamePanel gamePanel = new GamePanel();

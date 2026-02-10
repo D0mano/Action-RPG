@@ -215,8 +215,8 @@ public class TileManager {
                int screenX = worldX - gp.player.worldX + gp.player.screenX;
                int screenY = worldY - gp.player.worldY + gp.player.screenY;
 
-               if(((-gp.tileSize) <= screenX &&  screenX <= (gp.worldWidth + gp.tileSize)) &&
-                       ((-gp.tileSize) <= screenY &&  screenY <= (gp.worldHeight + gp.tileSize))){
+               if(((-gp.tileSize) <= screenX &&  screenX <= (gp.screenWidth )) &&
+                       ((-gp.tileSize) <= screenY &&  screenY <= (gp.screenHeight ))){
                    if (layer==1){
                        if( tileNum != -1 && tile[tileNum].layer == layer){
                            if (tile[tileNum].animation == null){

@@ -1,10 +1,9 @@
 package object;
 
 import entity.Projectile;
+import main.Animator;
 import main.GamePanel;
 
-import javax.imageio.ImageIO;
-import java.io.IOException;
 
 public class OBJ_FireWand  extends SuperObject{
     GamePanel gp;
@@ -13,21 +12,22 @@ public class OBJ_FireWand  extends SuperObject{
         this.gp = gp;
         solidArea.width = gp.tileSize;
         solidArea.height = gp.tileSize;
-        name = "fire_wand";
+        name = "fire wand";
         objectType = equipment;
         soundEffectIndex = 32;
-        try{
-            image = ImageIO.read(getClass().getResourceAsStream("/objects/fire_wand.png"));
-            image = uTool.scaleImage(image, gp.tileSize,  gp.tileSize);
-
-        }catch(IOException e){
-            e.printStackTrace();}
+        image = setup("fire_wand", gp.scale);
+        up = setup("fire_wand-Sheet",gp.scale);
+        upAnimator = new Animator(up,gp.tileSize,gp.tileSize,6,false);
 
     }
-    public void use(){
+    public boolean use(){
+        if (gp.player.projectile.alive){
+            return false;
+        }
         Projectile projectile = new FireBall(gp);
         gp.player.projectile = projectile;
         gp.player.shootProjectile();
         gp.player.consumeMana(projectile.useCost);
+        return projectile.alive;
     }
 }

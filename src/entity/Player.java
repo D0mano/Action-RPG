@@ -220,8 +220,8 @@ public class Player extends Entity {
         //PLAYER STATUS
         maxHealth = 100;
         health = 100;
-        maxMana = 100;
-        mana = 100;
+        maxMana = 500;
+        mana = 500;
 
         maxPotion = 3;
         potionNotUsed = maxPotion;
@@ -389,9 +389,9 @@ public class Player extends Entity {
                 }
             }
             if (invisibleCounter >= invisibleTimer){
-                invisible = false;
+                invincible = false;
             }else{
-                invisible = true;
+                invincible = true;
                 invisibleCounter++;
             }
             if (rollCounter > rollDuration) {
@@ -611,24 +611,44 @@ public class Player extends Entity {
 
         if ( jEquip != null && keyH.jEquipPressed){
             if (!jEquipKeyProcessed){
-                gp.playSoundEffect(jEquip.soundEffectIndex);
-                jEquip.use();
+
+
+                boolean used = jEquip.use();
+                if (used){gp.playSoundEffect(jEquip.soundEffectIndex);}
                 jEquipKeyProcessed = true;
+                if (used && jEquip.objectType == jEquip.singleUse){
+                    inventory[jEquip.singleUse].remove(jEquip);
+                }
             }
         }else{
             jEquipKeyProcessed = false;}
         if ( kEquip != null && keyH.kEquipPressed){
             if (!kEquipKeyProcessed){
-                gp.playSoundEffect(kEquip.soundEffectIndex);
-                kEquip.use();
+                boolean used = kEquip.use();
+                if (used){gp.playSoundEffect(kEquip.soundEffectIndex);}
                 kEquipKeyProcessed = true;
+                if (used && kEquip.objectType == kEquip.singleUse){
+                    inventory[kEquip.singleUse].remove(kEquip);
+                }
             }
         }else{
             kEquipKeyProcessed = false;}
 
+        if (lEquip != null && keyH.lEquipPressed){
+            if (!lEquipKeyProcessed){
+                boolean used= lEquip.use();
+                if (used){gp.playSoundEffect(lEquip.soundEffectIndex);}
+                lEquipKeyProcessed = true;
+                if (used && lEquip.objectType == lEquip.singleUse){
+                    inventory[lEquip.singleUse].remove(lEquip);
+                }
+            }
+        }else{
+            lEquipKeyProcessed = false;}
+
         if(keyH.healPressed){
             if (!healKeyProcessed){
-                heal(20);
+                usePotion();
                 healKeyProcessed = true;
             }
 
@@ -656,17 +676,11 @@ public class Player extends Entity {
 
         }
 
-        if (lEquip != null && keyH.lEquipPressed){
-            if (!lEquipKeyProcessed){
-                gp.playSoundEffect(lEquip.soundEffectIndex);
-                lEquip.use();
-                lEquipKeyProcessed = true;
-            }
-        }else{
-            lEquipKeyProcessed = false;}
+
 
         worldCol = worldX/gp.tileSize;
         worldRow = worldY/gp.tileSize;
+        updateEquipment();
 
 
 
@@ -674,10 +688,13 @@ public class Player extends Entity {
 
     public void pickUpObject(int index){
         if (index != 999){
+            gp.ui.itemOn = true;
+            gp.ui.item = gp.obj[index];
 
 
             String objName = gp.obj[index].name;
             addObjToInventory(gp.obj[index]);
+
 
             if (objName.equals("door")){
                 if (hasKey > 0){
@@ -814,7 +831,7 @@ public class Player extends Entity {
 
         g2.setColor(Color.RED);
         g2.drawRect(screenX+solidArea.x,screenY+solidArea.y,solidArea.width,solidArea.height);
-        if (invisible) {
+        if (invincible) {
             g2.setColor(Color.blue);
             g2.drawRect(screenX+solidArea.x,screenY+solidArea.y,solidArea.width,solidArea.height);
 
@@ -911,9 +928,17 @@ public class Player extends Entity {
                 case 2:
                     if (inventory[2].size() < equipmentSize){
                         inventory[obj.objectType].add(obj);
+                        if (jEquip == null){
+                            jEquip = obj;
+                        }else if (kEquip == null){
+                            kEquip = obj;
+                        }else if(lEquip == null){
+                            lEquip = obj;
+                        }
                     }
                     break;
             }
+
 
 
         }
@@ -926,6 +951,9 @@ public class Player extends Entity {
 //        addObjToInventory(new OBJ_Key(gp));
 //        addObjToInventory(new OBJ_Key(gp));
 //        addObjToInventory(new OBJ_Key(gp));
+
+        addObjToInventory(new OBJ_BlueFruit(gp));
+        addObjToInventory(new OBJ_RedFruit(gp));
     }
 
     public void reloadInventory(){
@@ -973,5 +1001,24 @@ public class Player extends Entity {
         }
        return obj;
     }
+    public void usePotion(){
+        if (potionNotUsed > 0 && health < maxHealth) {
+            gp.playSoundEffect(29);
+            potionNotUsed--;
+            heal(40);
+        }
 
+    }
+
+    public void updateEquipment(){
+        if ( jEquip != null && !hasObj(jEquip.name)){
+            jEquip = null;
+        }
+        if ( kEquip != null && !hasObj(kEquip.name)){
+            kEquip = null;
+        }
+        if ( lEquip != null && !hasObj(lEquip.name)){
+            lEquip = null;
+        }
+    }
 }

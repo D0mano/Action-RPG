@@ -2,12 +2,14 @@ package entity;
 
 import main.Animator;
 import main.GamePanel;
+import main.UtilityTool;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class Entity {
     public GamePanel gp;
+    public UtilityTool uTool = new UtilityTool();
 
     // Entity Attributes
     public String name;
@@ -57,6 +59,8 @@ public class Entity {
     final public int knockBacking = 4;
     final public int parrying = 5;
     final public int freezing = 6;
+    final public int grappling = 7;
+    final public int grabbed = 8;
 
 
 
@@ -65,13 +69,14 @@ public class Entity {
     // CHARACTER STATE
     public boolean alive = true;
     public boolean dying = false;
-    public boolean invisible = false;
+    public boolean invincible = false;
     public boolean damageTaken = false;
     public boolean hitOn = false;
     public boolean collisionOn = false;
     public boolean hpBarOn = false;
     public boolean onPath = false;
     public boolean canAttack = true;
+    public boolean attackHitDealt = false;
 
 
 
@@ -94,6 +99,7 @@ public class Entity {
     public int damageTakenTimer ;
     public int hpBarTimer = 600;
     public int attackDuration = 40;
+    public int attackingHitFrame = 20;
     public int attackCooldownTimer = 90;
     public int knockBacTimer = 10;
     public int freezingTimer;
@@ -135,6 +141,47 @@ public class Entity {
                 return;
             }
         }
+        if (entityStatus == grabbed) {
+            switch (direction){
+                case "up":
+                    if (gp.player.worldY-gp.tileSize >worldY+solidArea.height){
+                        worldY += gp.tileSize/4;
+                    }else if (name.equals("Rudeling")) {
+                        entityStatus = parrying;
+                    }else{
+                        entityStatus = walking;
+                    }
+                    break;
+                case "down":
+                    if (gp.player.worldY+gp.player.solidArea.height+gp.tileSize < worldY){
+                        worldY -= gp.tileSize/4;
+                    }else if (name.equals("Rudeling")) {
+                        entityStatus = parrying;
+                    }else{
+                        entityStatus = walking;
+                    }
+                    break;
+                case "left":
+                    if (gp.player.worldX-gp.tileSize > worldX+solidArea.width){
+                        worldX += gp.tileSize/4;
+                    }else if (name.equals("Rudeling")) {
+                        entityStatus = parrying;
+                    }else{
+                        entityStatus = walking;
+                    }
+                    break;
+                case "right":
+                    if (gp.player.worldX+gp.tileSize < worldX){
+                        worldX -= gp.tileSize/4;
+                    }else if (name.equals("Rudeling")) {
+                        entityStatus = parrying;
+                    }else{
+                        entityStatus = walking;
+                    }
+                    break;
+            }
+            return;
+        }
         if (entityStatus == knockBacking){
             collisionOn = false;
             gp.collisionChecker.checkEntity(this,gp.monster);
@@ -173,6 +220,7 @@ public class Entity {
         }
 
 
+
         if (entityStatus == attacking) {
             canAttack = false;
 
@@ -192,8 +240,14 @@ public class Entity {
                     rightAttackingAnimator.update();
                     break;
             }
+            if (attackCounter == attackingHitFrame && !attackHitDealt){
+                dealDamage();
+                attackHitDealt = true;
+
+            }
             if (attackCounter >= attackDuration) {
                 attackCounter = 0;
+                attackHitDealt = false;
                 if (name.equals("Rudeling")) {
                     entityStatus = parrying;
                 }else{
@@ -267,13 +321,15 @@ public class Entity {
 
             switch (direction) {
                 case "up":
-                    if (entityStatus == walking || entityStatus == knockBacking) {
+                    if (entityStatus == walking || entityStatus == knockBacking ) {
                         upAnimator.draw(g, screenX, screenY, gp.tileSize, gp.tileSize);
                     }else if (entityStatus == attacking) {
                         upAttackingAnimator.draw(g,screenX, screenY-gp.tileSize, gp.tileSize, 2*gp.tileSize);
                     }else if (entityStatus == freezing) {
 
                        drawFreezeOverlay(g,upAnimator.currentsprite,screenX,screenY,gp.tileSize,gp.tileSize);
+                    }else if (entityStatus == grabbed) {
+                        g.drawImage(upAnimator.currentsprite,screenX,screenY,gp.tileSize,gp.tileSize,null);
                     }
                     break;
                 case "down":
@@ -282,8 +338,9 @@ public class Entity {
                     }else if (entityStatus == attacking) {
                         downAttackingAnimator.draw(g,screenX, screenY, gp.tileSize, 2*gp.tileSize);
                     }else if (entityStatus == freezing) {
-
                         drawFreezeOverlay(g,downAnimator.currentsprite,screenX,screenY,gp.tileSize,gp.tileSize);
+                    }else if (entityStatus == grabbed) {
+                        g.drawImage(downAnimator.currentsprite,screenX,screenY,gp.tileSize,gp.tileSize,null);
                     }
                     break;
                 case "left":
@@ -292,8 +349,9 @@ public class Entity {
                     }else if (entityStatus == attacking) {
                         leftAttackingAnimator.draw(g,screenX-gp.tileSize, screenY, 2*gp.tileSize, gp.tileSize);
                     }else if (entityStatus == freezing) {
-
                         drawFreezeOverlay(g,leftAnimator.currentsprite,screenX,screenY,gp.tileSize,gp.tileSize);
+                    }else if (entityStatus == grabbed) {
+                        g.drawImage(leftAnimator.currentsprite,screenX,screenY,gp.tileSize,gp.tileSize,null);
                     }
                     break;
                 case "right":
@@ -302,8 +360,9 @@ public class Entity {
                     }else if (entityStatus == attacking) {
                         rightAttackingAnimator.draw(g,screenX, screenY, 2*gp.tileSize, gp.tileSize);
                     }else if (entityStatus == freezing) {
-
                         drawFreezeOverlay(g,rightAnimator.currentsprite,screenX,screenY,gp.tileSize,gp.tileSize);
+                    }else if (entityStatus == grabbed) {
+                        g.drawImage(rightAnimator.currentsprite,screenX,screenY,gp.tileSize,gp.tileSize,null);
                     }
                     break;
 
@@ -412,18 +471,16 @@ public class Entity {
     }
 
     public void heal(int heal){
-        if (potionNotUsed > 0){
-            if (health < maxHealth){
-                gp.playSoundEffect(29);
-                potionNotUsed--;
-            }
-            if(health+heal < maxHealth){
-                health += heal;
-            }else{
-                health = maxHealth;}
+
+        if(health+heal < maxHealth){
+            health += heal;
+        }else{
+            health = maxHealth;
         }
 
+
     }
+
 
     public void shootProjectile(){
         if (!projectile.alive && mana - projectile.useCost > 0){
@@ -466,6 +523,8 @@ public class Entity {
         g.drawRect(x, y, width, height);
         g.setComposite(old);
     }
+
+    public void dealDamage(){}
 }
 
 

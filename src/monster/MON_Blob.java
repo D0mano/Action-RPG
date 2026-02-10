@@ -185,16 +185,20 @@ public class MON_Blob  extends Entity {
         }
     }
     public void attack(){
-        UtilityTool uTool = new UtilityTool();
         gp.playSoundEffect(26);
         upAttackingAnimator.resetAnimation();
         downAttackingAnimator.resetAnimation();
         leftAttackingAnimator.resetAnimation();
         rightAttackingAnimator.resetAnimation();
         entityStatus = attacking;
+        attackHitDealt = false;
+
+    }
+
+    public void dealDamage(){
         hitOn = false;
         gp.collisionChecker.checkAttack(this , gp.player);
-        if(hitOn && !gp.player.invisible){
+        if(hitOn && !gp.player.invincible){
             if(gp.player.entityStatus == parrying && gp.player.direction.equals(uTool.oppositeDirection(direction))){
                 gp.player.takeDamage(attackPower/4);
                 gp.playSoundEffect(16);

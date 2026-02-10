@@ -15,6 +15,8 @@ public class UI {
     Font lilliput_40,trunic,lilliput_20,lilliput_15;
     public boolean messageOn = false;
     public String message = "";
+    public boolean itemOn = false;
+    public SuperObject item = null;
     int messageCounter = 0;
     public String currentDialogue = "";
     public boolean gameFinished = false;
@@ -43,6 +45,14 @@ public class UI {
 
     public int slotRow = 0;
     public int slotCol = 0;
+
+    public UtilityTool uTool = new UtilityTool();
+
+    public int potionXPos,potionYPos;
+    public int potionSize;
+    public int equipmentXPos,equipmentYPos;
+    public int equipmentSize;
+
 
 
 
@@ -157,6 +167,15 @@ public class UI {
 
     }
 
+    public void update(){
+        if (gp.gameState == gp.dialogueState){
+            if (item.upAnimator != null){
+                item.upAnimator.update();
+            }
+
+        }
+    }
+
     public BufferedImage setup(String imageName, float scale) {
         UtilityTool uTool = new UtilityTool();
         BufferedImage image = null;
@@ -224,7 +243,12 @@ public class UI {
 
         }
         if(gp.gameState == gp.dialogueState){
-            drawDialogueScreen();
+            if (messageOn){
+                drawMessageScreen();
+            }
+            if (itemOn){
+                drawItemScreen();
+            }
         }
         if (gp.gameState == gp.inInventory){
 
@@ -235,7 +259,10 @@ public class UI {
             if (gp.player.screenX >= tempScreenX){
                 gp.player.screenX = tempScreenX ;
                 drawInventoryScreen();
+
             }
+            drawPlayerPotion();
+            drawPlayerEquipment();
 
         }
     }
@@ -261,7 +288,7 @@ public class UI {
         int slotStartY2 = 4*gp.tileSize;
         int slotStartY3 = (15*gp.tileSize)/2;
         int slotOffset = 3*gp.tileSize/2;
-        int slotX = slotStartX;
+        int slotX ;
         int slotY = slotStartY1;
 
         // DRAW PLAYER'S ITEMS
@@ -385,7 +412,7 @@ public class UI {
 
     }
 
-    public void drawDialogueScreen(){
+    public void drawMessageScreen(){
 
         //WINDOW
         int x = gp.tileSize*2;
@@ -397,8 +424,35 @@ public class UI {
         g2.setFont(g2.getFont().deriveFont(Font.BOLD, gp.tileSize/2f));
         x = getXForCenteredTextAroundX(currentDialogue,(2*x+width)/2);
         y = (2*y+height)/2;
-
         g2.drawString(currentDialogue,x,y);
+    }
+
+    public void drawItemScreen(){
+        //  ITEM FRAME
+        int x = (11*gp.tileSize)/2;
+        int y= gp.tileSize;
+        g2.setColor(Color.black);
+        g2.fillOval(x,y,gp.tileSize*5,gp.tileSize*5);
+        g2.setColor(Color.white);
+        g2.setStroke(new BasicStroke(4));
+        g2.drawOval(x,y,gp.tileSize*5,gp.tileSize*5);
+
+        // DRAW THE ITEM
+        if (item.upAnimator != null){
+            item.upAnimator.draw(g2,x+gp.tileSize,y+gp.tileSize,gp.tileSize * 3,gp.tileSize * 3);
+        }else{
+            g2.drawImage(item.image,x+gp.tileSize,y+gp.tileSize,gp.tileSize * 3,gp.tileSize * 3,null);
+        }
+
+
+        //DRAW TEXT MESSAGE
+        g2.setFont(trunic);
+        int textX = getXforCenteredText(item.name);
+        int textY = 7 * gp.tileSize;
+        drawSubWindow(x-gp.tileSize,textY-(3*gp.tileSize)/2,7*gp.tileSize,2*gp.tileSize,messageWindow);
+        g2.setColor(Color.white);
+        g2.drawString(item.name,textX,textY);
+
     }
 
     public void drawOptionScreen(){
@@ -448,6 +502,7 @@ public class UI {
 
 
 
+
     }
 
     public void drawAudioScreen(){
@@ -466,7 +521,6 @@ public class UI {
         g2.drawString("Audio",x,y);
 
         g2.setFont(lilliput_20);
-        FontMetrics metrics = g2.getFontMetrics();
         int buttonWidth =(int)(1.3f*menuSelection.getWidth());
         int buttonHeight = menuSelection.getHeight();
         int startY = gp.screenHeight / 2 - (audioCommand.length * buttonHeight) / 2;
@@ -654,39 +708,97 @@ public class UI {
     }
 
     public void drawPlayerPotion(){
-        int x = (gp.maxScreenCol -2)*gp.tileSize;
-        int y = 2*gp.tileSize;
+
+        int tempX,tempY,tempSize;
+        if (gp.gameState == gp.inInventory){
+            tempX = (gp.maxScreenCol -2)*gp.tileSize - (gp.tileSize/3);
+            tempY = 2*gp.tileSize  + (gp.tileSize/3);
+            tempSize = gp.tileSize;
+
+                if(tempX > potionXPos){
+                    potionXPos += 1;
+                }
+                else{potionXPos = tempX;}
+                if(tempY > potionYPos){
+                    potionYPos += 1;
+                }else{potionYPos = tempY;}
+                if(tempSize > potionSize){
+                    potionSize += 1;
+                }else{potionSize = tempSize;}
+
+        }
+        else{
+            tempX = (gp.maxScreenCol -2)*gp.tileSize;
+            tempY = 2*gp.tileSize;
+            tempSize = (2*gp.tileSize/3);
+            potionXPos = tempX;
+            potionYPos = tempY;
+            potionSize = tempSize;
+        }
         for (int i =0; i< gp.player.potionNotUsed ;i++){
-            g2.drawImage(potionFull,x,y,null);
-            x-=gp.tileSize;
+            g2.drawImage(potionFull,potionXPos,potionYPos,potionSize,potionSize,null);
+            potionXPos -= potionSize;
         }
         for (int i =0; i< gp.player.maxPotion - gp.player.potionNotUsed ;i++){
-            g2.drawImage(potionEmpty,x,y,null);
-            x-=gp.tileSize;
+            g2.drawImage(potionEmpty,potionXPos,potionYPos,potionSize,potionSize,null);
+            potionXPos -= potionSize;
         }
+        potionXPos = tempX;
+        potionYPos = tempY;
+        potionSize = tempSize;
     }
 
     public void drawPlayerEquipment(){
-        UtilityTool uT = new UtilityTool();
-        int jX = ((gp.maxScreenCol -4)*gp.tileSize);
-        int kX = ((gp.maxScreenCol -3)*gp.tileSize);
-        int lX = ((gp.maxScreenCol -2)*gp.tileSize);
-        int y = (2*gp.tileSize/3) ;
+        int tempX,tempY,tempCirSize;
+        if (gp.gameState == gp.inInventory){
+            tempX = ((gp.maxScreenCol -2)*gp.tileSize);
+            tempY = (2*gp.tileSize/3) ;
+            tempCirSize = (3*gp.tileSize/2);
+
+            if(tempX > equipmentXPos){
+                equipmentXPos += 1;
+            }
+            else{equipmentXPos = tempX;}
+            if(tempY > equipmentYPos){
+                equipmentYPos += 1;
+            }else{equipmentYPos = tempY;}
+            if(tempCirSize > equipmentSize){
+                equipmentSize += 1;
+            }else{equipmentSize = tempCirSize;}
+        }
+        else{
+
+            tempX = ((gp.maxScreenCol -2)*gp.tileSize);
+            tempY = (2*gp.tileSize/3) ;
+            tempCirSize = gp.tileSize;
+            equipmentXPos = tempX;
+            equipmentYPos = tempY;
+            equipmentSize = tempCirSize;
+        }
+        int jX = equipmentXPos - 2*equipmentSize;
+        int kX = equipmentXPos - equipmentSize;
+        int lX = equipmentXPos;
+        int y = equipmentYPos;
         SuperObject jEquip = gp.player.jEquip;
         SuperObject kEquip = gp.player.kEquip;
         SuperObject lEquip = gp.player.lEquip;
         g2.setColor(new Color(47,47,47,200));
-        g2.fillOval(jX,y,gp.tileSize,gp.tileSize);
-        g2.fillOval(kX,y,gp.tileSize,gp.tileSize);
-        g2.fillOval(lX,y,gp.tileSize,gp.tileSize);
+        g2.fillOval(jX,y,equipmentSize,equipmentSize);
+        g2.fillOval(kX,y,equipmentSize,equipmentSize);
+        g2.fillOval(lX,y,equipmentSize,equipmentSize);
+
         if (jEquip != null){
-            g2.drawImage(uT.scaleImage(jEquip.image,(2*gp.tileSize/3),(2*gp.tileSize/3)),jX + gp.tileSize/6,y + gp.tileSize/6,null);
-        }
-        if (kEquip != null){
-            g2.drawImage(uT.scaleImage(kEquip.image,(2*gp.tileSize/3),(2*gp.tileSize/3)),kX + gp.tileSize/6,y + gp.tileSize/6,null);
+            g2.drawImage(jEquip.image,jX + equipmentSize/6,y + equipmentSize/6,(2*equipmentSize/3),(2*equipmentSize/3),null);
+        }if (kEquip != null){
+            g2.drawImage(kEquip.image,kX + equipmentSize/6,y + equipmentSize/6,(2*equipmentSize/3),(2*equipmentSize/3),null);
         }if (lEquip != null){
-            g2.drawImage(uT.scaleImage(lEquip.image,(2*gp.tileSize/3),(2*gp.tileSize/3)),lX + gp.tileSize/6,y + gp.tileSize/6,null);
+            g2.drawImage(lEquip.image,lX + equipmentSize/6,y + equipmentSize/6,(2*equipmentSize/3),(2*equipmentSize/3),null);
         }
+
+        equipmentXPos = tempX;
+        equipmentYPos = tempY;
+        equipmentSize = tempCirSize;
+
     }
 
     public int getXforCenteredText(String text){

@@ -1,9 +1,8 @@
 package object;
 
+import main.Animator;
 import main.GamePanel;
 
-import javax.imageio.ImageIO;
-import java.io.IOException;
 
 public class OBJ_Shield extends SuperObject
 {
@@ -14,10 +13,8 @@ public class OBJ_Shield extends SuperObject
         solidArea.height = gp.tileSize;
         name = "shield";
         objectType = gear;
-        try{
-            image = ImageIO.read(getClass().getResourceAsStream("/objects/shield.png"));
-            image = uTool.scaleImage(image, gp.tileSize,  gp.tileSize);
-
-        }catch(IOException e){
-            e.printStackTrace();}}
+        image = setup("shield", gp.scale);
+        up = setup("shield-Sheet",gp.scale);
+        upAnimator = new Animator(up,gp.tileSize,gp.tileSize,6,false);
+        }
 }

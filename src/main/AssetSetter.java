@@ -27,20 +27,25 @@ public class AssetSetter {
 
     public void setObject(){
         gp.obj[0] = new OBJ_Sword(gp);
-        gp.obj[0].worldX = 48  * gp.tileSize;
-        gp.obj[0].worldY = 53 * gp.tileSize;
+        gp.obj[0].worldCol = 48;
+        gp.obj[0].worldRow = 53;
+        gp.obj[0].setWorldCoordinate();
 
         gp.obj[1] = new OBJ_Shield(gp);
-        gp.obj[1].worldX = 16  * gp.tileSize;
-        gp.obj[1].worldY = 17 * gp.tileSize;
+        gp.obj[1].worldCol = 16;
+        gp.obj[1].worldRow = 17;
+        gp.obj[1].setWorldCoordinate();
 
-        gp.obj[2] = new OBJ_FireWand(gp);
-        gp.obj[2].worldX = 56  * gp.tileSize;
-        gp.obj[2].worldY = 11 * gp.tileSize;
+        gp.obj[2] = new OBJ_GrapplingHook(gp);
+        gp.obj[2].worldCol = 56 ;
+        gp.obj[2].worldRow = 11;
+        gp.obj[2].setWorldCoordinate();
 
         gp.obj[3] = new OBJ_IceWand(gp);
-        gp.obj[3].worldX = 48  * gp.tileSize;
-        gp.obj[3].worldY = 27 * gp.tileSize;
+        gp.obj[3].worldCol = 48;
+        gp.obj[3].worldRow = 27;
+        gp.obj[3].setWorldCoordinate();
+
 
 
     }
