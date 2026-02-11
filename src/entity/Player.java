@@ -701,7 +701,7 @@ public class Player extends Entity {
     public void pickUpObject(int index){
         if (index != 999){
             gp.ui.itemOn = true;
-            gp.ui.item = gp.obj[index];
+            gp.ui.item = gp.obj.get(index);
 
 
             String objName = gp.obj.get(index).name;

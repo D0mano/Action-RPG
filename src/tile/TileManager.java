@@ -20,12 +20,9 @@ public class TileManager {
     HashMap<Integer, TileData> tileDataMap = new HashMap<>();
 
 
-
-
     public TileManager(GamePanel gp) {
         this.gp = gp;
         tile = new Tile[120];
-        mapTileNum = new int[gp.maxWorldRow][gp.maxWorldCol][gp.maxWorldLayer];
         loadTileData("/maps/tile_data.txt");
         getTileImageFromTileSet("TunicTilesetV2");
 
@@ -55,14 +52,12 @@ public class TileManager {
                 ArrayList<String> collisionSide = new ArrayList<>();
 
                 if (sidesRaw.equals("none")) {
-                }
-                else if (sidesRaw.equals("all")) {
+                } else if (sidesRaw.equals("all")) {
                     collisionSide.add("up");
                     collisionSide.add("down");
                     collisionSide.add("left");
                     collisionSide.add("right");
-                }
-                else {
+                } else {
                     String[] sides = sidesRaw.split(";");
                     for (String side : sides) {
                         collisionSide.add(side.trim());
@@ -70,7 +65,7 @@ public class TileManager {
                 }
 
 
-                tileDataMap.put(id, new TileData(collision, layer, collisionSide,animated,id));
+                tileDataMap.put(id, new TileData(collision, layer, collisionSide, animated, id));
             }
             br.close();
 
@@ -177,3 +172,4 @@ public class TileManager {
 
 
 }
+
