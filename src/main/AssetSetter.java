@@ -26,25 +26,11 @@ public class AssetSetter {
     }
 
     public void setObject(){
-        gp.obj[0] = new OBJ_Sword(gp);
-        gp.obj[0].worldCol = 48;
-        gp.obj[0].worldRow = 53;
-        gp.obj[0].setWorldCoordinate();
+        placeObject("sword",48,53,0);
+        placeObject("shield",16,17,0);
+        placeObject("grappling_hook",56,11,0);
+        placeObject("ice_wand",48,27,0);
 
-        gp.obj[1] = new OBJ_Shield(gp);
-        gp.obj[1].worldCol = 16;
-        gp.obj[1].worldRow = 17;
-        gp.obj[1].setWorldCoordinate();
-
-        gp.obj[2] = new OBJ_GrapplingHook(gp);
-        gp.obj[2].worldCol = 56 ;
-        gp.obj[2].worldRow = 11;
-        gp.obj[2].setWorldCoordinate();
-
-        gp.obj[3] = new OBJ_IceWand(gp);
-        gp.obj[3].worldCol = 48;
-        gp.obj[3].worldRow = 27;
-        gp.obj[3].setWorldCoordinate();
 
 
 
@@ -52,25 +38,25 @@ public class AssetSetter {
 
     public void setMonster(){
         // Blob spawn
-        createMonster("blob",52,32);
-        createMonster("blob",34,27);
-        createMonster("blob",75,32);
-        createMonster("blob",80,27);
+        createMonster("blob",52,32,0);
+        createMonster("blob",34,27,0);
+        createMonster("blob",75,32,0);
+        createMonster("blob",80,27,0);
 
         //Hedghog spawn
-        createMonster("foxZombie",16,25);
-        createMonster("foxZombie",13,12);
-        createMonster("foxZombie",73,16);
-        createMonster("foxZombie",86,14);
+        createMonster("foxZombie",16,25,0);
+        createMonster("foxZombie",13,12,0);
+        createMonster("foxZombie",73,16,0);
+        createMonster("foxZombie",86,14,0);
 
         // Rudeling spawn
-        createMonster("rudeling",16,17);
-        createMonster("rudeling",56,11);
+        createMonster("rudeling",16,17,0);
+        createMonster("rudeling",56,11,0);
 
 
     }
 
-    public void createMonster(String monsterName,int worldCol,int worldRow){
+    public void createMonster(String monsterName,int worldCol,int worldRow,int mapIndex){
         Entity monster;
         if (monsterName.equals("rudeling")){
             monster = new MON_Rudeling(gp,worldCol,worldRow);
@@ -82,6 +68,30 @@ public class AssetSetter {
             monster = new MON_Blob(gp,worldCol,worldRow);
         }
 
-        gp.monster.add(monster);
+        gp.mapsList.get(mapIndex).monsterList.add(monster);
+    }
+
+    public void placeObject(String objectName,int worldCol,int worldRow,int mapIndex){
+        SuperObject obj;
+        switch (objectName){
+            case "sword": obj = new OBJ_Sword(gp); break;
+            case "shield": obj = new OBJ_Shield(gp); break;
+            case "fire_wand" : obj = new OBJ_FireWand(gp); break;
+            case "ice_wand": obj = new OBJ_IceWand(gp); break;
+            case "chest": obj = new OBJ_Chest(gp); break;
+            case "door": obj = new OBJ_Door(gp); break;
+            case "grappling_hook": obj = new OBJ_GrapplingHook(gp); break;
+            case "key": obj = new OBJ_Key(gp); break;
+            case "lantern": obj = new OBJ_Lantern(gp); break;
+            case "blue_fruit": obj = new OBJ_BlueFruit(gp); break;
+            case "red_fruit": obj = new OBJ_RedFruit(gp); break;
+            default:obj=null;  break;
+        }
+        if (obj != null){
+            obj.worldCol = worldCol;
+            obj.worldRow = worldRow;
+            obj.setWorldCoordinate();
+            gp.mapsList.get(mapIndex).objectsList.add(obj);
+        }
     }
 }

@@ -704,13 +704,13 @@ public class Player extends Entity {
             gp.ui.item = gp.obj[index];
 
 
-            String objName = gp.obj[index].name;
-            addObjToInventory(gp.obj[index]);
+            String objName = gp.obj.get(index).name;
+            addObjToInventory(gp.obj.get(index));
 
 
             if (objName.equals("door")){
                 if (hasKey > 0){
-                    gp.obj[index] = null;
+                    gp.obj.remove(index);
                     hasKey--;
                 }else{
                     gp.playSoundEffect(2);
@@ -726,7 +726,7 @@ public class Player extends Entity {
                 gp.ui.currentDialogue = "You pick up a "+objName+" !";
                 gp.previousState = gp.gameState;
                 gp.gameState = gp.dialogueState;
-                gp.obj[index] = null;
+                gp.obj.remove(index);
                 if (objName.equals("key")) {
                     hasKey++;
                 }
@@ -919,7 +919,7 @@ public class Player extends Entity {
     public void cutBush(List<Point> bushes){
         if (!bushes.isEmpty()){
             for (Point p : bushes){
-                gp.tileM.mapTileNum[p.y][p.x][0] = 16;
+                gp.tileM.currentMap.tileMap[p.y][p.x][0] = 16;
             }
         }
     }
@@ -1014,6 +1014,7 @@ public class Player extends Entity {
         }
        return obj;
     }
+
     public void usePotion(){
         if (potionNotUsed > 0 && health < maxHealth) {
             gp.playSoundEffect(29);

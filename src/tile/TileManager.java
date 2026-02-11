@@ -2,6 +2,7 @@ package tile;
 
 import main.Animator;
 import main.GamePanel;
+import main.Map;
 import main.UtilityTool;
 
 import javax.imageio.ImageIO;
@@ -15,7 +16,7 @@ import java.util.HashMap;
 public class TileManager {
     GamePanel gp;
     public Tile[] tile;
-    public int[][][] mapTileNum; // First layer
+    public Map currentMap;
     HashMap<Integer, TileData> tileDataMap = new HashMap<>();
 
 
@@ -27,13 +28,11 @@ public class TileManager {
         mapTileNum = new int[gp.maxWorldRow][gp.maxWorldCol][gp.maxWorldLayer];
         loadTileData("/maps/tile_data.txt");
         getTileImageFromTileSet("TunicTilesetV2");
-        loadMap("/maps/Overworld");
+
     }
 
-    public void reload(){
+    public void reload() {
         getTileImageFromTileSet("TunicTilesetV2");
-    }public void reloadMap(){
-        loadMap("/maps/Overworld");
     }
 
     public void loadTileData(String filePath) {
@@ -81,21 +80,21 @@ public class TileManager {
         }
     }
 
-    public void getTileImageFromTileSet(String tileSetName){
-        try{
-            BufferedImage tileset = ImageIO.read(getClass().getResourceAsStream("/tilesets/"+tileSetName+".png"));
+    public void getTileImageFromTileSet(String tileSetName) {
+        try {
+            BufferedImage tileset = ImageIO.read(getClass().getResourceAsStream("/tilesets/" + tileSetName + ".png"));
             int width = tileset.getWidth();
             int height = tileset.getHeight();
-            int nbcol = width/gp.originalTileSize;
-            int nbrow = height/gp.originalTileSize;
+            int nbcol = width / gp.originalTileSize;
+            int nbrow = height / gp.originalTileSize;
             int index = 0;
-            for(int i = 0; i < nbrow; i++){
-                for(int j = 0; j < nbcol; j++){
-                    boolean collision,animated ;
-                    int layer,id;
+            for (int i = 0; i < nbrow; i++) {
+                for (int j = 0; j < nbcol; j++) {
+                    boolean collision, animated;
+                    int layer, id;
 
                     ArrayList<String> collisionSide;
-                    BufferedImage tile = tileset.getSubimage(j*gp.originalTileSize,i*gp.originalTileSize,gp.originalTileSize,gp.originalTileSize);
+                    BufferedImage tile = tileset.getSubimage(j * gp.originalTileSize, i * gp.originalTileSize, gp.originalTileSize, gp.originalTileSize);
                     if (tileDataMap.containsKey(index)) {
                         TileData data = tileDataMap.get(index);
 
@@ -109,7 +108,7 @@ public class TileManager {
 
 
                         collisionSide = new ArrayList<>(data.collisionSide);
-                        setup(index,tile,collision,layer,collisionSide,id,animated);
+                        setup(index, tile, collision, layer, collisionSide, id, animated);
                         index++;
                     }
 
@@ -119,83 +118,62 @@ public class TileManager {
             }
 
 
-        }catch(IOException e){e.printStackTrace();}
-
-    }
-
-    public void loadMap(String mapPath){
-        // 1ST LAYER LOADING
-        try{
-            for (int layer = 0; layer < gp.maxWorldLayer; layer++) {
-                String layerPath = mapPath+"_layer_"+(int)(layer+1)+".csv";
-                InputStream is = getClass().getResourceAsStream(layerPath);
-                BufferedReader br = new BufferedReader(new InputStreamReader(is));
-
-                for (int row = 0; row < gp.maxWorldRow; row++) {
-                    String line = br.readLine();
-                    for (int col = 0; col < gp.maxWorldCol; col++) {
-                        String[] numbers = line.split(",");
-
-                        int num = Integer.parseInt(numbers[col]);
-
-                        mapTileNum[row][col][layer] =num;
-
-                    }
-                }
-                br.close();
-            }
-
-
-        }catch(Exception e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
-
     }
 
-    public void setup(int index,BufferedImage image,boolean collision,int layer,ArrayList<String>collisionSide,int id,Boolean animated){
+    public void setup(int index, BufferedImage image, boolean collision, int layer, ArrayList<String> collisionSide, int id, Boolean animated) {
         UtilityTool uTool = new UtilityTool();
         tile[index] = new Tile();
         tile[index].id = id;
         tile[index].image = image;
-        tile[index].image = uTool.scaleImage(tile[index].image, gp.tileSize,  gp.tileSize);
+        tile[index].image = uTool.scaleImage(tile[index].image, gp.tileSize, gp.tileSize);
         tile[index].collision = collision;
         tile[index].layer = layer;
         tile[index].collisionSide = collisionSide;
-        if(animated){
+        if (animated) {
             BufferedImage spriteSheet;
-            try{
-                spriteSheet = ImageIO.read(getClass().getResourceAsStream("/tiles/"+id+"-Sheet.png"));
-                spriteSheet = uTool.scaleImage(spriteSheet, spriteSheet.getWidth()*gp.scale,spriteSheet.getHeight()*gp.scale);
-                tile[index].animation =new Animator(spriteSheet,gp.tileSize,gp.tileSize,10,true);
+            try {
+                spriteSheet = ImageIO.read(getClass().getResourceAsStream("/tiles/" + id + "-Sheet.png"));
+                spriteSheet = uTool.scaleImage(spriteSheet, spriteSheet.getWidth() * gp.scale, spriteSheet.getHeight() * gp.scale);
+                tile[index].animation = new Animator(spriteSheet, gp.tileSize, gp.tileSize, 10, true);
 
-            }catch(Exception e){e.printStackTrace();}
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
     }
 
-    public void draw(Graphics2D g2d,int layer){
+    public void draw(Graphics2D g2d, int layerToDraw) {
+        int layer = layerToDraw-1;
+
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
-            for(int worldRow = 0; worldRow < gp.maxWorldRow; worldRow++){
-               for(int worldCol = 0; worldCol < gp.maxWorldCol; worldCol++){
-                   int tileNum = mapTileNum[worldRow][worldCol][layer];
 
-                   int worldX = worldCol * gp.tileSize;
-                   int worldY = worldRow * gp.tileSize;
-                   int screenX = worldX - gp.player.worldX + gp.player.screenX;
-                   int screenY = worldY - gp.player.worldY + gp.player.screenY;
+        for (int worldRow = 0; worldRow < currentMap.maxMapRow; worldRow++) {
+            for (int worldCol = 0; worldCol < currentMap.maxMapCol; worldCol++) {
+                int tileNum = currentMap.tileMap[worldRow][worldCol][layer];
 
-                   if(((-gp.tileSize) <= screenX &&  screenX <= (gp.screenWidth )) &&
-                           ((-gp.tileSize) <= screenY &&  screenY <= (gp.screenHeight ))){
-                           if( tileNum != -1){
-                               if (tile[tileNum].animation == null){
-                                   g2d.drawImage(tile[tileNum].image, screenX, screenY, null);
-                               }else{
-                                   tile[tileNum].animation.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
-                               }
-                           }
-                   }
-               }
-           }
+                int worldX = worldCol * gp.tileSize;
+                int worldY = worldRow * gp.tileSize;
+                int screenX = worldX - gp.player.worldX + gp.player.screenX;
+                int screenY = worldY - gp.player.worldY + gp.player.screenY;
+
+                if (((-gp.tileSize) <= screenX && screenX <= (gp.screenWidth)) &&
+                        ((-gp.tileSize) <= screenY && screenY <= (gp.screenHeight))) {
+                    if (tileNum != -1) {
+                        if (tile[tileNum].animation == null) {
+                            g2d.drawImage(tile[tileNum].image, screenX, screenY, null);
+                        } else {
+                            tile[tileNum].animation.draw(g2d, screenX, screenY, gp.tileSize, gp.tileSize);
+                        }
+                    }
+                }
+            }
         }
+    }
+
+
 }

@@ -38,11 +38,14 @@ public class GamePanel extends JPanel implements Runnable {
     Graphics2D g2;
 
     // WORLD SETTINGS
-    public final int maxWorldCol = 95;
-    public final int maxWorldRow = 79;
-    public final int maxWorldLayer = 2;
-    public  int worldWidth = tileSize * maxWorldCol;
-    public  int worldHeight = tileSize * maxWorldRow;
+    public int maxWorldCol;
+    public int maxWorldRow;
+    public int maxWorldLayer;
+    public int worldWidth;
+    public int worldHeight;
+    public int currentMapIndex = 0;
+    public ArrayList<Map> mapsList = new ArrayList<>();
+    public double luminosity = 1 ;
 
     //FPS
     int FPS = 60;
@@ -61,7 +64,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     // ENTITY AND PLAYER
     public Player player = new Player(this,this.keyH);
-    public SuperObject[]  obj = new SuperObject[10];
+    public ArrayList<SuperObject>  obj = new ArrayList<>();
     public ArrayList<Entity> monster = new ArrayList<>();
     public ArrayList<Entity> projectileList = new ArrayList<>();
     public ArrayList<Entity> entitiesList = new ArrayList<Entity>();
@@ -91,6 +94,7 @@ public class GamePanel extends JPanel implements Runnable {
         this.addKeyListener(keyH);
         this.setFocusable(true);
         this.setFocusTraversalKeysEnabled(false);
+        loadMap(new Map(this,"OverWorld"));
 
     }
     public void setScreenMode() {
@@ -154,12 +158,30 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void createTempScreen() {
-        tempScreen = new BufferedImage(screenWidth2, screenHeight2, BufferedImage.TYPE_INT_ARGB);
+        tempScreen = new BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_ARGB);
         g2 = (Graphics2D)tempScreen.getGraphics();
+    }
+
+    public void loadMap(Map newMap){
+        mapsList.add(newMap);
+    }
+    public void setMap(int mapIndex){
+        currentMapIndex = mapIndex;
+        Map currentMap = mapsList.get(mapIndex);
+        tileM.currentMap = currentMap;
+        maxWorldLayer = currentMap.maxMapLayer;
+        maxWorldCol = currentMap.maxMapCol;
+        maxWorldRow = currentMap.maxMapRow;
+        worldWidth = currentMap.mapWidth;
+        worldHeight = currentMap.mapHeight;
+        monster = currentMap.monsterList;
+        obj = currentMap.objectsList;
+
     }
 
 
     public void setupGame(){
+        setMap(0);
         assetSetter.setObject();
         assetSetter.setMonster();
         gameState = titleState;
@@ -287,7 +309,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         }else{
             //TILE 1ST LAYER
-            tileM.draw(g2,0);
+            tileM.draw(g2,1);
 
             // OBJECT
             for (SuperObject superObject : obj) {
@@ -320,7 +342,7 @@ public class GamePanel extends JPanel implements Runnable {
             entitiesList.clear();
 
             //TILE 2ND LAYER
-            tileM.draw(g2,1);
+            tileM.draw(g2,2);
 
 
 
@@ -332,7 +354,11 @@ public class GamePanel extends JPanel implements Runnable {
 
         ui.draw(g2);
 
+
         if(gameState == playState ){
+
+
+
             //DEBUG
             if (debugMode){
                 long drawEnd = System.nanoTime();
