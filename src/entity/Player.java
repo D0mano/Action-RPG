@@ -919,7 +919,7 @@ public class Player extends Entity {
     public void cutBush(List<Point> bushes){
         if (!bushes.isEmpty()){
             for (Point p : bushes){
-                gp.tileM.mapTileNum1[p.y][p.x] = 16;
+                gp.tileM.mapTileNum[p.y][p.x][0] = 16;
             }
         }
     }

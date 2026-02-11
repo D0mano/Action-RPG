@@ -53,6 +53,8 @@ public class UI {
     public int equipmentXPos,equipmentYPos;
     public int equipmentSize;
 
+    float itemScale = 0f;
+
 
 
 
@@ -174,6 +176,16 @@ public class UI {
             }
 
         }
+        if (itemOn) {
+            // Vitesse de l'animation (0.1f signifie 10% plus grand par frame)
+            if (itemScale < 1f) {
+                itemScale += 0.1f;
+                if (itemScale > 1f) itemScale = 1f; // On plafonne à 1 (taille normale)
+            }
+        } else {
+            // Reset l'animation si la fenêtre est fermée
+            itemScale = 0f;
+        }
     }
 
     public BufferedImage setup(String imageName, float scale) {
@@ -237,17 +249,23 @@ public class UI {
             drawPlayerPotion();
             drawPlayerEquipment();
 
+            drawLuminosity();
+
         }
         if (gp.gameState == gp.pauseState){
             drawPauseScreen();
+            drawLuminosity();
 
         }
         if(gp.gameState == gp.dialogueState){
             if (messageOn){
+
                 drawMessageScreen();
+                drawLuminosity();
             }
             if (itemOn){
-                drawItemScreen();
+                drawItemScreen2();
+                drawLuminosity();
             }
         }
         if (gp.gameState == gp.inInventory){
@@ -263,10 +281,23 @@ public class UI {
             }
             drawPlayerPotion();
             drawPlayerEquipment();
+            drawLuminosity();
 
         }
     }
-
+     public void drawLuminosity(){
+         // LUMINOSITY
+         if (gp.luminosity <= 1){
+             Color light = new Color(0,0,0,(int)((1-gp.luminosity)*255));
+             g2.setColor(light);
+             g2.fillRect(0,0,gp.screenWidth,gp.screenHeight);
+         }
+         else{
+             Color light = new Color(255,255,255,(int)((gp.luminosity-1)*255));
+             g2.setColor(light);
+             g2.fillRect(0,0,gp.screenWidth,gp.screenHeight);
+         }
+     }
     public void drawInventoryScreen(){
         GradientPaint vignette = new GradientPaint(
                 0,0,new Color(0,0,0,240),
@@ -453,6 +484,84 @@ public class UI {
         g2.setColor(Color.white);
         g2.drawString(item.name,textX,textY);
 
+    }
+
+    public void drawItemScreen2(){
+        if (item == null) return; // Sécurité
+
+        // --- 1. CALCUL DU CERCLE ---
+        // Dimensions finales (cibles)
+        int finalSize = gp.tileSize * 5;
+        int targetX = (11 * gp.tileSize) / 2;
+        int targetY = gp.tileSize;
+
+        // Calcul du centre du cercle (point pivot pour l'agrandissement)
+        int centerX = targetX + finalSize / 2;
+        int centerY = targetY + finalSize / 2;
+
+        // Dimensions actuelles basées sur l'animation
+        int currentSize = (int) (finalSize * itemScale);
+
+        // On recalcule X et Y pour que ça reste centré
+        int currentX = centerX - currentSize / 2;
+        int currentY = centerY - currentSize / 2;
+
+        // Dessin du fond noir et du contour blanc
+        g2.setColor(Color.black);
+        g2.fillOval(currentX, currentY, currentSize, currentSize);
+        g2.setColor(Color.white);
+        g2.setStroke(new BasicStroke(4));
+        g2.drawOval(currentX, currentY, currentSize, currentSize);
+
+        // --- 2. DESSIN DE L'ITEM ---
+        // On veut que l'item grandisse aussi
+        int itemFinalSize = gp.tileSize * 3;
+        int itemCurrentSize = (int) (itemFinalSize * itemScale);
+
+        // Centre de l'image de l'item (légèrement décalé car l'item est dans le cercle)
+        int itemCenterX = targetX + gp.tileSize + itemFinalSize / 2;
+        int itemCenterY = targetY + gp.tileSize + itemFinalSize / 2;
+
+        int itemDrawX = itemCenterX - itemCurrentSize / 2;
+        int itemDrawY = itemCenterY - itemCurrentSize / 2;
+
+        if (item.upAnimator != null){
+            item.upAnimator.draw(g2, itemDrawX, itemDrawY, itemCurrentSize, itemCurrentSize);
+        } else {
+            g2.drawImage(item.image, itemDrawX, itemDrawY, itemCurrentSize, itemCurrentSize, null);
+        }
+
+        // --- 3. DESSIN DU MESSAGE (TEXTE) ---
+        // On affiche le texte seulement si l'animation a commencé à apparaître un peu
+        if (itemScale > 0.1f) {
+            g2.setFont(trunic);
+
+            // On peut aussi animer la taille de la fenêtre de texte si tu veux
+            int textWindowWidth = 7 * gp.tileSize;
+            int textWindowHeight = 2 * gp.tileSize;
+
+            // Animation simple : on applique aussi l'échelle à la fenêtre de texte
+            int currentTextW = (int)(textWindowWidth * itemScale);
+            int currentTextH = (int)(textWindowHeight * itemScale);
+
+            // Position du texte
+            int textY = 7 * gp.tileSize;
+            int textWindowCenterX = (targetX - gp.tileSize) + (textWindowWidth / 2);
+            int textWindowCenterY = (textY - (3 * gp.tileSize) / 2) + (textWindowHeight / 2);
+
+            int winX = textWindowCenterX - currentTextW / 2;
+            int winY = textWindowCenterY - currentTextH / 2;
+
+            drawSubWindow(winX, winY, currentTextW, currentTextH, messageWindow);
+
+            // Pour le texte lui-même, changer la taille de la police en temps réel est coûteux.
+            // On l'affiche uniquement quand l'animation est presque finie pour éviter les glitchs visuels
+            if(itemScale > 0.8f){
+                g2.setColor(Color.white);
+                int textX = getXforCenteredText(item.name);
+                g2.drawString(item.name, textX, textY);
+            }
+        }
     }
 
     public void drawOptionScreen(){

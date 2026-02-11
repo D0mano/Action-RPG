@@ -15,8 +15,7 @@ import java.util.HashMap;
 public class TileManager {
     GamePanel gp;
     public Tile[] tile;
-    public int[][] mapTileNum1; // First layer
-    public int[][] mapTileNum2; // Seconde layer
+    public int[][][] mapTileNum; // First layer
     HashMap<Integer, TileData> tileDataMap = new HashMap<>();
 
 
@@ -25,8 +24,7 @@ public class TileManager {
     public TileManager(GamePanel gp) {
         this.gp = gp;
         tile = new Tile[120];
-        mapTileNum1 = new int[gp.maxWorldRow][gp.maxWorldCol];
-        mapTileNum2 = new int[gp.maxWorldRow][gp.maxWorldCol];
+        mapTileNum = new int[gp.maxWorldRow][gp.maxWorldCol][gp.maxWorldLayer];
         loadTileData("/maps/tile_data.txt");
         getTileImageFromTileSet("TunicTilesetV2");
         loadMap("/maps/Overworld");
@@ -128,58 +126,31 @@ public class TileManager {
     public void loadMap(String mapPath){
         // 1ST LAYER LOADING
         try{
-            InputStream is = getClass().getResourceAsStream(mapPath+"_layer_1.csv");
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            for (int layer = 0; layer < gp.maxWorldLayer; layer++) {
+                String layerPath = mapPath+"_layer_"+(int)(layer+1)+".csv";
+                InputStream is = getClass().getResourceAsStream(layerPath);
+                BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
+                for (int row = 0; row < gp.maxWorldRow; row++) {
+                    String line = br.readLine();
+                    for (int col = 0; col < gp.maxWorldCol; col++) {
+                        String[] numbers = line.split(",");
 
-            for(int row = 0; row < gp.maxWorldRow; row++){
-                String line = br.readLine();
-                for( int col = 0; col < gp.maxWorldCol; col++){
-                    String[] numbers = line.split(",");
+                        int num = Integer.parseInt(numbers[col]);
 
-                    int num = Integer.parseInt(numbers[col]);
+                        mapTileNum[row][col][layer] =num;
 
-                    mapTileNum1[row][col] = num;
-
+                    }
                 }
+                br.close();
             }
-            br.close();
+
 
         }catch(Exception e){
             e.printStackTrace();
         }
-        // 2ND LAYER LOADING
-        try{
-            InputStream is = getClass().getResourceAsStream(mapPath+"_layer_2.csv");
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
 
-            for(int row = 0; row < gp.maxWorldRow; row++){
-                String line = br.readLine();
-                for( int col = 0; col < gp.maxWorldCol; col++){
-                    String[] numbers;
-                    if (line != null) {
-                        numbers = line.split(",");
-                    }else{
-                        numbers = new String[gp.maxWorldCol];
-                        Arrays.fill(numbers, "-1");
-                    }
-                    int num;
-                    if (col < numbers.length) {
-                        num = Integer.parseInt(numbers[col]);
-                    }else{
-                        num = -1;
-                    }
-
-                    mapTileNum2[row][col] = num;
-
-                }
-            }
-            br.close();
-
-        }catch(Exception e){
-            e.printStackTrace();
-        }
     }
 
     public void setup(int index,BufferedImage image,boolean collision,int layer,ArrayList<String>collisionSide,int id,Boolean animated){
@@ -205,40 +176,26 @@ public class TileManager {
 
     public void draw(Graphics2D g2d,int layer){
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
-        for(int worldRow = 0; worldRow < gp.maxWorldRow; worldRow++){
-           for(int worldCol = 0; worldCol < gp.maxWorldCol; worldCol++){
-               int tileNum = mapTileNum1[worldRow][worldCol];
-               int tileNum2 = mapTileNum2[worldRow][worldCol];
+            for(int worldRow = 0; worldRow < gp.maxWorldRow; worldRow++){
+               for(int worldCol = 0; worldCol < gp.maxWorldCol; worldCol++){
+                   int tileNum = mapTileNum[worldRow][worldCol][layer];
 
-               int worldX = worldCol * gp.tileSize;
-               int worldY = worldRow * gp.tileSize;
-               int screenX = worldX - gp.player.worldX + gp.player.screenX;
-               int screenY = worldY - gp.player.worldY + gp.player.screenY;
+                   int worldX = worldCol * gp.tileSize;
+                   int worldY = worldRow * gp.tileSize;
+                   int screenX = worldX - gp.player.worldX + gp.player.screenX;
+                   int screenY = worldY - gp.player.worldY + gp.player.screenY;
 
-               if(((-gp.tileSize) <= screenX &&  screenX <= (gp.screenWidth )) &&
-                       ((-gp.tileSize) <= screenY &&  screenY <= (gp.screenHeight ))){
-                   if (layer==1){
-                       if( tileNum != -1 && tile[tileNum].layer == layer){
-                           if (tile[tileNum].animation == null){
-                               g2d.drawImage(tile[tileNum].image, screenX, screenY, null);
-                           }else{
-                               tile[tileNum].animation.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
+                   if(((-gp.tileSize) <= screenX &&  screenX <= (gp.screenWidth )) &&
+                           ((-gp.tileSize) <= screenY &&  screenY <= (gp.screenHeight ))){
+                           if( tileNum != -1){
+                               if (tile[tileNum].animation == null){
+                                   g2d.drawImage(tile[tileNum].image, screenX, screenY, null);
+                               }else{
+                                   tile[tileNum].animation.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
+                               }
                            }
-                       }
-                   }
-                   else if (layer==2){
-                       if(tileNum2 != -1 && tile[tileNum2].layer == layer){
-                           if (tile[tileNum2].animation == null){
-                               g2d.drawImage(tile[tileNum2].image, screenX, screenY, null);
-                           }else{
-                               tile[tileNum2].animation.draw(g2d,screenX,screenY,gp.tileSize,gp.tileSize);
-                           }
-
-                       }
-
                    }
                }
            }
-       }
-    }
+        }
 }

@@ -40,6 +40,7 @@ public class GamePanel extends JPanel implements Runnable {
     // WORLD SETTINGS
     public final int maxWorldCol = 95;
     public final int maxWorldRow = 79;
+    public final int maxWorldLayer = 2;
     public  int worldWidth = tileSize * maxWorldCol;
     public  int worldHeight = tileSize * maxWorldRow;
 
@@ -286,7 +287,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         }else{
             //TILE 1ST LAYER
-            tileM.draw(g2,1);
+            tileM.draw(g2,0);
 
             // OBJECT
             for (SuperObject superObject : obj) {
@@ -319,7 +320,9 @@ public class GamePanel extends JPanel implements Runnable {
             entitiesList.clear();
 
             //TILE 2ND LAYER
-            tileM.draw(g2,2);
+            tileM.draw(g2,1);
+
+
 
 
 

@@ -145,8 +145,8 @@ public class Entity {
             int worldCol, worldRow;
             worldCol = (gp.player.worldX+gp.player.solidArea.x)/gp.tileSize;
             worldRow = (gp.player.worldY+gp.player.solidArea.y)/gp.tileSize;
-            System.out.println("Player coord :"+worldCol * gp.tileSize + " " + worldRow * gp.tileSize);
-            System.out.println("Entity coord :"+worldX+" "+worldY);
+//            System.out.println("Player coord :"+worldCol * gp.tileSize + " " + worldRow * gp.tileSize);
+//            System.out.println("Entity coord :"+worldX+" "+worldY);
             Point forwardTile = gp.collisionChecker.findNextFreeTile(worldCol,worldRow,direction);
             int offset = gp.tileSize/4;
             switch (direction){
@@ -160,7 +160,7 @@ public class Entity {
                     }
                     break;
                 case "down":
-                    if (forwardTile.y * gp.tileSize-offset >= worldY + offset){
+                    if (forwardTile.y * gp.tileSize - offset >= worldY + offset){
                         worldY += gp.tileSize/4;
                     }else if (name.equals("Rudeling")) {
                         entityStatus = parrying;
