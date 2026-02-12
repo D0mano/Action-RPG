@@ -1,5 +1,6 @@
 package object;
 
+import main.Animator;
 import main.GamePanel;
 
 import javax.imageio.ImageIO;
@@ -15,11 +16,9 @@ public class OBJ_Lantern extends SuperObject {
         solidArea.height = gp.tileSize;
         name = "lantern";
         objectType = gear;
-        try{
-            image = ImageIO.read(getClass().getResourceAsStream("/objects/lantern.png"));
-            image = uTool.scaleImage(image, gp.tileSize,  gp.tileSize);
+        image = setup("lantern", gp.scale);
+        up = setup("lantern-Sheet",gp.scale);
+        upAnimator = new Animator(up,gp.tileSize,gp.tileSize,6,false);
 
-        }catch(IOException e){
-            e.printStackTrace();}
     }
 }

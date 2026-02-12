@@ -57,6 +57,7 @@ public class GamePanel extends JPanel implements Runnable {
     public AssetSetter assetSetter = new AssetSetter(this);
     Thread gameThread;
     public CollisionChecker collisionChecker = new CollisionChecker(this);
+    public EventHandler eventHandler = new EventHandler(this);
 
     public Sound music = new Sound();
     public Sound soundEffects = new Sound();
@@ -87,6 +88,7 @@ public class GamePanel extends JPanel implements Runnable {
     public final int graphicsSettingstate = 7;
     final public int inInventory = 8;
 
+
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth2, screenHeight2));
         this.setBackground(Color.black);
@@ -95,6 +97,8 @@ public class GamePanel extends JPanel implements Runnable {
         this.setFocusable(true);
         this.setFocusTraversalKeysEnabled(false);
         loadMap(new Map(this,"OverWorld"));
+        loadMap(new Map(this,"world02"));
+        loadMap(new Map(this,"World03"));
 
     }
     public void setScreenMode() {
@@ -176,6 +180,10 @@ public class GamePanel extends JPanel implements Runnable {
         worldHeight = currentMap.mapHeight;
         monster = currentMap.monsterList;
         obj = currentMap.objectsList;
+        player.worldCol = currentMap.playerCol;
+        player.worldRow = currentMap.playerRow;
+        player.worldX = player.worldCol * tileSize;
+        player.worldY = player.worldRow * tileSize;
 
     }
 
@@ -184,6 +192,8 @@ public class GamePanel extends JPanel implements Runnable {
         setMap(0);
         assetSetter.setObject();
         assetSetter.setMonster();
+        assetSetter.setPlayerSpawn();
+        mapsList.get(currentMapIndex).setPlayerSpawn();
         gameState = titleState;
         createTempScreen();
         updateSetting();
@@ -305,8 +315,6 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         if (gameState == titleState){
-
-
         }else{
             //TILE 1ST LAYER
             tileM.draw(g2,1);
@@ -318,6 +326,7 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
             entitiesList.add(player);
+
             for (Entity e : monster) {
                 if (e != null) {
                     entitiesList.add(e);
@@ -344,21 +353,12 @@ public class GamePanel extends JPanel implements Runnable {
             //TILE 2ND LAYER
             tileM.draw(g2,2);
 
-
-
-
-
-
-
         }
 
         ui.draw(g2);
 
 
         if(gameState == playState ){
-
-
-
             //DEBUG
             if (debugMode){
                 long drawEnd = System.nanoTime();

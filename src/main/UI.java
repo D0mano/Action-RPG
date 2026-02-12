@@ -8,6 +8,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
 
 public class UI {
     GamePanel gp;
@@ -55,7 +58,13 @@ public class UI {
 
     float itemScale = 0f;
 
-
+    // TRANSITION IRIS
+    public boolean transitionOn = false;
+    public int transitionState = 0; // 0 = nothing, 1 = closing , 2 = opening
+    public int transitionCounter = 0;
+    public double transitionSize = 0;
+    public double maxTransitionSize;
+    private Runnable onTransitionComplete;
 
 
 
@@ -63,6 +72,8 @@ public class UI {
     public UI(GamePanel gp,Player player) {
         this.gp = gp;
         this.player = player;
+        maxTransitionSize = gp.screenWidth * 2.0;
+
 
         try {
             // Tu changes juste l'extension du fichier ici
@@ -186,6 +197,33 @@ public class UI {
             // Reset l'animation si la fenêtre est fermée
             itemScale = 0f;
         }
+        if (transitionOn) {
+            double speed = maxTransitionSize / 60; //Do the transition in ~60 frames (1 sec)
+
+            // CLOSING
+            if (transitionState == 1) {
+
+
+                transitionSize -= speed;
+                if (transitionSize <= 0) {
+                    transitionSize = 0;
+                    if (onTransitionComplete != null) {
+                        onTransitionComplete.run();
+                    }
+                    transitionState = 2;
+                }
+            }
+            // OPENING
+            else if (transitionState == 2) {
+                transitionSize += speed;
+                if (transitionSize >= maxTransitionSize) {
+                    transitionSize = maxTransitionSize;
+                    transitionOn = false; // Transition finie
+                    transitionState = 0;
+                }
+            }
+        }
+
     }
 
     public BufferedImage setup(String imageName, float scale) {
@@ -248,8 +286,11 @@ public class UI {
             drawPlayerMana();
             drawPlayerPotion();
             drawPlayerEquipment();
-
             drawLuminosity();
+            if (transitionOn){
+                drawIrisTransition();
+            }
+
 
         }
         if (gp.gameState == gp.pauseState){
@@ -285,7 +326,7 @@ public class UI {
 
         }
     }
-     public void drawLuminosity(){
+    public void drawLuminosity(){
          // LUMINOSITY
          if (gp.luminosity <= 1){
              Color light = new Color(0,0,0,(int)((1-gp.luminosity)*255));
@@ -918,6 +959,37 @@ public class UI {
     public int getXForCenteredTextAroundX(String text,int x){
         int length = (int)g2.getFontMetrics().getStringBounds(text,g2).getWidth();
         return x - length/2;
+    }
+
+    public void drawIrisTransition() {
+
+        // --- DESSIN DU MASQUE ---
+        // 1. Créer une "Area" qui couvre tout l'écran (le noir)
+        Area screenArea = new Area(new Rectangle2D.Double(0, 0, gp.screenWidth, gp.screenHeight));
+
+        // 2. Créer le cercle au centre (le trou)
+
+        double centerX = player.screenX + gp.tileSize/2.0;
+        double centerY = player.screenY + gp.tileSize/2.0;
+
+        double x = centerX - (transitionSize / 2.0);
+        double y = centerY - (transitionSize / 2.0);
+
+        // Shape du cercle
+        Area circleArea = new Area(new Ellipse2D.Double(x, y, transitionSize, transitionSize));
+
+        // 3. Soustraire le cercle à l'écran ( Noir - Cercle = Masque à trou)
+        screenArea.subtract(circleArea);
+
+        // 4. Dessiner
+        g2.setColor(java.awt.Color.BLACK);
+        g2.fill(screenArea);
+    }
+    public void startTransition(Runnable action) {
+        onTransitionComplete = action;
+        transitionOn = true;
+        transitionState = 1; // Commence par fermer
+        transitionSize = maxTransitionSize; // Commence grand ouvert
     }
 }
 

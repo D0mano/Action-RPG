@@ -207,8 +207,8 @@ public class Player extends Entity {
     }
 
     public void setDefaultsValues(){
-        worldCol= 49;
-        worldRow= 66;
+        worldCol = 0;
+        worldRow = 0;
         worldX = gp.tileSize * worldCol;
         worldY = gp.tileSize * worldRow;
         normalSpeed = gp.tileSize/10;
@@ -456,6 +456,9 @@ public class Player extends Entity {
             // CHECK MONSTER COLLISION
             gp.collisionChecker.checkEntity(this,gp.monster);
 
+            // CHECK EVENT COLLISION
+            gp.eventHandler.checkEvent();
+
 
             //IF COLLISION IS FALSE PLAYER CAN MOVE
             if (!collisionOn) {
@@ -509,6 +512,9 @@ public class Player extends Entity {
         }
 
         if (entityStatus == idle) {
+            // CHECK EVENT COLLISION
+            gp.eventHandler.checkEvent();
+
             switch (direction) {
                 case "up": upIdleAnimator.update();break;
                 case "down": downIdleAnimator.update();break;
@@ -544,6 +550,9 @@ public class Player extends Entity {
 
                 // CHECK MONSTER COLLISION
                 gp.collisionChecker.checkEntity(this, gp.monster);
+
+                // CHECK EVENT COLLISION
+                gp.eventHandler.checkEvent();
 
 
                 //IF COLLISION IS FALSE PLAYER CAN MOVE
@@ -967,6 +976,7 @@ public class Player extends Entity {
         addObjToInventory(new OBJ_BlueFruit(gp));
         addObjToInventory(new OBJ_RedFruit(gp));
         addObjToInventory(new OBJ_GrapplingHook(gp));
+        addObjToInventory(new OBJ_Sword(gp));
     }
 
     public void reloadInventory(){

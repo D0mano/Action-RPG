@@ -26,7 +26,7 @@ public class AssetSetter {
     }
 
     public void setObject(){
-        placeObject("sword",48,53,0);
+        placeObject("lantern",48,53,0);
         placeObject("shield",16,17,0);
         placeObject("grappling_hook",56,11,0);
         placeObject("ice_wand",48,27,0);
@@ -53,6 +53,18 @@ public class AssetSetter {
         createMonster("rudeling",16,17,0);
         createMonster("rudeling",56,11,0);
 
+
+    }
+
+    public void setPlayerSpawn(){
+        gp.mapsList.get(0).playerCol = 49;
+        gp.mapsList.get(0).playerRow = 66;
+
+        gp.mapsList.get(1).playerCol = 24;
+        gp.mapsList.get(1).playerRow = 39;
+
+        gp.mapsList.get(2).playerCol = 40;
+        gp.mapsList.get(2).playerRow = 44;
 
     }
 

@@ -29,6 +29,10 @@ public class Map {
     //OBJECT INFO
     public ArrayList<SuperObject> objectsList = new ArrayList<>();
 
+    //PLAYER SPAWN
+    public int playerCol;
+    public int playerRow;
+
     public Map(GamePanel gp,String mapName){
         this.gp = gp;
         this.mapName = mapName;
@@ -99,5 +103,12 @@ public class Map {
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void setPlayerSpawn(){
+        gp.player.worldCol = playerCol;
+        gp.player.worldRow = playerRow;
+        gp.player.worldX = playerCol * gp.tileSize;
+        gp.player.worldY = playerRow * gp.tileSize;
     }
 }
