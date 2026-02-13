@@ -46,6 +46,9 @@ public class UI {
     public String[] graphicCommand = {"Display Mode","Resolution","Return"};
     public int commandNumberGraphic = 0;
 
+    public String[] loadCommand = {"File #1","File #2","File #3","Cancel"};
+    public int commandNumberLoad = 0;
+
     public int slotRow = 0;
     public int slotCol = 0;
 
@@ -278,6 +281,9 @@ public class UI {
                 g2.fillRect(0,0,gp.screenWidth,gp.screenHeight);
             }
             drawGraphicsScreen();
+        }
+        if (gp.gameState == gp.loadSaveState){
+            drawLoadScreen();
         }
 
         if (gp.gameState == gp.playState){
@@ -617,7 +623,7 @@ public class UI {
         drawSubWindow(0,0,gp.screenWidth,gp.screenHeight,optionWindow);
         g2.setFont(lilliput_40);
         int x =getXforCenteredText("Option");
-        int y = 2*gp.tileSize;
+        int y = (3*gp.tileSize)/2;
         g2.drawString("Option",x,y);
 
         g2.setFont(lilliput_20);
@@ -667,7 +673,7 @@ public class UI {
         drawSubWindow(0,0,gp.screenWidth,gp.screenHeight,optionWindow);
         g2.setFont(lilliput_40);
         int x = getXforCenteredText("Audio");
-        int y = 2*gp.tileSize;
+        int y = (3*gp.tileSize)/2;
         g2.drawString("Audio",x,y);
 
         g2.setFont(lilliput_20);
@@ -724,7 +730,7 @@ public class UI {
         drawSubWindow(0,0,gp.screenWidth,gp.screenHeight,optionWindow);
         g2.setFont(lilliput_40);
         int x = getXforCenteredText("Graphics");
-        int y = 2*gp.tileSize;
+        int y = (3*gp.tileSize)/2;
         g2.drawString("Graphics",x,y);
 
         g2.setFont(lilliput_15);
@@ -769,6 +775,62 @@ public class UI {
         }
 
 
+    }
+
+    public void drawLoadScreen(){
+        g2.setColor(Color.black);
+        g2.fillRect(0,0,gp.screenWidth,gp.screenHeight);
+        RadialGradientPaint vignette = new RadialGradientPaint(
+                new Point(gp.screenWidth/2,gp.screenHeight/2),
+                2*gp.screenWidth,
+                new float[]{0.0f,1.0f},
+                new Color[]{new Color(0,0,0,240),new Color(0,0,0,100)});
+        g2.setPaint(vignette);
+        g2.fillRect(0,0,gp.screenWidth,gp.screenHeight);
+        g2.setColor(Color.white);
+        drawSubWindow(0,0,gp.screenWidth,gp.screenHeight,optionWindow);
+        g2.setFont(lilliput_40);
+        int x = getXforCenteredText("Save Data");
+        int y = (3*gp.tileSize)/2;
+        g2.drawString("Save Data",x,y);
+
+        g2.setFont(lilliput_15);
+        int buttonWidth =(int)(1.3f*menuSelection.getWidth());
+        int buttonHeight = (3*menuSelection.getHeight())/2;
+        int startY = gp.screenHeight / 2 - ((loadCommand.length-1) * buttonHeight+ buttonHeight / 2) / 2;
+
+        for (int i = 0; i < loadCommand.length; i++) {
+
+            int buttonX = (gp.screenWidth - buttonWidth) / 2;
+            int buttonY = startY + (i * (buttonHeight + (int)(gp.screenHeight /57.6f)));
+            if (i == 3){
+                buttonHeight = (3*menuSelection.getHeight())/4;
+            }else{ buttonHeight = (3*menuSelection.getHeight())/2;}
+
+            if (i == commandNumberLoad) {
+
+                if ( menuSelectionOrange != null) {
+                    g2.drawImage(menuSelectionOrange, buttonX, buttonY, buttonWidth, buttonHeight, null);
+                }
+                g2.setColor(Color.WHITE);
+
+
+            } else {
+                if (menuSelection != null) {
+                    g2.drawImage(menuSelection, buttonX, buttonY, buttonWidth, buttonHeight, null);
+
+                }
+                g2.setColor(Color.LIGHT_GRAY);
+            }
+
+            int textX = buttonX + (buttonWidth ) / 8;
+            int textY = buttonY + (int)(gp.screenHeight /15.15f);
+            if (i == 3){
+                textY -= (int)(gp.tileSize/9.6f);
+            }
+            g2.drawString(loadCommand[i], textX, textY);
+
+        }
     }
 
     public void drawSubWindow(int x,int y,int width,int height,BufferedImage image){
@@ -961,29 +1023,25 @@ public class UI {
         return x - length/2;
     }
 
-    public void drawIrisTransition() {
+    public void drawIrisTransition(){
+        int strokeWidth = gp.screenWidth * 2;
 
-        // --- DESSIN DU MASQUE ---
-        // 1. Créer une "Area" qui couvre tout l'écran (le noir)
-        Area screenArea = new Area(new Rectangle2D.Double(0, 0, gp.screenWidth, gp.screenHeight));
+        g2.setStroke(new BasicStroke(strokeWidth));
+        g2.setColor(Color.BLACK);
 
-        // 2. Créer le cercle au centre (le trou)
+        double currentRadius = transitionSize / 2.0;
+        double drawingRadius = currentRadius + (strokeWidth / 2.0);
 
-        double centerX = player.screenX + gp.tileSize/2.0;
-        double centerY = player.screenY + gp.tileSize/2.0;
+        double centerX = gp.player.screenX + gp.tileSize/2f;
+        double centerY = gp.player.screenY + gp.tileSize/2f;
 
-        double x = centerX - (transitionSize / 2.0);
-        double y = centerY - (transitionSize / 2.0);
+        double x = centerX - drawingRadius;
+        double y = centerY - drawingRadius;
+        double size = drawingRadius;
 
-        // Shape du cercle
-        Area circleArea = new Area(new Ellipse2D.Double(x, y, transitionSize, transitionSize));
+        g2.drawOval((int)x,(int)y,(int)size*2,(int)size*2);
 
-        // 3. Soustraire le cercle à l'écran ( Noir - Cercle = Masque à trou)
-        screenArea.subtract(circleArea);
-
-        // 4. Dessiner
-        g2.setColor(java.awt.Color.BLACK);
-        g2.fill(screenArea);
+        g2.setStroke(new BasicStroke(1));
     }
     public void startTransition(Runnable action) {
         onTransitionComplete = action;

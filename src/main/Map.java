@@ -111,4 +111,9 @@ public class Map {
         gp.player.worldX = playerCol * gp.tileSize;
         gp.player.worldY = playerRow * gp.tileSize;
     }
+    public void reload(){
+        mapWidth   = gp.tileSize  * this.maxMapCol;
+        mapHeight   = gp.tileSize * this.maxMapRow;
+        loadMap();
+    }
 }

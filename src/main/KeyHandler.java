@@ -55,6 +55,11 @@ public class KeyHandler implements KeyListener {
                     gp.gameState = gp.playState;
 
                 }
+                if (gp.ui.commandNumber == 1) {
+                    gp.playSoundEffect(23);
+                    gp.previousState = gp.gameState;
+                    gp.gameState = gp.loadSaveState;
+                }
                 if (gp.ui.commandNumber == 2) {
                     gp.playSoundEffect(23);
                     gp.previousState = gp.gameState;
@@ -122,6 +127,46 @@ public class KeyHandler implements KeyListener {
 
                 }
             }
+        }
+        else if (gp.gameState == gp.loadSaveState ) {
+            if(code == KeyEvent.VK_ESCAPE){
+                gp.gameState = gp.previousState;
+                gp.previousState = gp.loadSaveState;
+            }
+
+            if (code == KeyEvent.VK_UP || code == KeyEvent.VK_Z) {
+                gp.playSoundEffect(5);
+                if (gp.ui.commandNumberLoad == 0) {
+                    gp.ui.commandNumberLoad = 3;
+                } else {
+                    gp.ui.commandNumberLoad--;
+                }
+            }
+            if (code == KeyEvent.VK_DOWN || code == KeyEvent.VK_S) {
+                gp.playSoundEffect(5);
+                if (gp.ui.commandNumberLoad == 3) {
+                    gp.ui.commandNumberLoad = 0;
+                } else {
+                    gp.ui.commandNumberLoad++;
+                }
+            }
+            if (code == KeyEvent.VK_ENTER) {
+
+                if (gp.ui.commandNumberLoad == 0) {
+                }
+                if (gp.ui.commandNumberLoad == 1) {
+
+                }
+                if (gp.ui.commandNumberLoad == 2) {
+
+                }
+                if (gp.ui.commandNumberLoad == 3) {
+                    gp.gameState = gp.previousState;
+                    gp.previousState = gp.loadSaveState;
+                    gp.playSoundEffect(24);
+                }
+            }
+
         }
         else if(gp.gameState == gp.audioSettingstate) {
             if(code == KeyEvent.VK_ESCAPE){

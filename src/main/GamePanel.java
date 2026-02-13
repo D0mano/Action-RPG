@@ -81,8 +81,9 @@ public class GamePanel extends JPanel implements Runnable {
     public int previousState;
     public final int titleState = 0;
     public final int optionState = 1;
-    public final int playState = 2;
-    public final int pauseState = 3;
+    public final int loadSaveState = 2;
+    public final int playState = 3;
+    public final int pauseState = 4;
     public final int dialogueState = 5;
     public final int audioSettingstate = 6;
     public final int graphicsSettingstate = 7;
@@ -158,6 +159,9 @@ public class GamePanel extends JPanel implements Runnable {
         assetSetter.reload();
         player.reload();
         ui.reload();
+        for (Map m : mapsList) {
+            m.reload();
+        }
 
     }
 
