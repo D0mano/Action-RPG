@@ -206,6 +206,8 @@ public class Player extends Entity {
 
     }
 
+
+
     public void setDefaultsValues(){
         worldCol = 0;
         worldRow = 0;
@@ -220,8 +222,8 @@ public class Player extends Entity {
         //PLAYER STATUS
         maxHealth = 100;
         health = 100;
-        maxMana = 500;
-        mana = 500;
+        maxMana = 100;
+        mana = 100;
 
         maxPotion = 3;
         potionNotUsed = maxPotion;
@@ -275,6 +277,7 @@ public class Player extends Entity {
         leftParry = setup("blocking/player_left-shield-Sheet",gp.scale);
         rightParry = setup("blocking/player_right-shield-Sheet",gp.scale);
     }
+
     public BufferedImage setup(String imageName,int scale){
         UtilityTool uTool = new UtilityTool();
         BufferedImage image = null;
@@ -286,6 +289,32 @@ public class Player extends Entity {
             e.printStackTrace();
         }
         return image;
+    }
+
+    public void resetPlayerValues(){
+        worldCol = gp.mapsList.get(gp.currentMapIndex).playerCol;
+        worldRow = gp.mapsList.get(gp.currentMapIndex).playerRow;
+        worldX = gp.tileSize * worldCol;
+        worldY = gp.tileSize * worldRow;
+        speed = normalSpeed;
+        health = maxHealth;
+        mana = maxMana;
+        maxPotion = 3;
+        potionNotUsed = maxPotion;
+        endurance = maxEndurance;
+        entityStatus = idle;
+        direction = "down";
+        invincible = false;
+
+
+    }
+    public void resetInventory(){
+        for (int i = 0; i < inventory.length; i++){
+            inventory[i].clear();
+        }
+        jEquip = null;
+        kEquip = null;
+        lEquip = null;
     }
 
 
@@ -973,10 +1002,10 @@ public class Player extends Entity {
 //        addObjToInventory(new OBJ_Key(gp));
 //        addObjToInventory(new OBJ_Key(gp));
 
-        addObjToInventory(new OBJ_BlueFruit(gp));
-        addObjToInventory(new OBJ_RedFruit(gp));
-        addObjToInventory(new OBJ_GrapplingHook(gp));
-        addObjToInventory(new OBJ_Sword(gp));
+//        addObjToInventory(new OBJ_BlueFruit(gp));
+//        addObjToInventory(new OBJ_RedFruit(gp));
+//        addObjToInventory(new OBJ_GrapplingHook(gp));
+//        addObjToInventory(new OBJ_Sword(gp));
     }
 
     public void reloadInventory(){

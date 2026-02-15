@@ -1,5 +1,6 @@
 package main;
 
+import data.SaveLoad;
 import entity.Entity;
 import entity.Player;
 import object.SuperObject;
@@ -9,6 +10,10 @@ import tile.TileManager;
 import javax.swing.JPanel;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class GamePanel extends JPanel implements Runnable {
@@ -71,6 +76,10 @@ public class GamePanel extends JPanel implements Runnable {
     public ArrayList<Entity> entitiesList = new ArrayList<Entity>();
     public ArrayList<Entity> particles = new ArrayList<>();
 
+    // SAVE SETTINGS
+    public SaveLoad[] saves = new SaveLoad[3];
+    public int currentSaveIndex = -1;
+
     public UI ui = new UI(this,player);
 
 
@@ -88,6 +97,7 @@ public class GamePanel extends JPanel implements Runnable {
     public final int audioSettingstate = 6;
     public final int graphicsSettingstate = 7;
     final public int inInventory = 8;
+    final public int gameOver = 10;
 
 
     public GamePanel() {
@@ -182,25 +192,77 @@ public class GamePanel extends JPanel implements Runnable {
         maxWorldRow = currentMap.maxMapRow;
         worldWidth = currentMap.mapWidth;
         worldHeight = currentMap.mapHeight;
+        resetMonster();
         monster = currentMap.monsterList;
         obj = currentMap.objectsList;
-        player.worldCol = currentMap.playerCol;
-        player.worldRow = currentMap.playerRow;
-        player.worldX = player.worldCol * tileSize;
-        player.worldY = player.worldRow * tileSize;
+
 
     }
 
 
-    public void setupGame(){
-        setMap(0);
-        assetSetter.setObject();
-        assetSetter.setMonster();
-        assetSetter.setPlayerSpawn();
-        mapsList.get(currentMapIndex).setPlayerSpawn();
+    public void setup(){
         gameState = titleState;
+        assetSetter.setPlayerSpawn();
+        setLoadFile();
         createTempScreen();
         updateSetting();
+    }
+    public void setupGame(){
+        if (currentSaveIndex < 3){
+            currentSaveIndex ++;
+        }
+        setMap(0);
+
+        assetSetter.setObject();
+        assetSetter.setMonster();
+        mapsList.get(currentMapIndex).setPlayerSpawn();
+        player.resetPlayerValues();
+        player.resetInventory();
+    }
+    public void setLoadFile(){
+        for (int i = 0;i<3;i++){
+            try {
+                String fileName = "File #"+(i+1);
+                BufferedReader br = new BufferedReader(new FileReader("saves/"+fileName+".dat"));
+                ui.loadCommand.remove("Cancel");
+                ui.loadCommand.add(fileName);
+                Collections.sort(ui.loadCommand);
+                ui.loadCommand.add("Cancel");
+                saves[i] = new SaveLoad(this,i+1);
+
+
+            } catch (FileNotFoundException _) {
+            }
+        }
+    }
+
+
+    public void saveGame(){
+        saves[currentSaveIndex] = new SaveLoad(this,currentSaveIndex+1);
+        saves[currentSaveIndex].save();
+        if (!ui.loadCommand.get(currentSaveIndex).equals(saves[currentSaveIndex].fileName)){
+            ui.loadCommand.remove("Cancel");
+            ui.loadCommand.add(saves[currentSaveIndex].fileName);
+            Collections.sort(ui.loadCommand);
+            ui.loadCommand.add("Cancel");
+        }
+
+
+    }
+    public void loadGame(){
+        if (saves[currentSaveIndex] != null) {
+            setMap(currentMapIndex);
+            player.resetPlayerValues();
+            player.resetInventory();
+            saves[currentSaveIndex].load();
+            assetSetter.setMonster();
+
+        }
+    }
+
+    public void removeSave(){
+        ui.loadCommand.remove(saves[currentSaveIndex].fileName);
+        saves[currentSaveIndex] = null;
     }
     public void startGameThread() {
         if (gameThread==null){
@@ -210,6 +272,9 @@ public class GamePanel extends JPanel implements Runnable {
             playMusic(18);
         }
 
+    }
+    public void resetMonster(){
+        monster.clear();
     }
 
     public void stopGameThread() {
@@ -319,7 +384,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         if (gameState == titleState){
-        }else{
+        }else if(!(gameState == loadSaveState)) {
             //TILE 1ST LAYER
             tileM.draw(g2,1);
 
@@ -327,6 +392,7 @@ public class GamePanel extends JPanel implements Runnable {
             for (SuperObject superObject : obj) {
                 if (superObject != null) {
                     superObject.draw(g2, this);
+
                 }
             }
             entitiesList.add(player);

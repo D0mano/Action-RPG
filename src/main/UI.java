@@ -6,11 +6,12 @@ import object.SuperObject;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class UI {
     GamePanel gp;
@@ -46,7 +47,7 @@ public class UI {
     public String[] graphicCommand = {"Display Mode","Resolution","Return"};
     public int commandNumberGraphic = 0;
 
-    public String[] loadCommand = {"File #1","File #2","File #3","Cancel"};
+    public ArrayList<String> loadCommand = new ArrayList<>();
     public int commandNumberLoad = 0;
 
     public int slotRow = 0;
@@ -76,6 +77,8 @@ public class UI {
         this.gp = gp;
         this.player = player;
         maxTransitionSize = gp.screenWidth * 2.0;
+        loadCommand.add("Cancel");
+
 
 
         try {
@@ -127,11 +130,9 @@ public class UI {
         potionFull = setup("/player/potion_full",gp.scale);
         potionEmpty = setup("/player/potion_empty",gp.scale);
 
-
-
-
-
     }
+
+
     public void reload(){
         try {
             // Tu changes juste l'extension du fichier ici
@@ -797,13 +798,13 @@ public class UI {
         g2.setFont(lilliput_15);
         int buttonWidth =(int)(1.3f*menuSelection.getWidth());
         int buttonHeight = (3*menuSelection.getHeight())/2;
-        int startY = gp.screenHeight / 2 - ((loadCommand.length-1) * buttonHeight+ buttonHeight / 2) / 2;
+        int startY = gp.screenHeight / 2 - ((loadCommand.size()-1) * buttonHeight+ buttonHeight / 2) / 2;
 
-        for (int i = 0; i < loadCommand.length; i++) {
+        for (int i = 0; i < loadCommand.size(); i++) {
 
             int buttonX = (gp.screenWidth - buttonWidth) / 2;
             int buttonY = startY + (i * (buttonHeight + (int)(gp.screenHeight /57.6f)));
-            if (i == 3){
+            if (gp.ui.loadCommand.get(i).equals("Cancel")){
                 buttonHeight = (3*menuSelection.getHeight())/4;
             }else{ buttonHeight = (3*menuSelection.getHeight())/2;}
 
@@ -825,10 +826,10 @@ public class UI {
 
             int textX = buttonX + (buttonWidth ) / 8;
             int textY = buttonY + (int)(gp.screenHeight /15.15f);
-            if (i == 3){
+            if (gp.ui.loadCommand.get(i).equals("Cancel")){
                 textY -= (int)(gp.tileSize/9.6f);
             }
-            g2.drawString(loadCommand[i], textX, textY);
+            g2.drawString(loadCommand.get(i), textX, textY);
 
         }
     }

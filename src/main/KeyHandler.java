@@ -48,6 +48,7 @@ public class KeyHandler implements KeyListener {
             }
             if (code == KeyEvent.VK_ENTER) {
                 if (gp.ui.commandNumber == 0) {
+                    gp.setupGame();
                     gp.stopMusic();
                     gp.playSoundEffect(4);
                     gp.playMusic(random.nextInt(3)+19);
@@ -137,33 +138,38 @@ public class KeyHandler implements KeyListener {
             if (code == KeyEvent.VK_UP || code == KeyEvent.VK_Z) {
                 gp.playSoundEffect(5);
                 if (gp.ui.commandNumberLoad == 0) {
-                    gp.ui.commandNumberLoad = 3;
+
+                    gp.ui.commandNumberLoad = gp.ui.loadCommand.size()-1;
                 } else {
                     gp.ui.commandNumberLoad--;
                 }
+
             }
             if (code == KeyEvent.VK_DOWN || code == KeyEvent.VK_S) {
                 gp.playSoundEffect(5);
-                if (gp.ui.commandNumberLoad == 3) {
+                if (gp.ui.commandNumberLoad == gp.ui.loadCommand.size()-1) {
                     gp.ui.commandNumberLoad = 0;
                 } else {
                     gp.ui.commandNumberLoad++;
                 }
+
             }
             if (code == KeyEvent.VK_ENTER) {
 
-                if (gp.ui.commandNumberLoad == 0) {
-                }
-                if (gp.ui.commandNumberLoad == 1) {
 
-                }
-                if (gp.ui.commandNumberLoad == 2) {
-
-                }
-                if (gp.ui.commandNumberLoad == 3) {
+                if (gp.ui.loadCommand.get(gp.ui.commandNumberLoad).equals("Cancel")){
                     gp.gameState = gp.previousState;
                     gp.previousState = gp.loadSaveState;
                     gp.playSoundEffect(24);
+
+                }else{
+                    gp.currentSaveIndex = gp.ui.commandNumberLoad;
+                    gp.loadGame();
+                    gp.stopMusic();
+                    gp.playSoundEffect(4);
+                    gp.playMusic(random.nextInt(3)+19);
+                    gp.previousState = gp.gameState;
+                    gp.gameState = gp.playState;
                 }
             }
 
@@ -412,6 +418,7 @@ public class KeyHandler implements KeyListener {
                     gp.previousState = gp.gameState;
                     gp.gameState = gp.titleState;
                     gp.playMusic(18);
+                    gp.saveGame();
                 }
             }
         }

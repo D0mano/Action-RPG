@@ -532,6 +532,8 @@ public class Entity {
     }
 
     public void dealDamage(){}
+
+
 }
 
 

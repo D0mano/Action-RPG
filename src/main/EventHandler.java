@@ -26,18 +26,13 @@ public class EventHandler {
                 if (!gp.ui.transitionOn){
                     gp.ui.startTransition(()->{
                         gp.setMap(1);
+                        gp.player.worldX = gp.tileM.currentMap.playerCol * gp.tileSize;
+                        gp.player.worldY = gp.tileM.currentMap.playerRow * gp.tileSize;
                         gp.player.screenX = (gp.screenWidth / 2) - (gp.tileSize / 2);
                         gp.player.screenY = (gp.screenHeight / 2) - (gp.tileSize / 2);
                     });
                 }
 
-            }
-            if (hit(48,53,"any")){
-                if (!gp.ui.transitionOn){
-                    gp.ui.startTransition(()->{
-                        gp.setMap(1);
-                    });
-                }
             }
         }
     }
