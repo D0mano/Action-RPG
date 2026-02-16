@@ -60,9 +60,9 @@ public class SaveLoad {
             Map map = gp.mapsList.get(i);
             ds.objList.add(uTool.getSerialArrayListFromSuperObjects(map.objectsList));
         }
+        ds.timeSpend += gp.timeSpend;
 
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("saves/" + fileName+".dat"));
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("saves/" + fileName+".dat"))){
             // Write the DataStorage object
             oos.writeObject(ds);
         } catch (IOException e) {
@@ -102,7 +102,7 @@ public class SaveLoad {
         for (int i = 0; i < gp.mapsList.size(); i++) {
             Map map = gp.mapsList.get(i);
             map.objectsList.clear();
-            map.objectsList = uTool.getSuperObjectArrayListFromSerialObjects(ds.objList.get(i),gp);
+            map.objectsList.addAll(uTool.getSuperObjectArrayListFromSerialObjects(ds.objList.get(i),gp));
         }
 
         // MAP AND POSITION
@@ -146,9 +146,7 @@ public class SaveLoad {
     }
 
     public ArrayList<SuperObject> getInventoryEquipment(){
-        try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("saves/" + fileName + ".dat"));
-
+        try( ObjectInputStream ois = new ObjectInputStream(new FileInputStream("saves/" + fileName + ".dat"))) {
             // Read the DataStorage object
             DataStorage ds = (DataStorage)ois.readObject();
 

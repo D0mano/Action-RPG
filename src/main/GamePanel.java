@@ -211,6 +211,10 @@ public class GamePanel extends JPanel implements Runnable {
         updateSetting();
     }
     public void setupGame(){
+        for (Map map : mapsList) {
+            map.objectsList.clear();
+            map.monsterList.clear();
+        }
         setMap(0);
         assetSetter.setObject();
         assetSetter.setMonster();
