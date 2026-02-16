@@ -19,6 +19,8 @@ import java.util.*;
 
 public class GamePanel extends JPanel implements Runnable {
 
+    public int timeSpend = 0; // Time spend playing (in frames)
+
 
     public boolean running = false;
 
@@ -344,6 +346,9 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void update(){
+        if ((gameState == playState) || (gameState == pauseState)|| (gameState == inInventory)){
+            timeSpend ++;
+        }
         if (gameState == playState){
 
             for (Tile tile :tileM.tile){

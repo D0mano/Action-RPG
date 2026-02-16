@@ -823,6 +823,13 @@ public class UI {
                 }
             }
 
+
+            // Draw time spend
+            if (gp.saves[i] != null){
+                g2.drawString(uTool.getTimeFromFrame(gp.saves[i].getTimeSpend(),gp.FPS),textX, textY+gp.tileSize/2);
+
+            }
+
         }
     }
 

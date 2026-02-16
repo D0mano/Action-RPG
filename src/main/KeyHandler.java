@@ -54,7 +54,7 @@ public class KeyHandler implements KeyListener {
 
                 }
                 if (gp.ui.commandNumber == 1) {
-                    gp.playSoundEffect(23);
+                    gp.playSoundEffect(49);
                     gp.previousState = gp.gameState;
                     gp.gameState = gp.loadSaveState;
                 }
@@ -182,7 +182,7 @@ public class KeyHandler implements KeyListener {
             }
 
             if (code == KeyEvent.VK_UP || code == KeyEvent.VK_Z) {
-                gp.playSoundEffect(5);
+                gp.playSoundEffect(45);
                 if (gp.ui.commandNumberLoad == 0) {
 
                     gp.ui.commandNumberLoad = gp.ui.loadCommand.size()-1;
@@ -192,7 +192,7 @@ public class KeyHandler implements KeyListener {
 
             }
             if (code == KeyEvent.VK_DOWN || code == KeyEvent.VK_S) {
-                gp.playSoundEffect(5);
+                gp.playSoundEffect(45);
                 if (gp.ui.commandNumberLoad == gp.ui.loadCommand.size()-1) {
                     gp.ui.commandNumberLoad = 0;
                 } else {
@@ -201,6 +201,8 @@ public class KeyHandler implements KeyListener {
 
             }
             if (code == KeyEvent.VK_ENTER) {
+                gp.playSoundEffect(48);
+                gp.playSoundEffect(44);
 
 
                 if (gp.ui.loadCommand.get(gp.ui.commandNumberLoad).equals("Cancel")){
@@ -240,7 +242,7 @@ public class KeyHandler implements KeyListener {
                 if (gp.ui.commandNumberLoadSelection == 0) {
                     gp.stopMusic();
                     gp.loadGame();
-                    gp.playSoundEffect(4);
+                    gp.playSoundEffect(46);
                     gp.playMusic(random.nextInt(3)+19);
                     gp.previousState = gp.gameState;
                     gp.gameState = gp.playState;
@@ -255,6 +257,7 @@ public class KeyHandler implements KeyListener {
 
                 }
                 if (gp.ui.commandNumberLoadSelection == 2) {
+                    gp.playSoundEffect(47);
                     gp.gameState = gp.loadSaveState;
 
                 }

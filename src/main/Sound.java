@@ -9,7 +9,7 @@ import javax.sound.sampled.FloatControl;
 public class Sound {
 
     Clip clip;
-    URL[] soundUrl= new URL[50];
+    URL[] soundUrl= new URL[60];
     float originalVolume = 1.0f;
     float currentVolume = originalVolume;
 
@@ -34,6 +34,17 @@ public class Sound {
         soundUrl[38] = setup("ui/ui_inventory_assign_left.wav");
         soundUrl[39] = setup("ui/ui_inventory_assign_right.wav");
         soundUrl[40] = setup("ui/ui_inventory_assign_top.wav");
+        soundUrl[44] = setup("ui/ui_main_savefiles_panel_in.wav");
+        soundUrl[45] = setup("ui/ui_main_savefiles_rollover.wav");
+        soundUrl[46] = setup("ui/ui_main_savefiles_selectedfile_load.wav");
+        soundUrl[47] = setup("ui/ui_main_savefiles_selectedfile_cancel.wav");
+        soundUrl[48] = setup("ui/ui_main_savefiles_selectfile.wav");
+        soundUrl[49] = setup("ui/ui_main_button_loadgame.wav");
+
+
+
+
+
 
 
 

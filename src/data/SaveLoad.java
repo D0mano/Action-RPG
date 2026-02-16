@@ -165,6 +165,18 @@ public class SaveLoad {
 
     }
 
+    public int getTimeSpend(){
+        try( ObjectInputStream ois = new ObjectInputStream(new FileInputStream("saves/" + fileName + ".dat"))) {
+            // Read the DataStorage object
+            DataStorage ds = (DataStorage)ois.readObject();
+
+           return ds.timeSpend;
+
+        } catch (ClassNotFoundException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private SuperObject findInEquipmentInventory(String name) {
         for (SuperObject obj : gp.player.inventory[2]) {
             if (obj.name.equals(name)) return obj;

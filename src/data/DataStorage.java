@@ -41,6 +41,8 @@ public class DataStorage implements Serializable {
     // OBJECT
     ArrayList<ArrayList<SerialObject>> objList = new ArrayList<>();
 
+    public int timeSpend = 0;
+
 
 
 
