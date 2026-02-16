@@ -32,7 +32,7 @@ public class UtilityTool {
         return switch (objectName) {
             case "sword" -> new OBJ_Sword(gp);
             case "shield" -> new OBJ_Shield(gp);
-            case "fir wand" -> new OBJ_FireWand(gp);
+            case "fire wand" -> new OBJ_FireWand(gp);
             case "ice wand" -> new OBJ_IceWand(gp);
             case "chest" -> new OBJ_Chest(gp);
             case "door" -> new OBJ_Door(gp);
@@ -41,7 +41,10 @@ public class UtilityTool {
             case "lantern" -> new OBJ_Lantern(gp);
             case "blue fruit" -> new OBJ_BlueFruit(gp);
             case "red fruit" -> new OBJ_RedFruit(gp);
-            default -> null;
+            default ->{
+                System.err.println("[UtilityTool] Unknown Object : \"" + objectName + "\"");
+                yield null;
+            }
         };
     }
 

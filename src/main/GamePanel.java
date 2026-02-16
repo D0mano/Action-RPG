@@ -10,10 +10,11 @@ import tile.TileManager;
 import javax.swing.JPanel;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.lang.reflect.Array;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class GamePanel extends JPanel implements Runnable {
@@ -78,7 +79,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     // SAVE SETTINGS
     public SaveLoad[] saves = new SaveLoad[3];
-    public int currentSaveIndex = -1;
+    public int currentSaveIndex = 0;
 
     public UI ui = new UI(this,player);
 
@@ -91,13 +92,15 @@ public class GamePanel extends JPanel implements Runnable {
     public final int titleState = 0;
     public final int optionState = 1;
     public final int loadSaveState = 2;
-    public final int playState = 3;
-    public final int pauseState = 4;
-    public final int dialogueState = 5;
-    public final int audioSettingstate = 6;
-    public final int graphicsSettingstate = 7;
-    final public int inInventory = 8;
+    public final int loadSaveSelectionState = 3;
+    public final int playState = 4;
+    public final int pauseState = 5;
+    public final int dialogueState = 6;
+    public final int audioSettingstate = 7;
+    public final int graphicsSettingstate = 8;
+    final public int inInventory = 9;
     final public int gameOver = 10;
+    final public int newGameSlotState = 11;
 
 
     public GamePanel() {
@@ -208,11 +211,7 @@ public class GamePanel extends JPanel implements Runnable {
         updateSetting();
     }
     public void setupGame(){
-        if (currentSaveIndex < 3){
-            currentSaveIndex ++;
-        }
         setMap(0);
-
         assetSetter.setObject();
         assetSetter.setMonster();
         mapsList.get(currentMapIndex).setPlayerSpawn();
@@ -220,18 +219,17 @@ public class GamePanel extends JPanel implements Runnable {
         player.resetInventory();
     }
     public void setLoadFile(){
-        for (int i = 0;i<3;i++){
-            try {
-                String fileName = "File #"+(i+1);
-                BufferedReader br = new BufferedReader(new FileReader("saves/"+fileName+".dat"));
-                ui.loadCommand.remove("Cancel");
-                ui.loadCommand.add(fileName);
-                Collections.sort(ui.loadCommand);
-                ui.loadCommand.add("Cancel");
-                saves[i] = new SaveLoad(this,i+1);
-
-
-            } catch (FileNotFoundException _) {
+        for (int i = 0; i < 3; i++) {
+            String fileName = "File #" + (i + 1);
+            File file = new File("saves/" + fileName + ".dat");
+            if (file.exists()) {
+                saves[i] = new SaveLoad(this, i + 1);
+                if (!ui.loadCommand.contains(fileName)) {
+                    ui.loadCommand.remove("Cancel");
+                    ui.loadCommand.add(fileName);
+                    Collections.sort(ui.loadCommand);
+                    ui.loadCommand.add("Cancel");
+                }
             }
         }
     }
@@ -240,9 +238,11 @@ public class GamePanel extends JPanel implements Runnable {
     public void saveGame(){
         saves[currentSaveIndex] = new SaveLoad(this,currentSaveIndex+1);
         saves[currentSaveIndex].save();
-        if (!ui.loadCommand.get(currentSaveIndex).equals(saves[currentSaveIndex].fileName)){
+
+        String slotName = saves[currentSaveIndex].fileName;
+        if (!ui.loadCommand.contains(slotName)) {
             ui.loadCommand.remove("Cancel");
-            ui.loadCommand.add(saves[currentSaveIndex].fileName);
+            ui.loadCommand.add(slotName);
             Collections.sort(ui.loadCommand);
             ui.loadCommand.add("Cancel");
         }
@@ -250,17 +250,25 @@ public class GamePanel extends JPanel implements Runnable {
 
     }
     public void loadGame(){
-        if (saves[currentSaveIndex] != null) {
-            setMap(currentMapIndex);
-            player.resetPlayerValues();
-            player.resetInventory();
-            saves[currentSaveIndex].load();
-            assetSetter.setMonster();
-
+        if (saves[currentSaveIndex] == null) {
+            System.err.println("[GamePanel] No saves on the slot " + (currentSaveIndex + 1));
+            return;
         }
+        player.resetPlayerValues();
+        player.resetInventory();
+        saves[currentSaveIndex].load();
     }
 
     public void removeSave(){
+        if (saves[currentSaveIndex] == null) return;
+
+        File file = new File("saves/" + saves[currentSaveIndex].fileName + ".dat");
+
+        if (file.exists() && !file.delete()) {
+            System.err.println("[GamePanel] Impossible de supprimer : " + file.getPath());
+            return;
+        }
+
         ui.loadCommand.remove(saves[currentSaveIndex].fileName);
         saves[currentSaveIndex] = null;
     }
@@ -384,7 +392,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         if (gameState == titleState){
-        }else if(!(gameState == loadSaveState)) {
+        }else if((gameState == playState) || (gameState == pauseState)|| (gameState == inInventory)) {
             //TILE 1ST LAYER
             tileM.draw(g2,1);
 

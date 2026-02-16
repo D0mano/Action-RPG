@@ -3,10 +3,15 @@ package data;
 import main.Map;
 
 import java.awt.*;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 
 public class DataStorage implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     // PLAYER STAT
     int playerHealth;
     int playerHealthMax;
@@ -23,7 +28,11 @@ public class DataStorage implements Serializable {
     int currentMapIndex;
 
     // INVENTORY
-    ArrayList<String> inventory = new ArrayList<>();
+    public ArrayList<String> gearInventory    = new ArrayList<>();
+    public ArrayList<String> singleUseInventory = new ArrayList<>();
+    public ArrayList<String> equipmentInventory = new ArrayList<>();
+
+    // EQUIPMENT SLOTS
     String jEquip;
     String kEquip;
     String lEquip;

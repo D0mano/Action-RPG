@@ -7,11 +7,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.awt.geom.Area;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class UI {
     GamePanel gp;
@@ -49,6 +45,11 @@ public class UI {
 
     public ArrayList<String> loadCommand = new ArrayList<>();
     public int commandNumberLoad = 0;
+
+    public String[] loadSelectionCommand = {"Load","Delete","Cancel"};
+    public int commandNumberLoadSelection = 0;
+
+    public int commandNumberNewSlot = 0;
 
     public int slotRow = 0;
     public int slotCol = 0;
@@ -260,6 +261,9 @@ public class UI {
             drawTitleScreen();
 
         }
+        if (gp.gameState == gp.newGameSlotState) {
+            drawNewGameSlotScreen();
+        }
         if(gp.gameState == gp.optionState){
             if (gp.previousState == gp.titleState){
                 g2.setColor(Color.black);
@@ -285,6 +289,9 @@ public class UI {
         }
         if (gp.gameState == gp.loadSaveState){
             drawLoadScreen();
+        }
+        if (gp.gameState == gp.loadSaveSelectionState){
+            drawLoadSelectionScreen();
         }
 
         if (gp.gameState == gp.playState){
@@ -333,6 +340,7 @@ public class UI {
 
         }
     }
+
     public void drawLuminosity(){
          // LUMINOSITY
          if (gp.luminosity <= 1){
@@ -346,6 +354,7 @@ public class UI {
              g2.fillRect(0,0,gp.screenWidth,gp.screenHeight);
          }
      }
+
     public void drawInventoryScreen(){
         GradientPaint vignette = new GradientPaint(
                 0,0,new Color(0,0,0,240),
@@ -504,34 +513,6 @@ public class UI {
         x = getXForCenteredTextAroundX(currentDialogue,(2*x+width)/2);
         y = (2*y+height)/2;
         g2.drawString(currentDialogue,x,y);
-    }
-
-    public void drawItemScreen(){
-        //  ITEM FRAME
-        int x = (11*gp.tileSize)/2;
-        int y= gp.tileSize;
-        g2.setColor(Color.black);
-        g2.fillOval(x,y,gp.tileSize*5,gp.tileSize*5);
-        g2.setColor(Color.white);
-        g2.setStroke(new BasicStroke(4));
-        g2.drawOval(x,y,gp.tileSize*5,gp.tileSize*5);
-
-        // DRAW THE ITEM
-        if (item.upAnimator != null){
-            item.upAnimator.draw(g2,x+gp.tileSize,y+gp.tileSize,gp.tileSize * 3,gp.tileSize * 3);
-        }else{
-            g2.drawImage(item.image,x+gp.tileSize,y+gp.tileSize,gp.tileSize * 3,gp.tileSize * 3,null);
-        }
-
-
-        //DRAW TEXT MESSAGE
-        g2.setFont(trunic);
-        int textX = getXforCenteredText(item.name);
-        int textY = 7 * gp.tileSize;
-        drawSubWindow(x-gp.tileSize,textY-(3*gp.tileSize)/2,7*gp.tileSize,2*gp.tileSize,messageWindow);
-        g2.setColor(Color.white);
-        g2.drawString(item.name,textX,textY);
-
     }
 
     public void drawItemScreen2(){
@@ -802,6 +783,7 @@ public class UI {
 
         for (int i = 0; i < loadCommand.size(); i++) {
 
+            // Draw the button
             int buttonX = (gp.screenWidth - buttonWidth) / 2;
             int buttonY = startY + (i * (buttonHeight + (int)(gp.screenHeight /57.6f)));
             if (gp.ui.loadCommand.get(i).equals("Cancel")){
@@ -824,6 +806,7 @@ public class UI {
                 g2.setColor(Color.LIGHT_GRAY);
             }
 
+            // Draw the text
             int textX = buttonX + (buttonWidth ) / 8;
             int textY = buttonY + (int)(gp.screenHeight /15.15f);
             if (gp.ui.loadCommand.get(i).equals("Cancel")){
@@ -831,7 +814,127 @@ public class UI {
             }
             g2.drawString(loadCommand.get(i), textX, textY);
 
+            // Draw the save info
+            int j = 0;
+            if(gp.saves[i]!= null){
+                for (SuperObject obj : gp.saves[i].getInventoryEquipment()){
+                    g2.drawImage(obj.image,textX+5*gp.tileSize+j*(2*gp.tileSize)/3,textY-(gp.tileSize/3),(2*gp.tileSize)/3,(2*gp.tileSize)/3,null);
+                    j++;
+                }
+            }
+
         }
+    }
+
+    public void drawLoadSelectionScreen(){
+        String fileName = "File #"+(gp.currentSaveIndex+1);
+        g2.setColor(Color.white);
+        drawSubWindow((4*gp.tileSize),(2*gp.tileSize),gp.screenWidth/2,gp.screenHeight/2,optionWindow);
+        g2.setFont(lilliput_20);
+        int x = getXforCenteredText(fileName);
+        int y = (int)(gp.screenHeight / 3.5f);
+        g2.drawString(fileName,x,y);
+
+        g2.setFont(lilliput_20);
+        FontMetrics metrics = g2.getFontMetrics();
+
+        int buttonWidth = (menuSelection.getWidth())/2;
+        int buttonHeight = (2*menuSelection.getHeight())/3;
+        int startY = (int)(gp.screenHeight/2.3f)  - (loadSelectionCommand.length * buttonHeight) / 2;
+
+        for (int i = 0; i < loadSelectionCommand.length; i++) {
+            int buttonX = (gp.screenWidth - buttonWidth) / 2;
+            int buttonY = startY + (i * (buttonHeight + (int)(gp.screenHeight /57.6f)));
+
+            if (i == commandNumberLoadSelection) {
+                if (menuSelectionOrange != null) {
+                    g2.drawImage(menuSelectionOrange, buttonX, buttonY, buttonWidth, buttonHeight, null);
+                }
+                g2.setColor(Color.WHITE);
+
+
+            } else {
+                if (menuSelection != null) {
+                    g2.drawImage(menuSelection, buttonX, buttonY, buttonWidth, buttonHeight, null);
+                }
+                g2.setColor(Color.LIGHT_GRAY);
+            }
+
+            int textX = buttonX + (buttonWidth - metrics.stringWidth(loadSelectionCommand[i])) / 2;
+            int textY = buttonY + (int)(gp.screenHeight /20f);
+            g2.drawString(loadSelectionCommand[i], textX, textY);
+        }
+    }
+
+    public void drawNewGameSlotScreen() {
+
+        // Fond noir + vignette (même style que les autres menus)
+        g2.setColor(Color.black);
+        g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+
+        RadialGradientPaint vignette = new RadialGradientPaint(
+                new Point(gp.screenWidth / 2, gp.screenHeight / 2),
+                2 * gp.screenWidth,
+                new float[]{0.0f, 1.0f},
+                new Color[]{new Color(0, 0, 0, 240), new Color(0, 0, 0, 100)});
+        g2.setPaint(vignette);
+        g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+
+        drawSubWindow(0, 0, gp.screenWidth, gp.screenHeight, optionWindow);
+
+        // Titre
+        g2.setFont(lilliput_40);
+        g2.setColor(Color.white);
+        int x = getXforCenteredText("New Game");
+        int y = (3 * gp.tileSize) / 2;
+        g2.drawString("New Game", x, y);
+
+        g2.setFont(lilliput_20);
+        FontMetrics metrics = g2.getFontMetrics();
+
+        // Les 3 slots + Cancel
+        String[] slotLabels = buildSlotLabels();
+        String[] allEntries = {slotLabels[0], slotLabels[1], slotLabels[2], "Cancel"};
+
+        int buttonWidth  = (int) (1.3f * menuSelection.getWidth());
+        int buttonHeight = menuSelection.getHeight();
+        int startY = gp.screenHeight / 2 - (allEntries.length * buttonHeight) / 2;
+
+        for (int i = 0; i < allEntries.length; i++) {
+            int buttonX = (gp.screenWidth - buttonWidth) / 2;
+            int buttonY = startY + i * (buttonHeight + (int) (gp.screenHeight / 57.6f));
+
+            // Bouton sélectionné
+            if (i == commandNumberNewSlot) {
+                g2.drawImage(menuSelectionOrange, buttonX, buttonY, buttonWidth, buttonHeight, null);
+                g2.setColor(Color.WHITE);
+            } else {
+                g2.drawImage(menuSelection, buttonX, buttonY, buttonWidth, buttonHeight, null);
+                g2.setColor(Color.LIGHT_GRAY);
+            }
+
+            int textX = buttonX + (buttonWidth - metrics.stringWidth(allEntries[i])) / 2;
+            int textY = buttonY + (int) (gp.screenHeight / 15.15f);
+            g2.drawString(allEntries[i], textX, textY);
+        }
+    }
+
+    /**
+     * Construit les labels des 3 slots :
+     * - "File #1 — Empty"   si pas de sauvegarde
+     * - "File #1 — Saved"   si une sauvegarde existe (sera écrasée)
+     */
+    private String[] buildSlotLabels() {
+        String[] labels = new String[3];
+        for (int i = 0; i < 3; i++) {
+            String slotName = "File #" + (i + 1);
+            if (gp.saves[i] != null) {
+                labels[i] = slotName + " — Overwrite ?";
+            } else {
+                labels[i] = slotName + " — Empty";
+            }
+        }
+        return labels;
     }
 
     public void drawSubWindow(int x,int y,int width,int height,BufferedImage image){

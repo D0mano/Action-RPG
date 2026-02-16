@@ -48,12 +48,9 @@ public class KeyHandler implements KeyListener {
             }
             if (code == KeyEvent.VK_ENTER) {
                 if (gp.ui.commandNumber == 0) {
-                    gp.setupGame();
-                    gp.stopMusic();
-                    gp.playSoundEffect(4);
-                    gp.playMusic(random.nextInt(3)+19);
+                    gp.playSoundEffect(23);
                     gp.previousState = gp.gameState;
-                    gp.gameState = gp.playState;
+                    gp.gameState = gp.newGameSlotState;
 
                 }
                 if (gp.ui.commandNumber == 1) {
@@ -69,6 +66,55 @@ public class KeyHandler implements KeyListener {
             }
             if (code == KeyEvent.VK_ESCAPE) {
                 System.exit(0);
+            }
+        }
+        else if (gp.gameState == gp.newGameSlotState) {
+
+
+            if (code == KeyEvent.VK_UP || code == KeyEvent.VK_Z) {
+                gp.playSoundEffect(5);
+                if (gp.ui.commandNumberNewSlot == 0) {
+                    gp.ui.commandNumberNewSlot = 3;
+                } else {
+                    gp.ui.commandNumberNewSlot--;
+                }
+            }
+            if (code == KeyEvent.VK_DOWN || code == KeyEvent.VK_S) {
+                gp.playSoundEffect(5);
+                if (gp.ui.commandNumberNewSlot == 3) {
+                    gp.ui.commandNumberNewSlot = 0;
+                } else {
+                    gp.ui.commandNumberNewSlot++;
+                }
+            }
+
+            if (code == KeyEvent.VK_ENTER) {
+
+                if (gp.ui.commandNumberNewSlot == 3) {
+                    gp.playSoundEffect(24);
+                    gp.gameState = gp.titleState;
+                    gp.ui.commandNumberNewSlot = 0;
+                    return;
+                }
+
+                int chosenSlot = gp.ui.commandNumberNewSlot; // 0, 1 ou 2
+
+
+                gp.currentSaveIndex = chosenSlot;
+
+                gp.setupGame();
+                gp.stopMusic();
+                gp.playSoundEffect(4);
+                gp.playMusic(random.nextInt(3) + 19);
+                gp.previousState = gp.gameState;
+                gp.gameState = gp.playState;
+                gp.ui.commandNumberNewSlot = 0;
+            }
+
+            if (code == KeyEvent.VK_ESCAPE) {
+                gp.playSoundEffect(24);
+                gp.gameState = gp.titleState;
+                gp.ui.commandNumberNewSlot = 0;
             }
         }
         else if(gp.gameState == gp.optionState ) {
@@ -131,7 +177,7 @@ public class KeyHandler implements KeyListener {
         }
         else if (gp.gameState == gp.loadSaveState ) {
             if(code == KeyEvent.VK_ESCAPE){
-                gp.gameState = gp.previousState;
+                gp.gameState = gp.titleState;
                 gp.previousState = gp.loadSaveState;
             }
 
@@ -158,21 +204,61 @@ public class KeyHandler implements KeyListener {
 
 
                 if (gp.ui.loadCommand.get(gp.ui.commandNumberLoad).equals("Cancel")){
-                    gp.gameState = gp.previousState;
+                    gp.gameState = gp.titleState;
                     gp.previousState = gp.loadSaveState;
                     gp.playSoundEffect(24);
 
                 }else{
                     gp.currentSaveIndex = gp.ui.commandNumberLoad;
-                    gp.loadGame();
+                    gp.gameState = gp.loadSaveSelectionState;
+                }
+            }
+
+        }
+        else if (gp.gameState == gp.loadSaveSelectionState ) {
+            if(code == KeyEvent.VK_ESCAPE){
+                gp.previousState = gp.gameState;
+                gp.gameState = gp.loadSaveState;
+            }
+            if (code == KeyEvent.VK_UP || code == KeyEvent.VK_Z) {
+                gp.playSoundEffect(5);
+                if (gp.ui.commandNumberLoadSelection == 0) {
+                    gp.ui.commandNumberLoadSelection = 2;
+                } else {
+                    gp.ui.commandNumberLoadSelection--;
+                }
+            }
+            if (code == KeyEvent.VK_DOWN || code == KeyEvent.VK_S) {
+                gp.playSoundEffect(5);
+                if (gp.ui.commandNumberLoadSelection == 2) {
+                    gp.ui.commandNumberLoadSelection = 0;
+                } else {
+                    gp.ui.commandNumberLoadSelection++;
+                }
+            }
+            if (code == KeyEvent.VK_ENTER) {
+                if (gp.ui.commandNumberLoadSelection == 0) {
                     gp.stopMusic();
+                    gp.loadGame();
                     gp.playSoundEffect(4);
                     gp.playMusic(random.nextInt(3)+19);
                     gp.previousState = gp.gameState;
                     gp.gameState = gp.playState;
+
+
+                }
+                if (gp.ui.commandNumberLoadSelection == 1) {
+                    gp.removeSave();
+                    gp.previousState = gp.gameState;
+                    gp.gameState = gp.loadSaveState;
+                    ;
+
+                }
+                if (gp.ui.commandNumberLoadSelection == 2) {
+                    gp.gameState = gp.loadSaveState;
+
                 }
             }
-
         }
         else if(gp.gameState == gp.audioSettingstate) {
             if(code == KeyEvent.VK_ESCAPE){
