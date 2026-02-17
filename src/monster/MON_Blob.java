@@ -207,6 +207,7 @@ public class MON_Blob  extends Entity {
             }else{
                 gp.player.takeDamage(attackPower);
                 gp.playSoundEffect(15);
+                knockBack(gp.player, 5);
             }
 
         }

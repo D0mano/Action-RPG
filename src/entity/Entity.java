@@ -92,7 +92,7 @@ public class Entity {
     // TIMERS (Durations for specific states)
     public int actionLockTimer = 120;
     public int invisibleTimer;
-    public int damageTakenTimer;
+    public int damageTakenTimer = 15;
     public int hpBarTimer = 600;         // How long the HP bar stays visible (frames)
     public int attackDuration = 40;
     public int attackingHitFrame = 20;   // The exact frame the damage is applied

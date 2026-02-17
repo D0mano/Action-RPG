@@ -226,6 +226,7 @@ public class MON_FoxZombie extends Entity {
             }else{
                 gp.player.takeDamage(attackPower);
                 gp.playSoundEffect(15);
+                knockBack(gp.player, 8);
             }
 
         }

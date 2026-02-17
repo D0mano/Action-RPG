@@ -351,6 +351,14 @@ public class Player extends Entity {
         displayedEndurance += (endurance - displayedEndurance) * 0.15f;
         displayedMana += (mana - displayedMana) * 0.15f;
 
+        if (damageTaken) {
+            damageTakenCounter++;
+            if (damageTakenCounter > damageTakenTimer) {
+                damageTaken = false;
+                damageTakenCounter = 0;
+            }
+        }
+
         // STATE: ATTACKING
         if (entityStatus == attacking) {
             attackCounter++;
@@ -364,6 +372,41 @@ public class Player extends Entity {
                 attackCounter = 0;
                 entityStatus = idle;
             }
+            return;
+        }
+
+        // STATE: KNOCKBACK (Pushed away after taking damage)
+        if (entityStatus == knockBacking) {
+            collisionOn = false;
+            gp.collisionChecker.checkEntity(this, gp.monster);
+            gp.collisionChecker.checkTile(this);
+
+            // Stop knockback if hitting a wall
+            if (collisionOn) {
+                knockBackCounter = 0;
+                entityStatus = idle;
+                speed = normalSpeed;
+            } else {
+                // Apply forced movement
+                switch (direction) {
+                    case "up": worldY -= speed; break;
+                    case "down": worldY += speed; break;
+                    case "left": worldX -= speed; break;
+                    case "right": worldX += speed; break;
+                }
+            }
+
+            knockBackCounter++;
+            if (knockBackCounter > knockBacTimer) {
+                knockBackCounter = 0;
+                if (name != null && name.equals("Rudeling")) {
+                    entityStatus = parrying;
+                } else {
+                    entityStatus = walking;
+                }
+                speed = normalSpeed;
+            }
+
             return;
         }
 
@@ -639,7 +682,7 @@ public class Player extends Entity {
         // TRANSITION TO WALKING STATE
         if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
             entityStatus = walking;
-        } else {
+        } else if (entityStatus != knockBacking) {
             entityStatus = idle;
         }
 
@@ -772,14 +815,19 @@ public class Player extends Entity {
     /**
      * Render method called every frame to display the correct animation
      * based on the player's status and facing direction.
-     * * @param g2d The graphics component handler.
+     * @param g2d The graphics component handler.
      */
     public void draw(Graphics2D g2d) {
+
+        // Blink effect when taking damage
+        if (damageTaken) {
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
+        }
         switch (direction) {
             case "up":
                 if (entityStatus == rolling) {
                     upRollAnimator.draw(g2d, screenX, screenY, gp.tileSize, gp.tileSize);
-                } else if (entityStatus == walking) {
+                } else if (entityStatus == walking || entityStatus == knockBacking) {
                     upAnimator.draw(g2d, screenX, screenY, gp.tileSize, gp.tileSize);
                 } else if (entityStatus == idle || entityStatus == grappling) {
                     upIdleAnimator.draw(g2d, screenX, screenY, gp.tileSize, gp.tileSize);
@@ -790,7 +838,7 @@ public class Player extends Entity {
                 }
                 break;
             case "down":
-                if (entityStatus == walking) {
+                if (entityStatus == walking || entityStatus == knockBacking) {
                     downAnimator.draw(g2d, screenX, screenY, gp.tileSize, gp.tileSize);
                 } else if (entityStatus == rolling) {
                     downRollAnimator.draw(g2d, screenX, screenY, gp.tileSize, gp.tileSize);
@@ -805,7 +853,7 @@ public class Player extends Entity {
             case "left":
                 if (entityStatus == rolling) {
                     leftRollAnimator.draw(g2d, screenX, screenY, gp.tileSize, gp.tileSize);
-                } else if (entityStatus == walking) {
+                } else if (entityStatus == walking || entityStatus == knockBacking) {
                     leftAnimator.draw(g2d, screenX, screenY, gp.tileSize, gp.tileSize);
                 } else if (entityStatus == idle || entityStatus == grappling) {
                     leftIdleAnimator.draw(g2d, screenX, screenY, gp.tileSize, gp.tileSize);
@@ -818,7 +866,7 @@ public class Player extends Entity {
             case "right":
                 if (entityStatus == rolling) {
                     rightRollAnimator.draw(g2d, screenX, screenY, gp.tileSize, gp.tileSize);
-                } else if (entityStatus == walking) {
+                } else if (entityStatus == walking || entityStatus == knockBacking) {
                     rightAnimator.draw(g2d, screenX, screenY, gp.tileSize, gp.tileSize);
                 } else if (entityStatus == idle || entityStatus == grappling) {
                     rightIdleAnimator.draw(g2d, screenX, screenY, gp.tileSize, gp.tileSize);
@@ -829,6 +877,9 @@ public class Player extends Entity {
                 }
                 break;
         }
+
+        // RESET OPACITY TO NORMAL
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
     }
 
     /**
