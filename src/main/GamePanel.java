@@ -117,6 +117,11 @@ public class GamePanel extends JPanel implements Runnable {
         loadMap(new Map(this,"World03"));
 
     }
+
+    /**
+     * Sets the screen mode to either Windowed or Fullscreen based on settings.
+     * It disposes the current frame, adjusts rendering sizes, and re-displays the window.
+     */
     public void setScreenMode() {
 
         GraphicsDevice gd = GraphicsEnvironment
@@ -156,11 +161,19 @@ public class GamePanel extends JPanel implements Runnable {
         this.revalidate();
         this.repaint();
     }
+
+    /**
+     * Reloads all assets, map dimensions, and updates screen configurations.
+     */
     public void updateSetting(){
         reload();
         setScreenMode();
 
     }
+
+    /**
+     * Recalculates variables based on current scaling and reloads necessary manager data.
+     */
     public void reload(){
         tileSize = originalTileSize * scale;
         screenWidth = tileSize * maxScreenCol;
@@ -180,14 +193,27 @@ public class GamePanel extends JPanel implements Runnable {
 
     }
 
+    /**
+     * Creates an off-screen BufferedImage buffer used for rendering to prevent flickering.
+     */
     public void createTempScreen() {
         tempScreen = new BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_ARGB);
         g2 = (Graphics2D)tempScreen.getGraphics();
     }
 
+    /**
+     * Adds a new Map instance to the global map list.
+     * @param newMap The map object to be registered.
+     */
     public void loadMap(Map newMap){
         mapsList.add(newMap);
     }
+
+    /**
+     * Switches the active map of the game using the provided index.
+     * Restores map limits, entities, and objects for the newly active map.
+     * @param mapIndex The index of the map in the mapsList.
+     */
     public void setMap(int mapIndex){
         currentMapIndex = mapIndex;
         Map currentMap = mapsList.get(mapIndex);
@@ -204,7 +230,9 @@ public class GamePanel extends JPanel implements Runnable {
 
     }
 
-
+    /**
+     * Basic game initialization. Prepares the menu state and searches for save files.
+     */
     public void setup(){
         gameState = titleState;
         assetSetter.setPlayerSpawn();
@@ -212,6 +240,11 @@ public class GamePanel extends JPanel implements Runnable {
         createTempScreen();
         updateSetting();
     }
+
+    /**
+     * Starts a completely new game by resetting all maps, spawning base items/monsters,
+     * and resetting player stats/inventory.
+     */
     public void setupGame(){
         for (Map map : mapsList) {
             map.objectsList.clear();
@@ -224,6 +257,10 @@ public class GamePanel extends JPanel implements Runnable {
         player.resetPlayerValues();
         player.resetInventory();
     }
+
+    /**
+     * Searches the local save directory for existing .dat files to populate the Load Menu.
+     */
     public void setLoadFile(){
         for (int i = 0; i < 3; i++) {
             String fileName = "File #" + (i + 1);
@@ -240,7 +277,9 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-
+    /**
+     * Saves the game into the currently selected save slot.
+     */
     public void saveGame(){
         saves[currentSaveIndex] = new SaveLoad(this,currentSaveIndex+1);
         saves[currentSaveIndex].save();
@@ -255,6 +294,10 @@ public class GamePanel extends JPanel implements Runnable {
 
 
     }
+
+    /**
+     * Loads the game from the currently selected save slot.
+     */
     public void loadGame(){
         if (saves[currentSaveIndex] == null) {
             System.err.println("[GamePanel] No saves on the slot " + (currentSaveIndex + 1));
@@ -265,6 +308,9 @@ public class GamePanel extends JPanel implements Runnable {
         saves[currentSaveIndex].load();
     }
 
+    /**
+     * Deletes the currently selected save file from the disk and removes it from UI elements.
+     */
     public void removeSave(){
         if (saves[currentSaveIndex] == null) return;
 
@@ -278,142 +324,169 @@ public class GamePanel extends JPanel implements Runnable {
         ui.loadCommand.remove(saves[currentSaveIndex].fileName);
         saves[currentSaveIndex] = null;
     }
+
+    /**
+     * Initializes and starts the main game loop thread.
+     * It also triggers the default background music.
+     */
     public void startGameThread() {
-        if (gameThread==null){
+        if (gameThread == null) {
             running = true;
             gameThread = new Thread(this);
             gameThread.start();
-            playMusic(18);
+            playMusic(18); // Starts default BGM
         }
-
     }
-    public void resetMonster(){
+
+    /**
+     * Clears the active monster list from the current map.
+     * Useful when resetting a map or transitioning between areas.
+     */
+    public void resetMonster() {
         monster.clear();
     }
 
+    /**
+     * Safely stops the main game loop and waits for the thread to die.
+     */
     public void stopGameThread() {
         running = false;
         try {
-            gameThread.join(); // attendre la fin proprement
+            gameThread.join(); // Wait for the thread to finish cleanly
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         gameThread = null;
     }
 
-
+    /**
+     * Core game loop logic. Runs at a fixed rate defined by the FPS variable
+     * using a delta-time accumulator to ensure consistent game speed.
+     */
     @Override
     public void run() {
-
-        double drawInterval = (double) 1000000000 / FPS; // 0.016666 seconds
+        // 1000000000 nanoseconds = 1 second. Divided by FPS (e.g. 60) gives frame duration.
+        double drawInterval = (double) 1000000000 / FPS;
         double delta = 0;
         long lastTime = System.nanoTime();
         long currentTime;
         long timer = 0;
         int drawCounter = 0;
 
-        while(running){
-
+        while (running) {
             currentTime = System.nanoTime();
             delta += (currentTime - lastTime) / drawInterval;
             timer += (currentTime - lastTime);
             lastTime = currentTime;
 
-            if(delta >= 1){
-                // 1 UPDATE : update information such as character position
+            // When delta reaches 1, it's time to process the next frame
+            if (delta >= 1) {
+                // 1. UPDATE: Calculate new positions, physics, and game logic
                 update();
 
-                //2 DRAW : draw the screen with the new update information
+                // 2. DRAW: Render the screen with the updated information
                 repaint();
 
                 delta--;
                 drawCounter++;
-
             }
-            // Display FPS
+
+            // Display FPS in console once every second
             if (timer >= 1000000000) {
-                System.out.println("FPS :" +drawCounter);
+                System.out.println("FPS :" + drawCounter);
                 drawCounter = 0;
                 timer = 0;
-           }
-
-
-
-
-
+            }
         }
-
     }
 
-    public void update(){
-        if ((gameState == playState) || (gameState == pauseState)|| (gameState == inInventory)){
-            timeSpend ++;
+    /**
+     * Updates the logical state of the game (entity positions, animations, interactions).
+     * The behavior changes drastically depending on the current gameState.
+     */
+    public void update() {
+        // Increment playtime tracker if the game is active or paused/in inventory
+        if ((gameState == playState) || (gameState == pauseState) || (gameState == inInventory)) {
+            timeSpend++;
         }
-        if (gameState == playState){
 
-            for (Tile tile :tileM.tile){
-                if (tile != null && tile.animation != null){
+        // --- PLAY STATE LOGIC ---
+        if (gameState == playState) {
+            // Update animated tiles
+            for (Tile tile : tileM.tile) {
+                if (tile != null && tile.animation != null) {
                     tile.animation.update();
                 }
             }
 
+            // Update main player logic
             player.update();
 
+            // Update monsters
             for (Entity entity : monster) {
                 if (entity != null) {
-                    if (entity.alive && !entity.dying){
+                    // Only update living monsters that aren't currently playing death animations
+                    if (entity.alive && !entity.dying) {
                         entity.update();
                     }
                 }
             }
-
+            // Safely remove dead monsters from the list
             monster.removeIf(e -> !e.alive);
 
+            // Update projectiles (magic, arrows, hook)
             for (Entity entity : projectileList) {
                 if (entity != null) {
-                    if (entity.alive ){
+                    if (entity.alive) {
                         entity.update();
                     }
                 }
             }
-
+            // Safely remove destroyed projectiles from the list
             projectileList.removeIf(e -> !e.alive);
-
-
         }
-        if (gameState == pauseState){
-            // NOTHING
+
+        // --- PAUSE STATE LOGIC ---
+        if (gameState == pauseState) {
+            // Game logic is frozen, nothing updates here
         }
+
+        // Always update UI elements (menus, dialogs, inventory cursors)
         ui.update();
-
     }
 
-    public void drawToTempScreen(){
+    /**
+     * Renders all graphical elements (tiles, objects, entities, UI) onto a temporary
+     * off-screen buffer. This technique (Double Buffering) prevents screen flickering
+     * and allows for dynamic resolution scaling.
+     */
+    public void drawToTempScreen() {
+        // Ensure the buffer exists
         if (tempScreen == null || g2 == null) {
-
             createTempScreen();
         }
 
-        long drawStart =0;
-        //DEBUG
-        if (debugMode){
+        long drawStart = 0;
+        if (debugMode) {
             drawStart = System.nanoTime();
         }
 
-        if (gameState == titleState){
-        }else if((gameState == playState) || (gameState == pauseState)|| (gameState == inInventory)) {
-            //TILE 1ST LAYER
-            tileM.draw(g2,1);
+        if (gameState == titleState) {
+            // Only UI is drawn on title screen (handled below)
+        } else if ((gameState == playState) || (gameState == pauseState) || (gameState == inInventory)) {
 
-            // OBJECT
+            // 1. DRAW TILE MAP (Background / Layer 1)
+            tileM.draw(g2, 1);
+
+            // 2. DRAW GROUND OBJECTS (Items, Chests, Doors)
             for (SuperObject superObject : obj) {
                 if (superObject != null) {
                     superObject.draw(g2, this);
-
                 }
             }
-            entitiesList.add(player);
 
+            // 3. GATHER ALL ENTITIES FOR Y-SORTING
+            entitiesList.add(player);
             for (Entity e : monster) {
                 if (e != null) {
                     entitiesList.add(e);
@@ -425,73 +498,110 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
 
+            // 4. SORT ENTITIES BY Y-COORDINATE
+            // This ensures entities "lower" on the screen are drawn last,
+            // creating a fake 3D depth effect (e.g., a player standing in front of a monster).
             entitiesList.sort(new Comparator<Entity>() {
                 @Override
                 public int compare(Entity e1, Entity e2) {
                     return Integer.compare(e1.worldY, e2.worldY);
                 }
             });
-            for (Entity e : entitiesList){
+
+            // 5. DRAW SORTED ENTITIES
+            for (Entity e : entitiesList) {
                 e.draw(g2);
             }
 
+            // Clear the list for the next frame
             entitiesList.clear();
 
-            //TILE 2ND LAYER
-            tileM.draw(g2,2);
-
+            // 6. DRAW TILE MAP (Foreground / Overlapping Layer 2)
+            tileM.draw(g2, 2);
         }
 
+        // 7. DRAW UI (Health bars, Dialogues, Inventory, Menus)
         ui.draw(g2);
 
-
-        if(gameState == playState ){
-            //DEBUG
-            if (debugMode){
+        // 8. DRAW DEBUG OVERLAY
+        if (gameState == playState) {
+            if (debugMode) {
                 long drawEnd = System.nanoTime();
                 long passedTime = drawEnd - drawStart;
-                g2.setColor(Color.white);
-                g2.setFont(new Font("Serif", Font.BOLD, (int)(screenHeight/19.2f)));
-                g2.drawString("Draw Time: " + passedTime , (screenHeight /57.6f), (screenHeight /1.92f));
-                g2.drawString("Coordinate :" + player.worldX+","+player.worldY , (screenHeight /57.6f), (screenHeight /1.74f));
-                g2.drawString("Tile Coordinate :"+ player.worldCol +","+player.worldRow,(screenHeight /57.6f), (screenHeight /1.60f));
-                player.showHitbox(g2);
 
+                g2.setColor(Color.white);
+                g2.setFont(new Font("Serif", Font.BOLD, (int) (screenHeight / 19.2f)));
+
+                // Print render time and coordinates
+                g2.drawString("Draw Time: " + passedTime, (screenHeight / 57.6f), (screenHeight / 1.92f));
+                g2.drawString("Coordinate :" + player.worldX + "," + player.worldY, (screenHeight / 57.6f), (screenHeight / 1.74f));
+                g2.drawString("Tile Coordinate :" + player.worldCol + "," + player.worldRow, (screenHeight / 57.6f), (screenHeight / 1.60f));
+
+                // Show player's hitboxes
+                player.showHitbox(g2);
             }
         }
     }
-    public void paintComponent(Graphics g) {
 
-        super.paintComponent(g);
+    /**
+     * Standard Swing method to render graphics. It draws the pre-rendered
+     * temporary screen onto the actual JPanel window, automatically stretching
+     * it to fit the current window size (screenWidth2, screenHeight2).
+     * @param g The Graphics context provided by Java Swing.
+     */
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g); // Erases previous frame
+
+        // Prepare the off-screen image
         drawToTempScreen();
 
+        // Draw the fully composed image onto the physical screen
         Graphics2D g2d = (Graphics2D) g;
-        g2d.drawImage(tempScreen, 0, 0,screenWidth2,screenHeight2, null);
-//        System.out.println("Screen width: " + screenWidth2+ " Screen height: " + screenHeight2);
-//        System.out.println("Panel width: " + screenWidth+ " Panel height: " + screenHeight);
+        g2d.drawImage(tempScreen, 0, 0, screenWidth2, screenHeight2, null);
 
+        // Clean up graphics resources to avoid memory leaks
         g2d.dispose();
     }
 
-    public void playMusic(int i){
+    /**
+     * Plays a background music track on a continuous loop.
+     * @param i The index of the music file in the Sound array.
+     */
+    public void playMusic(int i) {
         music.setFile(i);
         music.play();
         music.loop();
     }
 
-    public void stopMusic(){
+    /**
+     * Stops the currently playing background music.
+     */
+    public void stopMusic() {
         music.stop();
     }
 
-    public void playSoundEffect(int i){
+    /**
+     * Plays a sound effect once.
+     * @param i The index of the sound file in the Sound array.
+     */
+    public void playSoundEffect(int i) {
         soundEffects.setFile(i);
         soundEffects.play();
     }
 
-    public void updateMusicVolume(float volume){
+    /**
+     * Adjusts the volume of the background music.
+     * @param volume The target volume level (in decibels).
+     */
+    public void updateMusicVolume(float volume) {
         music.updateVolume(volume);
     }
-    public void updateSoundVolume(float volume){
+
+    /**
+     * Adjusts the volume of the sound effects.
+     * @param volume The target volume level (in decibels).
+     */
+    public void updateSoundVolume(float volume) {
         soundEffects.updateVolume(volume);
     }
 
