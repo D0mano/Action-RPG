@@ -1,10 +1,13 @@
 package main;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import entity.Entity;
 import monster.MON_Blob;
 import monster.MON_FoxZombie;
 import monster.MON_Rudeling;
 import object.*;
+
+import java.sql.Blob;
 
 /**
  * The AssetSetter class is responsible for populating the game's maps with
@@ -45,11 +48,39 @@ public class AssetSetter {
      * This method is called when starting a brand new game.
      */
     public void setObject() {
-        // Syntax: placeObject("Object Name", Column, Row, Map Index)
-        placeObject("sword", 48, 53, 0);
-        placeObject("shield", 16, 17, 0);
-        placeObject("grappling hook", 56, 11, 0);
-        placeObject("ice wand", 48, 27, 0);
+        int i = 0;
+        for (Map map : gp.mapsList){
+            if (map != null) {
+                JsonNode layerNode = map.rootNode.get("layers");
+                 for (JsonNode layer : layerNode) {
+                     if (layer.get("type").asText().equals("objectgroup") && layer.get("name").asText().equals("Obj_layer")) {
+                         JsonNode objArray = layer.get("objects");
+                         for (JsonNode obj : objArray) {
+                             String name;
+                             if (obj.get("template") != null) {
+                                 String templatePath = obj.get("template").asText();
+                                  name = templatePath.substring(templatePath.lastIndexOf("/") + 1).replace(".tx", "");
+                             }
+                             else{
+                                  name = obj.get("name").asText();
+                             }
+
+                             placeObject(name,obj.get("x").asInt()/gp.originalTileSize,(obj.get("y").asInt()/gp.originalTileSize)-1,i);
+                         }
+                     }
+                 }
+
+            }
+
+            i++;
+
+        }
+
+//        // Syntax: placeObject("Object Name", Column, Row, Map Index)
+//        placeObject("sword", 48, 53, 0);
+//        placeObject("shield", 16, 17, 0);
+//        placeObject("grappling hook", 56, 11, 0);
+//        placeObject("ice wand", 48, 27, 0);
     }
 
     /**
@@ -57,21 +88,43 @@ public class AssetSetter {
      * This method is called when starting a new game to populate the world with enemies.
      */
     public void setMonster() {
-        // BLOB SPAWNS
-        createMonster("blob", 52, 32, 0);
-        createMonster("blob", 34, 27, 0);
-        createMonster("blob", 75, 32, 0);
-        createMonster("blob", 80, 27, 0);
 
-        // FOX ZOMBIE SPAWNS
-        createMonster("foxZombie", 16, 25, 0);
-        createMonster("foxZombie", 13, 12, 0);
-        createMonster("foxZombie", 73, 16, 0);
-        createMonster("foxZombie", 86, 14, 0);
+        int i = 0;
+        for (Map map : gp.mapsList){
+            if (map != null) {
+                JsonNode layerNode = map.rootNode.get("layers");
+                for (JsonNode layer : layerNode) {
+                    if (layer.get("type").asText().equals("objectgroup") && layer.get("name").asText().equals("Mon_layer")) {
+                        JsonNode objArray = layer.get("objects");
+                        for (JsonNode obj : objArray) {
+                            String templatePath = obj.get("template").asText();
+                            String name = templatePath.substring(templatePath.lastIndexOf("/") + 1).replace(".tx", "");
+                            createMonster(name,obj.get("x").asInt()/gp.originalTileSize,(obj.get("y").asInt()/gp.originalTileSize)-1,i);
+                        }
+                    }
+                }
 
-        // RUDELING SPAWNS
-        createMonster("rudeling", 16, 17, 0);
-        createMonster("rudeling", 56, 11, 0);
+            }
+
+            i++;
+
+        }
+
+//        // BLOB SPAWNS
+//        createMonster("blob", 52, 32, 0);
+//        createMonster("blob", 34, 27, 0);
+//        createMonster("blob", 75, 32, 0);
+//        createMonster("blob", 80, 27, 0);
+//
+//        // FOX ZOMBIE SPAWNS
+//        createMonster("foxZombie", 16, 25, 0);
+//        createMonster("foxZombie", 13, 12, 0);
+//        createMonster("foxZombie", 73, 16, 0);
+//        createMonster("foxZombie", 86, 14, 0);
+//
+//        // RUDELING SPAWNS
+//        createMonster("rudeling", 16, 17, 0);
+//        createMonster("rudeling", 56, 11, 0);
     }
 
     /**
@@ -83,13 +136,13 @@ public class AssetSetter {
         gp.mapsList.get(0).playerCol = 49;
         gp.mapsList.get(0).playerRow = 66;
 
-        // Map 1 (Dungeon/Interior 1)
-        gp.mapsList.get(1).playerCol = 24;
-        gp.mapsList.get(1).playerRow = 39;
-
-        // Map 2 (Dungeon/Interior 2)
-        gp.mapsList.get(2).playerCol = 40;
-        gp.mapsList.get(2).playerRow = 44;
+//        // Map 1 (Dungeon/Interior 1)
+//        gp.mapsList.get(1).playerCol = 24;
+//        gp.mapsList.get(1).playerRow = 39;
+//
+//        // Map 2 (Dungeon/Interior 2)
+//        gp.mapsList.get(2).playerCol = 40;
+//        gp.mapsList.get(2).playerRow = 44;
     }
 
     /**
@@ -104,14 +157,20 @@ public class AssetSetter {
         Entity monster;
 
         // Determine which monster object to instantiate
-        if (monsterName.equals("rudeling")) {
-            monster = new MON_Rudeling(gp, worldCol, worldRow);
-        } else if (monsterName.equals("foxZombie")) {
-            monster = new MON_FoxZombie(gp, worldCol, worldRow);
-        } else {
-            // Default to Blob if name doesn't match above
-            monster = new MON_Blob(gp, worldCol, worldRow);
+        switch (monsterName) {
+            case "Blob": monster = new MON_Blob(gp,worldCol,worldRow);break;
+            case "Rudeling": monster = new MON_Rudeling(gp,worldCol,worldRow);break;
+            case "Fox_Zombie": monster = new MON_FoxZombie(gp,worldCol,worldRow);break;
+            default :{System.err.println("[AssetSetter] Invalid monster name! :"+monsterName); return;}
         }
+//        if (monsterName.equals("rudeling")) {
+//            monster = new MON_Rudeling(gp, worldCol, worldRow);
+//        } else if (monsterName.equals("foxZombie")) {
+//            monster = new MON_FoxZombie(gp, worldCol, worldRow);
+//        } else {
+//            // Default to Blob if name doesn't match above
+//            monster = new MON_Blob(gp, worldCol, worldRow);
+//        }
 
         // Add the created monster to the specific map's entity list
         gp.mapsList.get(mapIndex).monsterList.add(monster);

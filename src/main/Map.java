@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Represents a playable area (Map) in the game, holding map dimensions,
@@ -16,6 +18,8 @@ import java.util.ArrayList;
 public class Map {
     public GamePanel gp;
     public String mapName;
+
+    public JsonNode rootNode;
 
     // MAP DIMENSIONS
     public int maxMapCol;
@@ -51,43 +55,75 @@ public class Map {
      * Calculates the total width and height of the map based on the tile size.
      */
     public void getMapMetaData(){
+
+        ObjectMapper mapper = new ObjectMapper();
+        String path = "/maps/"+mapName+".tmj";
+
         try{
-            // Count the number of layers by checking existing files
-            int layer = 0;
-            while(true){
-                String path = "/maps/"+mapName+"_layer_"+(layer+1)+".csv";
-                InputStream is = getClass().getResourceAsStream(path);
-                if(is == null) break; // Exit loop when no more layers are found
-                layer++;
-                is.close();
-            }
-            this.maxMapLayer = layer;
+            // We load the JSON file from the res/maps folder
+            InputStream is = getClass().getResourceAsStream(path);
+            rootNode = mapper.readTree(is);
 
-            // Count rows and columns based on the first layer
-            InputStream is = getClass().getResourceAsStream("/maps/"+mapName+"_layer_1.csv");
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            // Retrieve global dimension
+            this.maxMapCol = rootNode.get("width").asInt();
+            this.maxMapRow = rootNode.get("height").asInt();
+            this.mapWidth = maxMapCol * gp.tileSize;
+            this.mapHeight = maxMapRow * gp.tileSize;
 
-            String line;
-            int cols = 0;
-            int rows = 0;
-            if((line = br.readLine()) != null){
-                String[] numbers = line.split(",");
-                cols = numbers.length;
-                rows++;
+            // Count the number of layers
+            int numLayer = 0;
+            JsonNode layerNode = rootNode.get("layers");
+            if (layerNode.isArray()) {
+                for (JsonNode layer :layerNode ) {
+                    if ("tilelayer".equals(layer.get("type").asText())) {
+                        numLayer++;
+                    }
+                }
             }
-            while(br.readLine() != null){
-                rows++;
-            }
-            br.close();
+            this.maxMapLayer = numLayer;
 
-            // Assign dimensions
-            this.maxMapCol = cols;
-            this.maxMapRow = rows;
-            this.mapWidth = gp.tileSize  * this.maxMapCol;
-            this.mapHeight = gp.tileSize * this.maxMapRow;
-        }catch(IOException e){
+
+        }
+        catch (IOException e){
             e.printStackTrace();
         }
+//        try{
+//            // Count the number of layers by checking existing files
+//            int layer = 0;
+//            while(true){
+//                String path = "/maps/"+mapName+"_layer_"+(layer+1)+".csv";
+//                InputStream is = getClass().getResourceAsStream(path);
+//                if(is == null) break; // Exit loop when no more layers are found
+//                layer++;
+//                is.close();
+//            }
+//            this.maxMapLayer = layer;
+//
+//            // Count rows and columns based on the first layer
+//            InputStream is = getClass().getResourceAsStream("/maps/"+mapName+"_layer_1.csv");
+//            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+//
+//            String line;
+//            int cols = 0;
+//            int rows = 0;
+//            if((line = br.readLine()) != null){
+//                String[] numbers = line.split(",");
+//                cols = numbers.length;
+//                rows++;
+//            }
+//            while(br.readLine() != null){
+//                rows++;
+//            }
+//            br.close();
+//
+//            // Assign dimensions
+//            this.maxMapCol = cols;
+//            this.maxMapRow = rows;
+//            this.mapWidth = gp.tileSize  * this.maxMapCol;
+//            this.mapHeight = gp.tileSize * this.maxMapRow;
+//        }catch(IOException e){
+//            e.printStackTrace();
+//        }
     }
 
     /**
@@ -96,25 +132,45 @@ public class Map {
     public void loadMap(){
         getMapMetaData();
         tileMap = new int[this.maxMapRow][this.maxMapCol][this.maxMapLayer];
-        try{
-            for (int layer = 0; layer < maxMapLayer; layer++) {
-                String layerPath = "/maps/"+mapName+"_layer_"+(layer+1)+".csv";
-                InputStream is = getClass().getResourceAsStream(layerPath);
-                BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        // We fill the array
+        int currentLayer = 0;
+        JsonNode layerNode = rootNode.get("layers");
+        if(layerNode.isArray()){
+            for (JsonNode layer : layerNode) {
+                if ("tilelayer".equals(layer.get("type").asText())){
+                    JsonNode dataArray = layer.get("data");
 
-                for (int row = 0; row < maxMapRow; row++) {
-                    String line = br.readLine();
-                    String[] numbers = line.split(",");
-                    for (int col = 0; col < maxMapCol; col++) {
-                        int num = Integer.parseInt(numbers[col]);
-                        tileMap[row][col][layer] = num;
+                    for (int i = 0; i < dataArray.size(); i++) {
+                        int tileId = dataArray.get(i).asInt();
+
+                        int row = i / maxMapCol;
+                        int col = i % maxMapCol;
+
+                        tileMap[row][col][currentLayer] = tileId-1;
                     }
+                    currentLayer++;
                 }
-                br.close();
             }
-        }catch(Exception e){
-            e.printStackTrace();
         }
+//        try{
+//            for (int layer = 0; layer < maxMapLayer; layer++) {
+//                String layerPath = "/maps/"+mapName+"_layer_"+(layer+1)+".csv";
+//                InputStream is = getClass().getResourceAsStream(layerPath);
+//                BufferedReader br = new BufferedReader(new InputStreamReader(is));
+//
+//                for (int row = 0; row < maxMapRow; row++) {
+//                    String line = br.readLine();
+//                    String[] numbers = line.split(",");
+//                    for (int col = 0; col < maxMapCol; col++) {
+//                        int num = Integer.parseInt(numbers[col]);
+//                        tileMap[row][col][layer] = num;
+//                    }
+//                }
+//                br.close();
+//            }
+//        }catch(Exception e){
+//            e.printStackTrace();
+//        }
     }
 
     /**
