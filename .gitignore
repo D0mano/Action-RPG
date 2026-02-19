@@ -1,5 +1,9 @@
 ### IntelliJ IDEA ###
+Tiled - files
+ActionRPG.tiled-project
+ActionRPG.tiled-session
 res/sounds/musics/
+saves
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
