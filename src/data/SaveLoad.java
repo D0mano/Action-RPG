@@ -46,6 +46,8 @@ public class SaveLoad {
         // SAVE PLAYER POSITION
         ds.playerCol = gp.player.worldCol;
         ds.playerRow = gp.player.worldRow;
+        ds.playerWorldX = gp.player.worldX;
+        ds.playerWorldY = gp.player.worldY;
         ds.playerScreenX = gp.player.screenX;
         ds.playerScreenY = gp.player.screenY;
         ds.currentMapIndex = gp.currentMapIndex;
@@ -123,8 +125,8 @@ public class SaveLoad {
         gp.setMap(ds.currentMapIndex);
         gp.player.worldCol = ds.playerCol;
         gp.player.worldRow = ds.playerRow;
-        gp.player.worldX = gp.player.worldCol * gp.tileSize;
-        gp.player.worldY = gp.player.worldRow * gp.tileSize;
+        gp.player.worldX = ds.playerWorldX;
+        gp.player.worldY = ds.playerWorldY;
         gp.player.screenX = ds.playerScreenX;
         gp.player.screenY = ds.playerScreenY;
 

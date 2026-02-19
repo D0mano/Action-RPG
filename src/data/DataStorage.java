@@ -23,6 +23,8 @@ public class DataStorage implements Serializable {
     // COORDINATE
     int playerCol;
     int playerRow;
+    int playerWorldX;
+    int playerWorldY;
     int playerScreenX;
     int playerScreenY;
     int currentMapIndex;

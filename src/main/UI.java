@@ -91,6 +91,14 @@ public class UI {
     public double maxTransitionSize;
     private Runnable onTransitionComplete;
 
+    public enum TransitionType{
+        Iris,
+        FadeInOut,
+        SlideInOut,
+        Shutters;
+    }
+    public TransitionType transitionType = TransitionType.Iris;
+
     /**
      * Constructor for the UI class.
      * Initializes fonts, sizes, and loads all required UI textures.
@@ -223,27 +231,105 @@ public class UI {
 
         // Handle Iris (circle wipe) Transition logic
         if (transitionOn) {
-            double speed = maxTransitionSize / 60; // Complete transition in ~60 frames (1 second)
+            if (transitionType == TransitionType.Iris) {
+                double speed = maxTransitionSize / 60; // Complete transition in ~60 frames (1 second)
 
-            // STATE 1: CLOSING TRANSITION (Screen goes black)
-            if (transitionState == 1) {
-                transitionSize -= speed;
-                if (transitionSize <= 0) {
-                    transitionSize = 0;
-                    // Trigger the action (e.g., loading map) exactly when screen is fully black
-                    if (onTransitionComplete != null) {
-                        onTransitionComplete.run();
+                // STATE 1: CLOSING TRANSITION (Screen goes black)
+                if (transitionState == 1) {
+                    transitionSize -= speed;
+                    if (transitionSize <= 0) {
+                        transitionSize = 0;
+                        // Trigger the action (e.g., loading map) exactly when screen is fully black
+                        if (onTransitionComplete != null) {
+                            onTransitionComplete.run();
+                        }
+                        transitionState = 2; // Switch to opening
                     }
-                    transitionState = 2; // Switch to opening
+                }
+                // STATE 2: OPENING TRANSITION (Screen reveals)
+                else if (transitionState == 2) {
+                    transitionSize += speed;
+                    if (transitionSize >= maxTransitionSize) {
+                        transitionSize = maxTransitionSize;
+                        transitionOn = false; // Transition finished
+                        transitionState = 0;
+                    }
+                }
+
+            }
+            else if (transitionType == TransitionType.FadeInOut){
+                double speed = maxTransitionSize / 60; // Complete transition in ~120 frames (2 second)
+
+                // STATE 1: FADE IN
+                if (transitionState == 1) {
+                    transitionSize += speed;
+                    if (transitionSize >= maxTransitionSize) {
+                        transitionSize = maxTransitionSize;
+                        // Trigger the action (e.g., loading map) exactly when screen is fully black
+                        if (onTransitionComplete != null) {
+                            onTransitionComplete.run();
+                        }
+                        transitionState = 2; // Switch to opening
+                    }
+                }
+                // STATE 2: FADE OUT
+                else if (transitionState == 2) {
+                    transitionSize -= speed;
+                    if (transitionSize <= 0) {
+                        transitionSize = 0;
+                        transitionOn = false; // Transition finished
+                        transitionState = 0;
+                    }
                 }
             }
-            // STATE 2: OPENING TRANSITION (Screen reveals)
-            else if (transitionState == 2) {
-                transitionSize += speed;
-                if (transitionSize >= maxTransitionSize) {
-                    transitionSize = maxTransitionSize;
-                    transitionOn = false; // Transition finished
-                    transitionState = 0;
+            else if (transitionType == TransitionType.SlideInOut){
+                double speed = maxTransitionSize / 60; // Complete transition in ~120 frames (2 second)
+
+                // STATE 1: SLIDE IN
+                if (transitionState == 1) {
+                    transitionSize += speed;
+                    if (transitionSize >= maxTransitionSize) {
+                        transitionSize = maxTransitionSize;
+                        // Trigger the action (e.g., loading map) exactly when screen is fully black
+                        if (onTransitionComplete != null) {
+                            onTransitionComplete.run();
+                        }
+                        transitionState = 2; // Switch to opening
+                    }
+                }
+                // STATE 2: SLIDE OUT
+                else if (transitionState == 2) {
+                    transitionSize -= speed;
+                    if (transitionSize <= 0) {
+                        transitionSize = 0;
+                        transitionOn = false; // Transition finished
+                        transitionState = 0;
+                    }
+                }
+            }
+            else if (transitionType == TransitionType.Shutters){
+                double speed = maxTransitionSize / 60; // Complete transition in ~120 frames (2 second)
+
+                // STATE 1: Shutter Open
+                if (transitionState == 1) {
+                    transitionSize += speed;
+                    if (transitionSize >= maxTransitionSize) {
+                        transitionSize = maxTransitionSize;
+                        // Trigger the action (e.g., loading map) exactly when screen is fully black
+                        if (onTransitionComplete != null) {
+                            onTransitionComplete.run();
+                        }
+                        transitionState = 2; // Switch to opening
+                    }
+                }
+                // STATE 2: Shutter Close
+                else if (transitionState == 2) {
+                    transitionSize -= speed;
+                    if (transitionSize <= 0) {
+                        transitionSize = 0;
+                        transitionOn = false; // Transition finished
+                        transitionState = 0;
+                    }
                 }
             }
         }
@@ -332,7 +418,19 @@ public class UI {
             drawPlayerEquipment();
             drawLuminosity();
             if (transitionOn) {
-                drawIrisTransition();
+                if (transitionType == TransitionType.Iris){
+                    drawIrisTransition();
+                }
+                if (transitionType == TransitionType.FadeInOut){
+                    drawFadeInOutTransition();
+                }
+                if (transitionType == TransitionType.SlideInOut){
+                    drawSlideInOutTransition();
+                }
+                if (transitionType == TransitionType.Shutters){
+                    drawShutterTransition();
+                }
+
             }
         }
 
@@ -963,7 +1061,7 @@ public class UI {
         for (int i = 0; i < 3; i++) {
             String slotName = "File #" + (i + 1);
             if (gp.saves[i] != null) {
-                labels[i] = slotName + " — Overwrite ?";
+                labels[i] = slotName + " — Overwrite";
             } else {
                 labels[i] = slotName + " — Empty";
             }
@@ -1203,13 +1301,50 @@ public class UI {
     }
 
     /**
+     * Draws fade in and out transition effect heavily used for scene/map changes.
+     * Drawing a fully black rectangle and changing the alpha composite
+     */
+    public void drawFadeInOutTransition(){
+        g2.setColor(new Color(0, 0, 0, (int)(transitionSize)));
+        g2.fillRect(0,0,gp.screenWidth,gp.screenHeight);
+
+    }
+
+    /**
+     * Draws the slide in and out transition effect heavily used for scene/map changes.
+     * Uses extremely thick borders rendering inward and outward to ensure the screen is fully masked.
+     */
+    public void drawSlideInOutTransition(){
+        g2.setColor(Color.BLACK);
+        g2.fillRect(0,0,(int)(transitionSize),gp.screenHeight);
+    }
+
+    public void drawShutterTransition(){
+        g2.setColor(Color.BLACK);
+        g2.fillRect(0,0,(int)(transitionSize),gp.screenHeight);
+        g2.fillRect((int)(gp.screenWidth-transitionSize),0,(int)(transitionSize+gp.tileSize),gp.screenHeight);
+    }
+
+
+
+    /**
      * Initiates the screen Iris Transition animation.
      * @param action The chunk of code (Runnable block) to execute once the screen is fully dark.
      */
-    public void startTransition(Runnable action) {
+    public void startTransition(TransitionType type ,Runnable action) {
+        maxTransitionSize = switch (type){
+            case TransitionType.Iris -> 2*gp.screenWidth;
+            case TransitionType.FadeInOut -> 255;
+            case TransitionType.SlideInOut -> gp.screenWidth;
+            case  TransitionType.Shutters ->gp.screenWidth/2f;
+        };
+        transitionType = type;
         onTransitionComplete = action;
         transitionOn = true;
         transitionState = 1; // Begins closing sequence
-        transitionSize = maxTransitionSize; // Start completely open
+        transitionSize = switch (type) {
+            case TransitionType.Iris -> maxTransitionSize;
+            case TransitionType.FadeInOut ,TransitionType.SlideInOut  ,TransitionType.Shutters -> 0;
+        };
     }
 }
