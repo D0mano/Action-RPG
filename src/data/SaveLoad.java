@@ -111,6 +111,9 @@ public class SaveLoad {
         gp.player.endurance = ds.playerStamina;
         gp.player.maxEndurance = ds.playerStaminaMax;
 
+        // RESTORE TIME SPEND
+        gp.timeSpend = ds.timeSpend;
+
         // RESTORE GROUND OBJECTS
         for (int i = 0; i < gp.mapsList.size(); i++) {
             Map map = gp.mapsList.get(i);
