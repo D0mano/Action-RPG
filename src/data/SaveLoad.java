@@ -73,7 +73,7 @@ public class SaveLoad {
         }
 
         // SAVE TIME SPEND ON THE SAVE FILE
-        ds.timeSpend += gp.timeSpend;
+        ds.timeSpend = gp.timeSpend;
 
         // Write the DataStorage object to disk using try-with-resources
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("saves/" + fileName + ".dat"))) {
