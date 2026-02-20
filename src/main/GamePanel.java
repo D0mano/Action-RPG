@@ -103,6 +103,7 @@ public class GamePanel extends JPanel implements Runnable {
     final public int inInventory = 9;
     final public int gameOver = 10;
     final public int newGameSlotState = 11;
+    final public int controlSettingState = 12;
 
 
     public GamePanel() {

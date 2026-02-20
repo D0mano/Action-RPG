@@ -1,5 +1,7 @@
 package main;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import entity.Player;
 import object.SuperObject;
 
@@ -54,7 +56,7 @@ public class UI {
     public String[] pauseCommand = {"Return to Game", "Options", "Quit"};
     public int commandNumberPause = 0;
 
-    public String[] optionCommand = {"Audio", "Graphics", "Return"};
+    public String[] optionCommand = {"Audio", "Graphics","Controls", "Return"};
     public int commandNumberOption = 0;
 
     public String[] audioCommand = {"Musics", "Sounds Effects", "Return"};
@@ -62,6 +64,10 @@ public class UI {
 
     public String[] graphicCommand = {"Display Mode", "Resolution", "Return"};
     public int commandNumberGraphic = 0;
+
+    public JsonNode controleRootNode ;
+    public int commandNumberControle = 0;
+    public int totalCategories = 0;
 
     public ArrayList<String> loadCommand = new ArrayList<>();
     public int commandNumberLoad = 0;
@@ -86,7 +92,7 @@ public class UI {
     // IRIS TRANSITION (Circle screen wipe)
     public boolean transitionOn = false;
     public int transitionState = 0; // 0 = idle, 1 = closing, 2 = opening
-    public int transitionCounter = 0;
+    public int transitionSpeed;
     public double transitionSize = 0;
     public double maxTransitionSize;
     private Runnable onTransitionComplete;
@@ -111,24 +117,15 @@ public class UI {
         maxTransitionSize = gp.screenWidth * 2.0;
         loadCommand.add("Cancel");
 
-        try {
-            InputStream is = getClass().getResourceAsStream("/fonts/Lilliput Steps.otf");
-            InputStream is2 = getClass().getResourceAsStream("/fonts/Trunic-Bold.otf");
+        getFont();
+        getImage();
+        getControle();
 
-            // NOTE: Font.TRUETYPE_FONT works perfectly for .otf files as well.
-            Font lilliputFont = Font.createFont(Font.TRUETYPE_FONT, is);
-            Font Trunic = Font.createFont(Font.TRUETYPE_FONT, is2);
 
-            // Derive specific sizes based on tile scaling
-            lilliput_40 = lilliputFont.deriveFont(Font.PLAIN, gp.tileSize);
-            lilliput_20 = lilliputFont.deriveFont(Font.PLAIN, (gp.tileSize * (2 / 3f)));
-            lilliput_15 = lilliputFont.deriveFont(Font.PLAIN, (gp.tileSize * (1 / 2f)));
-            trunic = Trunic.deriveFont(Font.BOLD, gp.tileSize);
 
-        } catch (FontFormatException | IOException e) {
-            e.printStackTrace();
-        }
+    }
 
+    public void getImage(){
         // LOAD HUD TEXTURES
         healthOverlay = setup("/player/health_overlay", (int)(gp.scale * (2 / 3f)));
         healthMiddle = setup("/player/health_mid", (int)(gp.scale * (2 / 3f)));
@@ -155,6 +152,45 @@ public class UI {
 
         potionFull = setup("/player/potion_full", gp.scale);
         potionEmpty = setup("/player/potion_empty", gp.scale);
+    }
+
+    public void getFont(){
+        try {
+            InputStream is = getClass().getResourceAsStream("/fonts/Lilliput Steps.otf");
+            InputStream is2 = getClass().getResourceAsStream("/fonts/Trunic-Bold.otf");
+
+            // NOTE: Font.TRUETYPE_FONT works perfectly for .otf files as well.
+            Font lilliputFont = Font.createFont(Font.TRUETYPE_FONT, is);
+            Font Trunic = Font.createFont(Font.TRUETYPE_FONT, is2);
+
+            // Derive specific sizes based on tile scaling
+            lilliput_40 = lilliputFont.deriveFont(Font.PLAIN, gp.tileSize);
+            lilliput_20 = lilliputFont.deriveFont(Font.PLAIN, (gp.tileSize * (2 / 3f)));
+            lilliput_15 = lilliputFont.deriveFont(Font.PLAIN, (gp.tileSize * (1 / 2f)));
+            trunic = Trunic.deriveFont(Font.BOLD, gp.tileSize);
+
+        } catch (FontFormatException | IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void getControle(){
+        ObjectMapper mapper = new ObjectMapper();
+        String path = "/UI/controle_file.json";
+
+        try {
+            InputStream is = getClass().getResourceAsStream(path);
+            controleRootNode = mapper.readTree(is);
+
+            // Calcule le nombre de catégories
+            JsonNode controlsArray = controleRootNode.get("controls");
+            if (controlsArray != null && controlsArray.isArray()) {
+                totalCategories = controlsArray.size();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -231,11 +267,11 @@ public class UI {
 
         // Handle Iris (circle wipe) Transition logic
         if (transitionOn) {
-            if (transitionType == TransitionType.Iris) {
-                double speed = maxTransitionSize / 60; // Complete transition in ~60 frames (1 second)
+            double speed = maxTransitionSize / transitionSpeed; // Default value 60 : Complete transition in ~60 frames (1 second)
 
-                // STATE 1: CLOSING TRANSITION (Screen goes black)
-                if (transitionState == 1) {
+            // STATE 1: CLOSING TRANSITION (Screen goes black)
+            if (transitionState == 1) {
+                if (transitionType == TransitionType.Iris) {
                     transitionSize -= speed;
                     if (transitionSize <= 0) {
                         transitionSize = 0;
@@ -246,22 +282,7 @@ public class UI {
                         transitionState = 2; // Switch to opening
                     }
                 }
-                // STATE 2: OPENING TRANSITION (Screen reveals)
-                else if (transitionState == 2) {
-                    transitionSize += speed;
-                    if (transitionSize >= maxTransitionSize) {
-                        transitionSize = maxTransitionSize;
-                        transitionOn = false; // Transition finished
-                        transitionState = 0;
-                    }
-                }
-
-            }
-            else if (transitionType == TransitionType.FadeInOut){
-                double speed = maxTransitionSize / 60; // Complete transition in ~120 frames (2 second)
-
-                // STATE 1: FADE IN
-                if (transitionState == 1) {
+                else if (transitionType == TransitionType.FadeInOut || transitionType == TransitionType.Shutters || transitionType == TransitionType.SlideInOut) {
                     transitionSize += speed;
                     if (transitionSize >= maxTransitionSize) {
                         transitionSize = maxTransitionSize;
@@ -271,34 +292,21 @@ public class UI {
                         }
                         transitionState = 2; // Switch to opening
                     }
-                }
-                // STATE 2: FADE OUT
-                else if (transitionState == 2) {
-                    transitionSize -= speed;
-                    if (transitionSize <= 0) {
-                        transitionSize = 0;
-                        transitionOn = false; // Transition finished
-                        transitionState = 0;
-                    }
-                }
-            }
-            else if (transitionType == TransitionType.SlideInOut){
-                double speed = maxTransitionSize / 60; // Complete transition in ~120 frames (2 second)
 
-                // STATE 1: SLIDE IN
-                if (transitionState == 1) {
+                }
+
+            }
+            // STATE 2: OPENING TRANSITION (Screen reveals)
+            else if (transitionState == 2) {
+                if (transitionType == TransitionType.Iris) {
                     transitionSize += speed;
                     if (transitionSize >= maxTransitionSize) {
                         transitionSize = maxTransitionSize;
-                        // Trigger the action (e.g., loading map) exactly when screen is fully black
-                        if (onTransitionComplete != null) {
-                            onTransitionComplete.run();
-                        }
-                        transitionState = 2; // Switch to opening
+                        transitionOn = false; // Transition finished
+                        transitionState = 0;
                     }
                 }
-                // STATE 2: SLIDE OUT
-                else if (transitionState == 2) {
+                else if (transitionType == TransitionType.FadeInOut || transitionType == TransitionType.Shutters || transitionType == TransitionType.SlideInOut) {
                     transitionSize -= speed;
                     if (transitionSize <= 0) {
                         transitionSize = 0;
@@ -306,32 +314,9 @@ public class UI {
                         transitionState = 0;
                     }
                 }
-            }
-            else if (transitionType == TransitionType.Shutters){
-                double speed = maxTransitionSize / 60; // Complete transition in ~120 frames (2 second)
 
-                // STATE 1: Shutter Open
-                if (transitionState == 1) {
-                    transitionSize += speed;
-                    if (transitionSize >= maxTransitionSize) {
-                        transitionSize = maxTransitionSize;
-                        // Trigger the action (e.g., loading map) exactly when screen is fully black
-                        if (onTransitionComplete != null) {
-                            onTransitionComplete.run();
-                        }
-                        transitionState = 2; // Switch to opening
-                    }
-                }
-                // STATE 2: Shutter Close
-                else if (transitionState == 2) {
-                    transitionSize -= speed;
-                    if (transitionSize <= 0) {
-                        transitionSize = 0;
-                        transitionOn = false; // Transition finished
-                        transitionState = 0;
-                    }
-                }
             }
+
         }
     }
 
@@ -388,6 +373,9 @@ public class UI {
             }
             drawOptionScreen();
         }
+        if (gp.gameState == gp.controlSettingState) {
+            drawControleScreen();
+        }
         if (gp.gameState == gp.audioSettingstate) {
             if (gp.previousState == gp.titleState) {
                 g2.setColor(Color.black);
@@ -417,21 +405,7 @@ public class UI {
             drawPlayerPotion();
             drawPlayerEquipment();
             drawLuminosity();
-            if (transitionOn) {
-                if (transitionType == TransitionType.Iris){
-                    drawIrisTransition();
-                }
-                if (transitionType == TransitionType.FadeInOut){
-                    drawFadeInOutTransition();
-                }
-                if (transitionType == TransitionType.SlideInOut){
-                    drawSlideInOutTransition();
-                }
-                if (transitionType == TransitionType.Shutters){
-                    drawShutterTransition();
-                }
 
-            }
         }
 
         // PAUSE & DIALOGUE STATES
@@ -464,6 +438,22 @@ public class UI {
             drawPlayerPotion();
             drawPlayerEquipment();
             drawLuminosity();
+        }
+
+        if (transitionOn) {
+            if (transitionType == TransitionType.Iris){
+                drawIrisTransition();
+            }
+            if (transitionType == TransitionType.FadeInOut){
+                drawFadeInOutTransition();
+            }
+            if (transitionType == TransitionType.SlideInOut){
+                drawSlideInOutTransition();
+            }
+            if (transitionType == TransitionType.Shutters){
+                drawShutterTransition();
+            }
+
         }
     }
 
@@ -889,6 +879,122 @@ public class UI {
         }
     }
 
+    public void drawControleScreen(){
+        RadialGradientPaint vignette = new RadialGradientPaint(
+                new Point(gp.screenWidth / 2, gp.screenHeight / 2),
+                2 * gp.screenWidth,
+                new float[]{0.0f, 1.0f},
+                new Color[]{new Color(0, 0, 0, 240), new Color(0, 0, 0, 100)});
+        g2.setPaint(vignette);
+        g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+
+        g2.setColor(Color.white);
+        drawSubWindow(0, 0, gp.screenWidth, gp.screenHeight, optionWindow);
+        g2.setFont(lilliput_40);
+        int x = getXforCenteredText("Control");
+        int y = (3 * gp.tileSize) / 2;
+        g2.drawString("Control", x, y);
+
+        // Safety check: verify that the JSON file is loaded
+        if (controleRootNode == null || !controleRootNode.has("controls")) {
+            g2.setFont(lilliput_20);
+            g2.setColor(Color.RED);
+            String error = "Error: controls file not loaded";
+            g2.drawString(error, getXforCenteredText(error), gp.screenHeight / 2);
+            return;
+        }
+
+        JsonNode controlsArray = controleRootNode.get("controls");
+
+        // Safety check: verify that categories exist
+        if (controlsArray.size() == 0) {
+            g2.setFont(lilliput_20);
+            g2.setColor(Color.RED);
+            String error = "No controls defined";
+            g2.drawString(error, getXforCenteredText(error), gp.screenHeight / 2);
+            return;
+        }
+
+        // Clamp commandNumberControle within the valid range
+        if (commandNumberControle < 0) commandNumberControle = 0;
+        if (commandNumberControle >= totalCategories) commandNumberControle = totalCategories - 1;
+
+        // Retrieve the current category
+        JsonNode currentCategory = controlsArray.get(commandNumberControle);
+        String categoryName = currentCategory.get("category").asText();
+        JsonNode actions = currentCategory.get("actions");
+
+        // --- Display the category name ---
+        g2.setFont(trunic);
+        g2.setFont(g2.getFont().deriveFont(Font.BOLD, gp.tileSize / 2f));
+        g2.setColor(myOrange);
+        int categoryX = getXforCenteredText(categoryName);
+        int categoryY = y + 2*gp.tileSize;
+        g2.drawString(categoryName, categoryX, categoryY);
+
+        // --- Display actions (label + key) ---
+        g2.setFont(lilliput_20);
+        FontMetrics metrics = g2.getFontMetrics();
+
+        int startY = categoryY + gp.tileSize;
+        int lineHeight = (int) (gp.tileSize * 0.6f);
+        int keyColumnX = gp.screenWidth / 2 + 3*gp.tileSize;  // Key column on the right
+
+        for (int i = 0; i < actions.size(); i++) {
+            JsonNode action = actions.get(i);
+            String label = action.get("label").asText();
+            String key = action.get("key").asText();
+
+            int lineY = startY + (i * lineHeight);
+
+            // Label (aligned to the left of the center)
+            g2.setColor(Color.WHITE);
+            int labelX = gp.screenWidth / 2 - gp.tileSize * 6;
+            g2.drawString(label, labelX, lineY);
+
+            // Key (aligned to the right of the center, with orange background)
+            g2.setColor(myOrange);
+            int keyWidth = metrics.stringWidth(key) + gp.tileSize / 4;
+            int keyHeight = (int) (gp.tileSize * 0.5f);
+            int keyX = keyColumnX;
+            int keyY = lineY - (int) (gp.tileSize * 0.4f);
+
+            // Orange rounded rectangle background
+            g2.fillRoundRect(keyX, keyY, keyWidth, keyHeight, 5, 5);
+
+            // Key text in white
+            g2.setColor(Color.WHITE);
+            int textX = keyX + gp.tileSize / 8;
+            int textY = lineY;
+            g2.drawString(key, textX, textY);
+        }
+
+        // --- Navigation indicators (up/down arrows) ---
+        g2.setFont(lilliput_15);
+        metrics = g2.getFontMetrics();
+        g2.setColor(Color.LIGHT_GRAY);
+        int navY = gp.screenHeight - 3*gp.tileSize/2;
+
+        // Left arrow if not the first category
+        if (commandNumberControle > 0) {
+            String leftArrow = "<- " + controlsArray.get(commandNumberControle - 1).get("category").asText();
+            g2.drawString(leftArrow, (3*gp.tileSize)/2, navY);
+        }
+
+        // Right arrow if not the last category
+        if (commandNumberControle < totalCategories - 1) {
+            String rightArrow = controlsArray.get(commandNumberControle + 1).get("category").asText() + " ->";
+            int rightX = gp.screenWidth - (3*gp.tileSize)/2 - metrics.stringWidth(rightArrow);
+            g2.drawString(rightArrow, rightX, navY);
+        }
+
+        // "ESC to return" instruction
+        g2.setColor(Color.GRAY);
+        String escText = "ESC to return";
+        int escX = getXforCenteredText(escText);
+        int escY = gp.screenHeight - gp.tileSize;
+        g2.drawString(escText, escX, escY);
+    }
     /**
      * Menu allowing the player to select which save file to load.
      */
@@ -1312,13 +1418,17 @@ public class UI {
 
     /**
      * Draws the slide in and out transition effect heavily used for scene/map changes.
-     * Uses extremely thick borders rendering inward and outward to ensure the screen is fully masked.
+     * Draws a black rectangle and changing its width
      */
     public void drawSlideInOutTransition(){
         g2.setColor(Color.BLACK);
         g2.fillRect(0,0,(int)(transitionSize),gp.screenHeight);
     }
 
+    /**
+     * Draws the Shutter transition effect  used for scene/map changes.
+     * Draws two rectangles and changing their widths and positions
+     */
     public void drawShutterTransition(){
         g2.setColor(Color.BLACK);
         g2.fillRect(0,0,(int)(transitionSize),gp.screenHeight);
@@ -1331,7 +1441,7 @@ public class UI {
      * Initiates the screen Iris Transition animation.
      * @param action The chunk of code (Runnable block) to execute once the screen is fully dark.
      */
-    public void startTransition(TransitionType type ,Runnable action) {
+    public void startTransition(TransitionType type ,int transitionSpeed,Runnable action) {
         maxTransitionSize = switch (type){
             case TransitionType.Iris -> 2*gp.screenWidth;
             case TransitionType.FadeInOut -> 255;
@@ -1339,6 +1449,7 @@ public class UI {
             case  TransitionType.Shutters ->gp.screenWidth/2f;
         };
         transitionType = type;
+        this.transitionSpeed =  transitionSpeed;
         onTransitionComplete = action;
         transitionOn = true;
         transitionState = 1; // Begins closing sequence

@@ -1,0 +1,38 @@
+{
+  "controls": [
+    {
+      "category": "Movement",
+      "actions": [
+        {"label": "Move Up", "key": "Z"},
+        {"label": "Move Down", "key": "S"},
+        {"label": "Move Left", "key": "Q"},
+        {"label": "Move Right", "key": "D"}
+      ]
+    },
+    {
+      "category": "Combat",
+      "actions": [
+        {"label": "Use Item 1", "key": "J"},
+        {"label": "Use Item 2", "key": "K"},
+        {"label": "Use Item 3", "key": "L"},
+        {"label": "Dodge Roll", "key": "Space"},
+        {"label": "Parry/Block", "key": "N"}
+      ]
+    },
+    {
+      "category": "Items and Interaction",
+      "actions": [
+        {"label": "Use Health Potion", "key": "U"},
+        {"label": "Interact/Pick Up", "key": "F"},
+        {"label": "Open Inventory", "key": "Tab"}
+      ]
+    },
+    {
+      "category": "System",
+      "actions": [
+        {"label": "Pause Menu", "key": "Esc"},
+        {"label": "Toggle Debug", "key": "P"}
+      ]
+    }
+  ]
+}

@@ -50,18 +50,24 @@ public class KeyHandler implements KeyListener {
                 if (gp.ui.commandNumber == 0) {
                     gp.playSoundEffect(23);
                     gp.previousState = gp.gameState;
-                    gp.gameState = gp.newGameSlotState;
+                    gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
+                    gp.gameState = gp.newGameSlotState;});
 
                 }
                 if (gp.ui.commandNumber == 1) {
                     gp.playSoundEffect(49);
                     gp.previousState = gp.gameState;
-                    gp.gameState = gp.loadSaveState;
+                    gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
+                        gp.gameState = gp.loadSaveState;
+                    });
+
                 }
                 if (gp.ui.commandNumber == 2) {
                     gp.playSoundEffect(23);
                     gp.previousState = gp.gameState;
-                    gp.gameState = gp.optionState;
+                    gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
+                        gp.gameState = gp.optionState;
+                    });
                 }
             }
             if (code == KeyEvent.VK_ESCAPE) {
@@ -92,8 +98,9 @@ public class KeyHandler implements KeyListener {
 
                 if (gp.ui.commandNumberNewSlot == 3) {
                     gp.playSoundEffect(24);
+                    gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
                     gp.gameState = gp.titleState;
-                    gp.ui.commandNumberNewSlot = 0;
+                    gp.ui.commandNumberNewSlot = 0;});
                     return;
                 }
 
@@ -113,8 +120,9 @@ public class KeyHandler implements KeyListener {
 
             if (code == KeyEvent.VK_ESCAPE) {
                 gp.playSoundEffect(24);
+                gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
                 gp.gameState = gp.titleState;
-                gp.ui.commandNumberNewSlot = 0;
+                gp.ui.commandNumberNewSlot = 0;});
             }
         }
         else if(gp.gameState == gp.optionState ) {
@@ -122,26 +130,28 @@ public class KeyHandler implements KeyListener {
                 if (gp.previousState == gp.titleState) {
                     gp.playSoundEffect(24);
                     gp.previousState = gp.gameState;
-                    gp.gameState = gp.titleState;
+                    gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
+                    gp.gameState = gp.titleState;});
 
                 }else if (gp.previousState == gp.pauseState) {
                     gp.playSoundEffect(25);
                     gp.previousState = gp.gameState;
-                    gp.gameState = gp.pauseState;
+                    gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
+                    gp.gameState = gp.pauseState;});
                 }
             }
 
             if (code == KeyEvent.VK_UP || code == KeyEvent.VK_Z) {
                 gp.playSoundEffect(5);
                 if (gp.ui.commandNumberOption == 0) {
-                    gp.ui.commandNumberOption = 2;
+                    gp.ui.commandNumberOption = 3;
                 } else {
                     gp.ui.commandNumberOption--;
                 }
             }
             if (code == KeyEvent.VK_DOWN || code == KeyEvent.VK_S) {
                 gp.playSoundEffect(5);
-                if (gp.ui.commandNumberOption == 2) {
+                if (gp.ui.commandNumberOption == 3) {
                     gp.ui.commandNumberOption = 0;
                 } else {
                     gp.ui.commandNumberOption++;
@@ -151,34 +161,69 @@ public class KeyHandler implements KeyListener {
 
                 if (gp.ui.commandNumberOption == 0) {
                     gp.playSoundEffect(25);
-                    gp.gameState = gp.audioSettingstate;
+                    gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
+                    gp.gameState = gp.audioSettingstate;});
 
                 }
                 if (gp.ui.commandNumberOption == 1) {
                     gp.playSoundEffect(25);
-                    gp.gameState = gp.graphicsSettingstate;
+                    gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
+                    gp.gameState = gp.graphicsSettingstate;});
 
                 }
                 if (gp.ui.commandNumberOption == 2) {
+                    gp.playSoundEffect(25);
+                    gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
+                    gp.gameState = gp.controlSettingState;});
+                }
+                if (gp.ui.commandNumberOption == 3) {
                     if (gp.previousState == gp.titleState){
                         gp.playSoundEffect(24);
                         gp.previousState = gp.gameState;
-                        gp.gameState = gp.titleState;
+                        gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
+                        gp.gameState = gp.titleState;});
 
                     }else if (gp.previousState ==gp.pauseState){
                         gp.playSoundEffect(25);
                         gp.previousState = gp.gameState;
-                        gp.gameState = gp.pauseState;
+                        gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
+                        gp.gameState = gp.pauseState;});
                     }
 
 
                 }
             }
         }
+        else if(gp.gameState == gp.controlSettingState ) {
+            if(code == KeyEvent.VK_ESCAPE){
+                gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
+                gp.gameState = gp.optionState;});
+            }
+            // Navigation gauche/droite entre catégories
+            if (code == KeyEvent.VK_LEFT || code == KeyEvent.VK_Q) {
+                gp.playSoundEffect(5);
+                if (gp.ui.commandNumberControle == 0) {
+                    gp.ui.commandNumberControle = gp.ui.totalCategories - 1;
+                } else {
+                    gp.ui.commandNumberControle--;
+                }
+            }
+
+            if (code == KeyEvent.VK_RIGHT || code == KeyEvent.VK_D) {
+                gp.playSoundEffect(5);
+                if (gp.ui.commandNumberControle >= gp.ui.totalCategories - 1) {
+                    gp.ui.commandNumberControle = 0;
+                } else {
+                    gp.ui.commandNumberControle++;
+                }
+            }
+        }
         else if (gp.gameState == gp.loadSaveState ) {
             if(code == KeyEvent.VK_ESCAPE){
-                gp.gameState = gp.titleState;
                 gp.previousState = gp.loadSaveState;
+                gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
+                gp.gameState = gp.titleState;});
+
             }
 
             if (code == KeyEvent.VK_UP || code == KeyEvent.VK_Z) {
@@ -206,7 +251,8 @@ public class KeyHandler implements KeyListener {
 
 
                 if (gp.ui.loadCommand.get(gp.ui.commandNumberLoad).equals("Cancel")){
-                    gp.gameState = gp.titleState;
+                    gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
+                    gp.gameState = gp.titleState;});
                     gp.previousState = gp.loadSaveState;
                     gp.playSoundEffect(24);
 
@@ -266,7 +312,8 @@ public class KeyHandler implements KeyListener {
         else if(gp.gameState == gp.audioSettingstate) {
             if(code == KeyEvent.VK_ESCAPE){
                 gp.playSoundEffect(25);
-                gp.gameState = gp.optionState;
+                gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
+                gp.gameState = gp.optionState;});
             }
 
             if (code == KeyEvent.VK_UP || code == KeyEvent.VK_Z) {
@@ -321,7 +368,8 @@ public class KeyHandler implements KeyListener {
 
                 if (gp.ui.commandNumberAudio == 2) {
                     gp.playSoundEffect(25);
-                    gp.gameState = gp.optionState;
+                    gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
+                    gp.gameState = gp.optionState;});
                 }
             }
 
@@ -329,7 +377,8 @@ public class KeyHandler implements KeyListener {
         else if(gp.gameState == gp.graphicsSettingstate) {
             if(code == KeyEvent.VK_ESCAPE){
                 gp.playSoundEffect(25);
-                gp.gameState = gp.optionState;
+                gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
+                gp.gameState = gp.optionState;});
             }
 
             if (code == KeyEvent.VK_UP || code == KeyEvent.VK_Z) {
@@ -394,9 +443,9 @@ public class KeyHandler implements KeyListener {
                 }
                 if (gp.ui.commandNumberGraphic == 2) {
                     gp.playSoundEffect(25);
-                    gp.gameState = gp.optionState;
                     gp.updateSetting();
-
+                    gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
+                    gp.gameState = gp.optionState;});
 
 
 
@@ -504,8 +553,9 @@ public class KeyHandler implements KeyListener {
                     gp.stopMusic();
                     gp.playSoundEffect(1);
                     gp.music.setVolume(gp.music.currentVolume);
+                    gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
                     gp.previousState = gp.gameState;
-                    gp.gameState = gp.titleState;
+                    gp.gameState = gp.titleState;});
                     gp.playMusic(18);
                     gp.saveGame();
                 }

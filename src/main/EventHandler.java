@@ -24,7 +24,7 @@ public class EventHandler {
             //Access to the forest
             if (hit(95,14,"right")){
                 if (!gp.ui.transitionOn){
-                    gp.ui.startTransition(UI.TransitionType.FadeInOut,()->{
+                    gp.ui.startTransition(UI.TransitionType.FadeInOut,60,()->{
                         gp.setMap(1);
                         gp.player.worldX = gp.tileM.currentMap.playerCol * gp.tileSize;
                         gp.player.worldY = gp.tileM.currentMap.playerRow * gp.tileSize;
