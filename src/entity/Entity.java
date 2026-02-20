@@ -174,7 +174,7 @@ public class Entity {
                     }
                     break;
                 case "down":
-                    if (forwardTile.y * gp.tileSize - offset >= worldY + offset) {
+                    if (forwardTile.y * gp.tileSize >= (worldY+solidArea.y+solidArea.height) + offset) {
                         worldY += offset;
                     } else if (name != null && name.equals("Rudeling")) {
                         entityStatus = parrying;
@@ -183,7 +183,7 @@ public class Entity {
                     }
                     break;
                 case "left":
-                    if (forwardTile.x * gp.tileSize + offset <= worldX - offset) {
+                    if (forwardTile.x * gp.tileSize <= worldX - offset) {
                         worldX -= offset;
                     } else if (name != null && name.equals("Rudeling")) {
                         entityStatus = parrying;
@@ -192,7 +192,7 @@ public class Entity {
                     }
                     break;
                 case "right":
-                    if (forwardTile.x * gp.tileSize - offset >= worldX + offset) {
+                    if (forwardTile.x * gp.tileSize >= (worldX + solidArea.x + solidArea.width) + offset ) {
                         worldX += offset;
                     } else if (name != null && name.equals("Rudeling")) {
                         entityStatus = parrying;
