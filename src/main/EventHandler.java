@@ -22,13 +22,26 @@ public class EventHandler {
     public void checkEvent(){
         if (gp.currentMapIndex == 0){
             //Access to the forest
-            if (hit(95,14,"right")){
+            if (hit(95,14,"right") ||hit(95,13,"right")|| hit(95,15,"right")){
                 if (!gp.ui.transitionOn){
                     gp.ui.startTransition(UI.TransitionType.FadeInOut,60,()->{
                         gp.setMap(1);
                         gp.player.worldX = gp.tileM.currentMap.playerCol * gp.tileSize;
                         gp.player.worldY = gp.tileM.currentMap.playerRow * gp.tileSize;
-                        gp.player.screenX = (gp.screenWidth / 2) - (gp.tileSize / 2);
+                        gp.player.screenX = 0;
+                        gp.player.screenY = (gp.screenHeight / 2) - (gp.tileSize / 2);
+                    });
+                }
+            }
+        }
+        if (gp.currentMapIndex == 1){
+            if (hit(0,15,"left")||hit(0,16,"left")|| hit(0,17,"left")){
+                if (!gp.ui.transitionOn) {
+                    gp.ui.startTransition(UI.TransitionType.FadeInOut, 60, () -> {
+                        gp.setMap(0);
+                        gp.player.worldX = 95 * gp.tileSize;
+                        gp.player.worldY = 14 * gp.tileSize;
+                        gp.player.screenX = gp.screenWidth-gp.tileSize;
                         gp.player.screenY = (gp.screenHeight / 2) - (gp.tileSize / 2);
                     });
                 }

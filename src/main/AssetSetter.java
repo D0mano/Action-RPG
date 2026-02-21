@@ -136,9 +136,9 @@ public class AssetSetter {
         gp.mapsList.get(0).playerCol = 49;
         gp.mapsList.get(0).playerRow = 66;
 
-//        // Map 1 (Dungeon/Interior 1)
-//        gp.mapsList.get(1).playerCol = 24;
-//        gp.mapsList.get(1).playerRow = 39;
+        // Map 1 (EastForest)
+        gp.mapsList.get(1).playerCol = 0;
+        gp.mapsList.get(1).playerRow = 16;
 //
 //        // Map 2 (Dungeon/Interior 2)
 //        gp.mapsList.get(2).playerCol = 40;

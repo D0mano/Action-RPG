@@ -11,10 +11,6 @@ import javax.swing.JPanel;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.lang.reflect.Array;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class GamePanel extends JPanel implements Runnable {
@@ -114,8 +110,8 @@ public class GamePanel extends JPanel implements Runnable {
         this.setFocusable(true);
         this.setFocusTraversalKeysEnabled(false);
         loadMap(new Map(this,"OverWorld"));
-        loadMap(new Map(this,"world02"));
-        loadMap(new Map(this,"World03"));
+        loadMap(new Map(this,"EastForest"));
+//        loadMap(new Map(this,"World03"));
 
     }
 
@@ -225,8 +221,10 @@ public class GamePanel extends JPanel implements Runnable {
         worldWidth = currentMap.mapWidth;
         worldHeight = currentMap.mapHeight;
         resetMonster();
-        monster = currentMap.monsterList;
-        obj = currentMap.objectsList;
+        monster.clear();
+        monster.addAll(currentMap.monsterList);
+        obj.clear();
+        obj.addAll(currentMap.objectsList);
 
 
     }
@@ -251,9 +249,9 @@ public class GamePanel extends JPanel implements Runnable {
             map.objectsList.clear();
             map.monsterList.clear();
         }
-        setMap(0);
         assetSetter.setObject();
         assetSetter.setMonster();
+        setMap(0);
         mapsList.get(currentMapIndex).setPlayerSpawn();
         player.resetPlayerValues();
         player.resetInventory();

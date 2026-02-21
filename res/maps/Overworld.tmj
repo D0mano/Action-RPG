@@ -99,7 +99,7 @@
          "name":"Obj_layer",
          "objects":[
                 {
-                 "gid":138,
+                 "gid":134,
                  "height":16,
                  "id":15,
                  "name":"sword",
@@ -111,7 +111,7 @@
                  "y":864
                 }, 
                 {
-                 "gid":137,
+                 "gid":133,
                  "height":16,
                  "id":16,
                  "name":"shield",
@@ -123,7 +123,7 @@
                  "y":288
                 }, 
                 {
-                 "gid":131,
+                 "gid":127,
                  "height":16,
                  "id":17,
                  "name":"fire wand",
@@ -135,7 +135,7 @@
                  "y":192
                 }, 
                 {
-                 "gid":133,
+                 "gid":129,
                  "height":16,
                  "id":18,
                  "name":"ice wand",
@@ -147,7 +147,7 @@
                  "y":448
                 }, 
                 {
-                 "gid":132,
+                 "gid":128,
                  "height":16,
                  "id":19,
                  "name":"grappling hook",
@@ -333,15 +333,15 @@
         }, 
         {
          "firstgid":121,
-         "source":"..\/..\/Tiled - files\/Tileset\/Entity.tsx"
-        }, 
-        {
-         "firstgid":125,
          "source":"..\/..\/Tiled - files\/Tileset\/MonsterTileset.tsx"
         }, 
         {
-         "firstgid":129,
+         "firstgid":125,
          "source":"..\/..\/Tiled - files\/Tileset\/ObjectTileset.tsx"
+        }, 
+        {
+         "firstgid":135,
+         "source":"..\/..\/Tiled - files\/Tileset\/TunicTilesetV3.tsx"
         }],
  "tilewidth":16,
  "type":"map",

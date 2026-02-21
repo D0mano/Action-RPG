@@ -114,7 +114,7 @@ public class SaveLoad {
         // RESTORE TIME SPEND
         gp.timeSpend = ds.timeSpend;
 
-        // RESTORE GROUND OBJECTS
+        // RESTORE GROUND OBJECTS AND RESPAWN MONSTER 
         for (int i = 0; i < gp.mapsList.size(); i++) {
             Map map = gp.mapsList.get(i);
             map.objectsList.clear(); // Clear memory reference
@@ -123,6 +123,7 @@ public class SaveLoad {
                 map.objectsList.addAll(loadedObjects); // Append elements properly
             }
         }
+        gp.assetSetter.setMonster();
 
         // RESTORE MAP AND POSITION
         gp.setMap(ds.currentMapIndex);
@@ -156,7 +157,7 @@ public class SaveLoad {
         for (Map map : gp.mapsList) {
             map.monsterList.clear();
         }
-        gp.assetSetter.setMonster();
+
     }
 
     /**
