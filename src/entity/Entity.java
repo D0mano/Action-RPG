@@ -507,6 +507,8 @@ public class Entity {
             health = 0;
             dying = true;
         }
+        if (this == gp.player) {
+        }
     }
 
     /**

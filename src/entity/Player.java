@@ -1,9 +1,6 @@
 package entity;
 
-import main.Animator;
-import main.GamePanel;
-import main.KeyHandler;
-import main.UtilityTool;
+import main.*;
 import object.*;
 
 import javax.imageio.ImageIO;
@@ -236,7 +233,7 @@ public class Player extends Entity {
 
         // PLAYER STATUS
         maxHealth = 100;
-        health = 100;
+        health = 1;
         maxMana = 100;
         mana = 100;
 
@@ -319,7 +316,7 @@ public class Player extends Entity {
         worldX = gp.tileSize * worldCol;
         worldY = gp.tileSize * worldRow;
         speed = normalSpeed;
-        health = maxHealth;
+        health = 1;
         mana = maxMana;
         maxPotion = 3;
         potionNotUsed = maxPotion;
@@ -346,6 +343,7 @@ public class Player extends Entity {
      * and specific action logic depending on the current entity status.
      */
     public void update() {
+
         // SMOOTH GAUGE ANIMATION CALCULATIONS
         displayedHealth += (health - displayedHealth) * 0.15f;
         displayedEndurance += (endurance - displayedEndurance) * 0.15f;
@@ -805,6 +803,7 @@ public class Player extends Entity {
                 gp.previousState = gp.gameState;
                 gp.gameState = gp.dialogueState;
                 gp.obj.remove(index);
+                gp.mapsList.get(gp.currentMapIndex).objectsList.remove(index);
                 if (objName.equals("key")) {
                     hasKey++;
                 }
@@ -819,6 +818,9 @@ public class Player extends Entity {
      */
     public void draw(Graphics2D g2d) {
 
+//        if (dying){
+//            dyingAnimation(g2d);
+//        }
         // Blink effect when taking damage
         if (damageTaken) {
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
@@ -1148,5 +1150,11 @@ public class Player extends Entity {
         if (lEquip != null && !hasObj(lEquip.name)) {
             lEquip = null;
         }
+    }
+
+    public void dyingAnimation(Graphics2D g) {
+        gp.ui.startTransition(UI.TransitionType.Iris,80,()->{
+            System.out.println("Transition mid");
+        });
     }
 }

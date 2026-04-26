@@ -44,282 +44,78 @@ public class CollisionChecker {
         ArrayList<String> collisionSide2;
 
         int tileNum1, tileNum2,tileNum3; // The third tileNum is relevant only for Entity whose width is superior to the tileSize (Rudeling)
+        for (int layer = 0 ;layer < gp.maxWorldLayer ;layer ++) {
+            switch (entity.direction) {
+                case "up":
+                    // Predict the next row the entity will enter
+                    entityTopRow = (entityTopWorldY - entity.speed) / gp.tileSize;
+                    if (entityTopRow < 0) {
+                        entity.collisionOn = true;
+                        break;
+                    }
 
-        switch (entity.direction) {
-            case "up":
-                // Predict the next row the entity will enter
-                entityTopRow = (entityTopWorldY - entity.speed) / gp.tileSize;
-                if (entityTopRow < 0) {
-                    entity.collisionOn = true;
+                    // Check the top-left and top-right corners of the hitbox against the tile map
+                    tileNum1 = gp.tileM.currentMap.tileMap[entityTopRow][entityLeftCol][layer];
+                    tileNum2 = gp.tileM.currentMap.tileMap[entityTopRow][entityRightCol][layer];
+
+                    // For bigger Entity we also check the middle
+                    tileNum3 = gp.tileM.currentMap.tileMap[entityTopRow][(entityLeftCol+entityRightCol)/2][layer];
+
+                    if ((tileNum1 != -1 && gp.tileM.tile[tileNum1].collision ) || (tileNum2 != -1 && gp.tileM.tile[tileNum2].collision) || (tileNum3 != -1 && gp.tileM.tile[tileNum3].collision)) {
+                        entity.collisionOn = true;
+                    }
                     break;
-                }
 
-                // Check the top-left and top-right corners of the hitbox against the tile map
-                tileNum1 = gp.tileM.currentMap.tileMap[entityTopRow][entityLeftCol][0];
-                tileNum2 = gp.tileM.currentMap.tileMap[entityTopRow][entityRightCol][0];
+                case "down":
 
-                // For bigger Entity we also check the middle
-                tileNum3 = gp.tileM.currentMap.tileMap[entityTopRow][(entityLeftCol+entityRightCol)/2][0];
+                    entityBottomRow = (entityBottomWorldY + entity.speed) / gp.tileSize;
+                    if (entityBottomRow >= gp.maxWorldRow) {
+                        entity.collisionOn = true;
+                        break;
+                    }
+                    tileNum1 = gp.tileM.currentMap.tileMap[entityBottomRow][entityLeftCol][layer];
+                    tileNum2 = gp.tileM.currentMap.tileMap[entityBottomRow][entityRightCol][layer];
+                    tileNum3 = gp.tileM.currentMap.tileMap[entityBottomRow][(entityLeftCol+entityRightCol)/2][layer];
 
-                if (gp.tileM.tile[tileNum1].collision || gp.tileM.tile[tileNum2].collision || gp.tileM.tile[tileNum3].collision) {
-                    entity.collisionOn = true;
-//                    collisionSide1 = gp.tileM.tile[tileNum1].collisionSide;
-//                    collisionSide2 = gp.tileM.tile[tileNum2].collisionSide;
-//
-//                    // Evaluate specific collision faces (e.g., one-way walls or sloped edges)
-//                    if (collisionSide1.contains("up")) {
-//                        int topY = entityTopRow * gp.tileSize;
-//                        if (entityTopWorldY - entity.speed * 3 <= topY) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide1.contains("down")) {
-//                        int topY = entityTopRow * gp.tileSize + gp.tileSize;
-//                        if (entityTopWorldY - entity.speed <= topY && entityBottomWorldY - entity.speed >= topY) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide1.contains("left")) {
-//                        int leftX = entityLeftCol * gp.tileSize;
-//                        if (entityLeftWorldX <= leftX) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide1.contains("right")) {
-//                        int rightX = entityLeftCol * gp.tileSize + gp.tileSize;
-//                        if (entityLeftWorldX <= rightX && entityRightWorldX >= rightX) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    // Same evaluation for the right-side corner
-//                    if (collisionSide2.contains("up")) {
-//                        int topY = entityTopRow * gp.tileSize;
-//                        if (entityTopWorldY - entity.speed * 3 <= topY) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide2.contains("down")) {
-//                        int topY = entityTopRow * gp.tileSize + gp.tileSize;
-//                        if (entityTopWorldY - entity.speed <= topY && entityBottomWorldY - entity.speed >= topY) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide2.contains("left")) {
-//                        int leftX = entityRightCol * gp.tileSize;
-//                        if (entityRightWorldX >= leftX && entityLeftWorldX <= leftX) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide2.contains("right")) {
-//                        int rightX = entityRightCol * gp.tileSize + gp.tileSize;
-//                        if (entityRightWorldX >= rightX) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-                }
-                break;
 
-            case "down":
-
-                entityBottomRow = (entityBottomWorldY + entity.speed) / gp.tileSize;
-                if (entityBottomRow >= gp.maxWorldRow) {
-                    entity.collisionOn = true;
+                    if ((tileNum1 != -1 && gp.tileM.tile[tileNum1].collision ) || (tileNum2 != -1 && gp.tileM.tile[tileNum2].collision) || (tileNum3 != -1 && gp.tileM.tile[tileNum3].collision)) {
+                        entity.collisionOn = true;
+                    }
                     break;
-                }
-                tileNum1 = gp.tileM.currentMap.tileMap[entityBottomRow][entityLeftCol][0];
-                tileNum2 = gp.tileM.currentMap.tileMap[entityBottomRow][entityRightCol][0];
-                tileNum3 = gp.tileM.currentMap.tileMap[entityBottomRow][(entityLeftCol+entityRightCol)/2][0];
 
+                case "left":
+                    entityLeftCol = (entityLeftWorldX - entity.speed) / gp.tileSize;
+                    if (entityLeftCol < 0) {
+                        entity.collisionOn = true;
+                        break;
+                    }
+                    tileNum1 = gp.tileM.currentMap.tileMap[entityTopRow][entityLeftCol][layer];
+                    tileNum2 = gp.tileM.currentMap.tileMap[entityBottomRow][entityLeftCol][layer];
+                    tileNum3 =gp.tileM.currentMap.tileMap[(entityTopRow+entityBottomRow)/2][entityLeftCol][layer];
 
-                if (gp.tileM.tile[tileNum1].collision || gp.tileM.tile[tileNum2].collision || gp.tileM.tile[tileNum3].collision) {
-                    entity.collisionOn = true;
-//                    collisionSide1 = gp.tileM.tile[tileNum1].collisionSide;
-//                    collisionSide2 = gp.tileM.tile[tileNum2].collisionSide;
-//
-//                    if (collisionSide1.contains("up")) {
-//                        int topY = entityBottomRow * gp.tileSize;
-//                        if (entityBottomWorldY + entity.speed >= topY && entityTopWorldY + entity.speed <= topY) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide1.contains("down")) {
-//                        int topY = entityBottomRow * gp.tileSize + gp.tileSize;
-//                        if (entityBottomWorldY + entity.speed * 3 >= topY) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide1.contains("left")) {
-//                        int leftX = entityLeftCol * gp.tileSize;
-//                        if (entityLeftWorldX <= leftX) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide1.contains("right")) {
-//                        int rightX = entityLeftCol * gp.tileSize + gp.tileSize;
-//                        if (entityLeftWorldX <= rightX && entityRightWorldX >= rightX) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide2.contains("up")) {
-//                        int topY = entityBottomRow * gp.tileSize;
-//                        if (entityBottomWorldY + entity.speed >= topY && entityTopWorldY + entity.speed <= topY) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide2.contains("down")) {
-//                        int topY = entityBottomRow * gp.tileSize + gp.tileSize;
-//                        if (entityBottomWorldY + entity.speed * 3 >= topY) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide2.contains("left")) {
-//                        int leftX = entityRightCol * gp.tileSize;
-//                        if (entityRightWorldX >= leftX && entityLeftWorldX <= leftX) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide2.contains("right")) {
-//                        int rightX = entityRightCol * gp.tileSize + gp.tileSize;
-//                        if (entityRightWorldX >= rightX) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-                }
-                break;
-
-            case "left":
-                entityLeftCol = (entityLeftWorldX - entity.speed) / gp.tileSize;
-                if (entityLeftCol < 0) {
-                    entity.collisionOn = true;
+                    if ((tileNum1 != -1 && gp.tileM.tile[tileNum1].collision ) || (tileNum2 != -1 && gp.tileM.tile[tileNum2].collision) || (tileNum3 != -1 && gp.tileM.tile[tileNum3].collision)) {
+                        entity.collisionOn = true;
+                    }
                     break;
-                }
-                tileNum1 = gp.tileM.currentMap.tileMap[entityTopRow][entityLeftCol][0];
-                tileNum2 = gp.tileM.currentMap.tileMap[entityBottomRow][entityLeftCol][0];
-                tileNum3 =gp.tileM.currentMap.tileMap[(entityTopRow+entityBottomRow)/2][entityLeftCol][0];
 
-                if (gp.tileM.tile[tileNum1].collision || gp.tileM.tile[tileNum2].collision || gp.tileM.tile[tileNum3].collision) {
-                    entity.collisionOn = true;
-//                    collisionSide1 = gp.tileM.tile[tileNum1].collisionSide;
-//                    collisionSide2 = gp.tileM.tile[tileNum2].collisionSide;
-//
-//                    if (collisionSide1.contains("up")) {
-//                        int topY = entityTopRow * gp.tileSize + 3;
-//                        if (entityTopWorldY <= topY) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide1.contains("down")) {
-//                        int topY = entityTopRow * gp.tileSize + gp.tileSize - 3;
-//                        if (entityTopWorldY <= topY && entityBottomWorldY >= topY) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide1.contains("left")) {
-//                        int leftX = entityLeftCol * gp.tileSize;
-//                        if (entityLeftWorldX - entity.speed * 3 <= leftX) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide1.contains("right")) {
-//                        int rightX = entityLeftCol * gp.tileSize + gp.tileSize;
-//                        if (entityLeftWorldX - entity.speed <= rightX && entityRightWorldX >= rightX) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide2.contains("up")) {
-//                        int topY = entityBottomRow * gp.tileSize + 3;
-//                        if (entityBottomWorldY >= topY && entityTopWorldY <= topY) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide2.contains("down")) {
-//                        int topY = entityBottomRow * gp.tileSize + gp.tileSize - 3;
-//                        if (entityBottomWorldY >= topY) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide2.contains("left")) {
-//                        int leftX = entityLeftCol * gp.tileSize;
-//                        if (entityLeftWorldX - entity.speed * 3 <= leftX) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide2.contains("right")) {
-//                        int rightX = entityLeftCol * gp.tileSize + gp.tileSize;
-//                        if (entityLeftWorldX - entity.speed <= rightX && entityRightWorldX >= rightX) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-                }
-                break;
+                case "right":
 
-            case "right":
+                    entityRightCol = (entityRightWorldX + entity.speed) / gp.tileSize;
+                    if (entityRightCol >= gp.maxWorldCol) {
+                        entity.collisionOn = true;
+                        break;
+                    }
+                    tileNum1 = gp.tileM.currentMap.tileMap[entityTopRow][entityRightCol][layer];
+                    tileNum2 = gp.tileM.currentMap.tileMap[entityBottomRow][entityRightCol][layer];
+                    tileNum3 =gp.tileM.currentMap.tileMap[(entityTopRow+entityBottomRow)/2][entityRightCol][layer];
 
-                entityRightCol = (entityRightWorldX + entity.speed) / gp.tileSize;
-                if (entityRightCol >= gp.maxWorldCol) {
-                    entity.collisionOn = true;
+                    if ((tileNum1 != -1 && gp.tileM.tile[tileNum1].collision ) || (tileNum2 != -1 && gp.tileM.tile[tileNum2].collision) || (tileNum3 != -1 && gp.tileM.tile[tileNum3].collision)) {
+                        entity.collisionOn = true;
+                    }
                     break;
-                }
-                tileNum1 = gp.tileM.currentMap.tileMap[entityTopRow][entityRightCol][0];
-                tileNum2 = gp.tileM.currentMap.tileMap[entityBottomRow][entityRightCol][0];
-                tileNum3 =gp.tileM.currentMap.tileMap[(entityTopRow+entityBottomRow)/2][entityRightCol][0];
-
-                if (gp.tileM.tile[tileNum1].collision || gp.tileM.tile[tileNum2].collision || gp.tileM.tile[tileNum3].collision) {
-                    entity.collisionOn = true;
-//                    collisionSide1 = gp.tileM.tile[tileNum1].collisionSide;
-//                    collisionSide2 = gp.tileM.tile[tileNum2].collisionSide;
-//
-//                    if (collisionSide1.contains("up")) {
-//                        int topY = entityTopRow * gp.tileSize;
-//                        if (entityTopWorldY <= topY) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide1.contains("down")) {
-//                        int topY = entityTopRow * gp.tileSize + gp.tileSize;
-//                        if (entityTopWorldY <= topY && entityBottomWorldY >= topY) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide1.contains("left")) {
-//                        int leftX = entityRightCol * gp.tileSize;
-//                        if (entityRightWorldX + entity.speed >= leftX && entityLeftWorldX + entity.speed <= leftX) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide1.contains("right")) {
-//                        int rightX = entityRightCol * gp.tileSize + gp.tileSize;
-//                        if (entityRightWorldX + entity.speed * 3 >= rightX) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide2.contains("up")) {
-//                        int topY = entityBottomRow * gp.tileSize;
-//                        if (entityBottomRow >= topY && entityTopRow <= topY) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide2.contains("down")) {
-//                        int topY = entityBottomRow * gp.tileSize + gp.tileSize;
-//                        if (entityBottomRow >= topY) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide2.contains("left")) {
-//                        int leftX = entityRightCol * gp.tileSize;
-//                        if (entityRightWorldX + entity.speed >= leftX && entityLeftWorldX + entity.speed <= leftX) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-//                    if (collisionSide2.contains("right")) {
-//                        int rightX = entityRightCol * gp.tileSize + gp.tileSize;
-//                        if (entityRightWorldX + entity.speed * 3 >= rightX) {
-//                            entity.collisionOn = true;
-//                        }
-//                    }
-                }
-                break;
+            }
         }
+
     }
 
     /**

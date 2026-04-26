@@ -57,7 +57,7 @@ public class MON_Rudeling extends Entity {
         leftAnimator = new Animator(left,(3*gp.tileSize)/2,(3*gp.tileSize)/2,12,true);
         rightAnimator = new Animator(right,(3*gp.tileSize)/2,(3*gp.tileSize)/2,12,true);
 
-        downAttackingAnimator = new Animator(downAttacking,gp.tileSize*2,gp.tileSize*2,10,false);
+        downAttackingAnimator = new Animator(downAttacking,gp.tileSize*3,gp.tileSize*3,10,false);
         upAttackingAnimator = new Animator(upAttacking,gp.tileSize*2,gp.tileSize*2,10,false);
         leftAttackingAnimator = new Animator(leftAttacking,gp.tileSize*2,gp.tileSize*2,10,false);
         rightAttackingAnimator = new Animator(rightAttacking,gp.tileSize*2,gp.tileSize*2,10,false);
@@ -98,7 +98,7 @@ public class MON_Rudeling extends Entity {
         leftAnimator.reload(left,(3*gp.tileSize)/2,(3*gp.tileSize)/2);
         rightAnimator.reload(right,(3*gp.tileSize)/2,(3*gp.tileSize)/2);
 
-        downAttackingAnimator.reload(downAttacking,gp.tileSize*2,gp.tileSize*2);
+        downAttackingAnimator.reload(downAttacking,gp.tileSize*3,gp.tileSize*3);
         upAttackingAnimator.reload(upAttacking,gp.tileSize*2,gp.tileSize*2);
         leftAttackingAnimator.reload(leftAttacking,gp.tileSize*2,gp.tileSize*2);
         rightAttackingAnimator.reload(rightAttacking,gp.tileSize*2,gp.tileSize*2);
@@ -126,7 +126,7 @@ public class MON_Rudeling extends Entity {
         left = setup("walking/rudeling_left-Sheet",gp.scale);
         right = setup("walking/rudeling_right-Sheet",gp.scale);
 
-        downAttacking = setup("attacking/player_down-slash-Sheet",gp.scale);
+        downAttacking = setup("attacking/rudeling_down-slash-Sheet",gp.scale);
         upAttacking = setup("attacking/player_up-slash-Sheet",gp.scale);
         leftAttacking = setup("attacking/player_left-slash-Sheet",gp.scale);
         rightAttacking = setup("attacking/player_right-slash-Sheet",gp.scale);
@@ -246,7 +246,7 @@ public class MON_Rudeling extends Entity {
                     if (entityStatus == parrying|| entityStatus == knockBacking) {
                         downAnimator.draw(g, screenX, screenY, (3*gp.tileSize)/2, (3*gp.tileSize)/2);
                     }else if (entityStatus == attacking) {
-                        downAttackingAnimator.draw(g,screenX,screenY,gp.tileSize*2,gp.tileSize*2);
+                        downAttackingAnimator.draw(g,screenX,screenY,gp.tileSize*3,gp.tileSize*3);
                     }else if (entityStatus == freezing) {
                         drawFreezeOverlay(g,downAnimator.currentsprite,screenX,screenY,(3*gp.tileSize)/2, (3*gp.tileSize)/2);
                     }else if (entityStatus == grabbed) {

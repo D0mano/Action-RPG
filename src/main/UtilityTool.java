@@ -149,4 +149,8 @@ public class UtilityTool {
         return String.format("%02d:%02d:%02d", hours, minutes, seconds);
 
     }
+
+    public String getPath(String path){
+        return path.replace("\\","");
+    }
 }

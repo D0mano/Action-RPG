@@ -190,6 +190,11 @@ public class GamePanel extends JPanel implements Runnable {
 
     }
 
+    public void retry(){
+        resetMonsters();
+
+    }
+
     /**
      * Creates an off-screen BufferedImage buffer used for rendering to prevent flickering.
      */
@@ -212,6 +217,11 @@ public class GamePanel extends JPanel implements Runnable {
      * @param mapIndex The index of the map in the mapsList.
      */
     public void setMap(int mapIndex){
+        System.out.println("Before map change: ");
+        for (SuperObject obj : this.obj){
+            System.out.println(obj.name);
+        }
+        System.out.println("End for loop");
         currentMapIndex = mapIndex;
         Map currentMap = mapsList.get(mapIndex);
         tileM.currentMap = currentMap;
@@ -220,12 +230,21 @@ public class GamePanel extends JPanel implements Runnable {
         maxWorldRow = currentMap.maxMapRow;
         worldWidth = currentMap.mapWidth;
         worldHeight = currentMap.mapHeight;
-        resetMonster();
-        monster.clear();
+        clearCurrentMonsterList();
         monster.addAll(currentMap.monsterList);
+        System.out.println("After map change :");
+        for (SuperObject obj : this.obj){
+            System.out.println(obj.name);
+        }
+        System.out.println("End for loop");
+
         obj.clear();
         obj.addAll(currentMap.objectsList);
-
+        System.out.println("After obj.clear: ");
+        for (SuperObject obj : this.obj){
+            System.out.println(obj.name);
+        }
+        System.out.println("End for loop");
 
     }
 
@@ -341,8 +360,22 @@ public class GamePanel extends JPanel implements Runnable {
      * Clears the active monster list from the current map.
      * Useful when resetting a map or transitioning between areas.
      */
-    public void resetMonster() {
+    public void clearCurrentMonsterList() {
         monster.clear();
+    }
+
+    public void resetMonsters(){
+        for (Map map : mapsList) {
+            map.monsterList.clear();
+        }
+        assetSetter.setMonster();
+    }
+
+    public void resetObjects() {
+        for (Map map : mapsList) {
+            map.objectsList.clear();
+        }
+        assetSetter.setObject();
     }
 
     /**
@@ -392,7 +425,7 @@ public class GamePanel extends JPanel implements Runnable {
 
             // Display FPS in console once every second
             if (timer >= 1000000000) {
-                System.out.println("FPS :" + drawCounter);
+//                System.out.println("FPS :" + drawCounter);
                 drawCounter = 0;
                 timer = 0;
             }

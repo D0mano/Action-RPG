@@ -87,43 +87,6 @@ public class Map {
         catch (IOException e){
             e.printStackTrace();
         }
-//        try{
-//            // Count the number of layers by checking existing files
-//            int layer = 0;
-//            while(true){
-//                String path = "/maps/"+mapName+"_layer_"+(layer+1)+".csv";
-//                InputStream is = getClass().getResourceAsStream(path);
-//                if(is == null) break; // Exit loop when no more layers are found
-//                layer++;
-//                is.close();
-//            }
-//            this.maxMapLayer = layer;
-//
-//            // Count rows and columns based on the first layer
-//            InputStream is = getClass().getResourceAsStream("/maps/"+mapName+"_layer_1.csv");
-//            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-//
-//            String line;
-//            int cols = 0;
-//            int rows = 0;
-//            if((line = br.readLine()) != null){
-//                String[] numbers = line.split(",");
-//                cols = numbers.length;
-//                rows++;
-//            }
-//            while(br.readLine() != null){
-//                rows++;
-//            }
-//            br.close();
-//
-//            // Assign dimensions
-//            this.maxMapCol = cols;
-//            this.maxMapRow = rows;
-//            this.mapWidth = gp.tileSize  * this.maxMapCol;
-//            this.mapHeight = gp.tileSize * this.maxMapRow;
-//        }catch(IOException e){
-//            e.printStackTrace();
-//        }
     }
 
     /**
@@ -152,25 +115,6 @@ public class Map {
                 }
             }
         }
-//        try{
-//            for (int layer = 0; layer < maxMapLayer; layer++) {
-//                String layerPath = "/maps/"+mapName+"_layer_"+(layer+1)+".csv";
-//                InputStream is = getClass().getResourceAsStream(layerPath);
-//                BufferedReader br = new BufferedReader(new InputStreamReader(is));
-//
-//                for (int row = 0; row < maxMapRow; row++) {
-//                    String line = br.readLine();
-//                    String[] numbers = line.split(",");
-//                    for (int col = 0; col < maxMapCol; col++) {
-//                        int num = Integer.parseInt(numbers[col]);
-//                        tileMap[row][col][layer] = num;
-//                    }
-//                }
-//                br.close();
-//            }
-//        }catch(Exception e){
-//            e.printStackTrace();
-//        }
     }
 
     /**

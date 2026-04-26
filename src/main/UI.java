@@ -926,7 +926,7 @@ public class UI {
 
         // --- Display the category name ---
         g2.setFont(trunic);
-        g2.setFont(g2.getFont().deriveFont(Font.BOLD, gp.tileSize / 2f));
+        g2.setFont(g2.getFont().deriveFont(Font.BOLD, gp.tileSize /1.5f));
         g2.setColor(myOrange);
         int categoryX = getXforCenteredText(categoryName);
         int categoryY = y + 2*gp.tileSize;
@@ -956,8 +956,8 @@ public class UI {
             g2.setColor(myOrange);
             int keyWidth = metrics.stringWidth(key) + gp.tileSize / 4;
             int keyHeight = (int) (gp.tileSize * 0.5f);
-            int keyX = keyColumnX;
-            int keyY = lineY - (int) (gp.tileSize * 0.4f);
+            int keyX = keyColumnX - gp.tileSize / 8;
+            int keyY = lineY - (int) (gp.tileSize * 0.46f);
 
             // Orange rounded rectangle background
             g2.fillRoundRect(keyX, keyY, keyWidth, keyHeight, 5, 5);
@@ -995,6 +995,7 @@ public class UI {
         int escY = gp.screenHeight - gp.tileSize;
         g2.drawString(escText, escX, escY);
     }
+
     /**
      * Menu allowing the player to select which save file to load.
      */
