@@ -319,7 +319,6 @@ public class UI {
                 }
 
             }
-
         }
     }
 
@@ -409,6 +408,7 @@ public class UI {
             drawPlayerEquipment();
             drawLuminosity();
 
+
         }
 
         // PAUSE & DIALOGUE STATES
@@ -443,6 +443,10 @@ public class UI {
             drawLuminosity();
         }
 
+
+        if (gp.gameState == gp.gameOver){
+            drawGameOverScreen();
+        }
         if (transitionOn) {
             if (transitionType == TransitionType.Iris){
                 drawIrisTransition();
@@ -458,6 +462,8 @@ public class UI {
             }
 
         }
+
+
     }
 
     /**
@@ -1163,6 +1169,45 @@ public class UI {
     }
 
     /**
+     * Renders the Game Over screen.
+     * Black background, "Game Over" title in Trunic font,
+     * options displayed like the title screen menu.
+     */
+    public void drawGameOverScreen() {
+
+        // Only show menu once the Iris is fully closed
+        if (transitionOn && transitionState == 1) return;
+
+        // --- 1. BLACK BACKGROUND ---
+        g2.setColor(Color.BLACK);
+        g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+
+        // --- 2. "GAME OVER" TITLE ---
+        g2.setFont(trunic);
+        g2.setFont(g2.getFont().deriveFont(Font.BOLD, gp.tileSize * 1.5f));
+        String title = "Game Over";
+        int titleX = getXforCenteredText(title);
+        int titleY = gp.screenHeight / 3;
+        g2.setColor(Color.white);
+        g2.drawString(title, titleX, titleY);
+
+        // --- 3. OPTIONS (same style as title screen) ---
+        g2.setFont(lilliput_20);
+        int optionsX = gp.screenWidth / 2;
+        int startY = (int)(gp.screenHeight * 0.65f);
+        int gap = (int)(gp.screenHeight / 5.76f);
+
+        for (int i = 0; i < gameOverCommand.length; i++) {
+            g2.setColor(commandNumberGameOver == i ? myOrange : Color.white);
+            int textX = getXForCenteredTextAroundX(gameOverCommand[i], optionsX);
+            g2.drawString(gameOverCommand[i], textX, startY + (i * gap));
+        }
+        // RESET OPACITY TO NORMAL
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+        gp.ui.player.draw(g2);
+    }
+
+    /**
      * Constructs labels for the 3 save slots indicating if they are free or occupied.
      * @return String array representing the text of the slots.
      */
@@ -1440,9 +1485,8 @@ public class UI {
     }
 
 
-
     /**
-     * Initiates the screen Iris Transition animation.
+     * Initiates the screen Transition animation. Begins with the closing state
      * @param action The chunk of code (Runnable block) to execute once the screen is fully dark.
      */
     public void startTransition(TransitionType type ,int transitionSpeed,Runnable action) {
@@ -1459,6 +1503,23 @@ public class UI {
         transitionState = 1; // Begins closing sequence
         transitionSize = switch (type) {
             case TransitionType.Iris -> maxTransitionSize;
+            case TransitionType.FadeInOut ,TransitionType.SlideInOut  ,TransitionType.Shutters -> 0;
+        };
+    }
+
+    public void startOpeningTransition(TransitionType type ,int transitionSpeed) {
+        transitionSize = switch (type){
+            case TransitionType.Iris -> 0;
+            case TransitionType.FadeInOut -> 255;
+            case TransitionType.SlideInOut -> gp.screenWidth;
+            case  TransitionType.Shutters ->gp.screenWidth/2f;
+        };
+        transitionType = type;
+        this.transitionSpeed =  transitionSpeed;
+        transitionOn = true;
+        transitionState = 2; // Begins opening sequence
+        maxTransitionSize = switch (type) {
+            case TransitionType.Iris -> 2*gp.screenWidth;
             case TransitionType.FadeInOut ,TransitionType.SlideInOut  ,TransitionType.Shutters -> 0;
         };
     }
