@@ -192,6 +192,10 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void retry(){
         resetMonsters();
+        player.retry();
+        gameState = playState;
+        setMap(currentMapIndex);
+
 
     }
 

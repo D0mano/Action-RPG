@@ -44,6 +44,7 @@ public class Animator {
      * @param newSpriteHeight The newly scaled frame height.
      */
     public void reload(BufferedImage newSpriteSheet, int newSpriteWidth, int newSpriteHeight) {
+        index = 0;
         loadSprites(newSpriteSheet, newSpriteWidth, newSpriteHeight);
     }
 

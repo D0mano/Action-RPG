@@ -216,6 +216,11 @@ public class Player extends Entity {
         reloadInventory();
     }
 
+    public void retry(){
+        setDefaultsValues();
+        resetPlayerValues();
+    }
+
     /**
      * Sets the default base stats for a fresh new game session.
      */

@@ -75,6 +75,9 @@ public class UI {
     public String[] loadSelectionCommand = {"Load", "Delete", "Cancel"};
     public int commandNumberLoadSelection = 0;
 
+    public String[] gameOverCommand = {"Restart","Quit"};
+    public int commandNumberGameOver = 0;
+
     public int commandNumberNewSlot = 0;
 
     // INVENTORY CURSOR

@@ -506,9 +506,12 @@ public class Entity {
             gp.playSoundEffect(deathSoundIndex);
             health = 0;
             dying = true;
+            if (this == gp.player) {
+                gp.music.stop();
+            }
+
         }
-        if (this == gp.player) {
-        }
+
     }
 
     /**

@@ -662,6 +662,57 @@ public class KeyHandler implements KeyListener {
                 gp.gameState = gp.playState;
             }
         }
+        else if(gp.gameState == gp.gameOver){
+            if (code == KeyEvent.VK_UP || code == KeyEvent.VK_Z) {
+                gp.playSoundEffect(5);
+                if (gp.ui.commandNumberGameOver == 0) {
+                    gp.ui.commandNumberGameOver = 1;
+                } else {
+                    gp.ui.commandNumberGameOver--;
+                }
+            }
+            if (code == KeyEvent.VK_DOWN || code == KeyEvent.VK_S) {
+                gp.playSoundEffect(5);
+                if (gp.ui.commandNumberGameOver == 1) {
+                    gp.ui.commandNumberGameOver = 0;
+                } else {
+                    gp.ui.commandNumberGameOver++;
+                }
+            }
+            if (code == KeyEvent.VK_ENTER) {
+                if (gp.ui.commandNumberGameOver == 0) {
+                    System.out.println("Restart");
+                    gp.retry();
+                    gp.ui.startOpeningTransition(UI.TransitionType.Iris,80);
+                    gp.playSoundEffect(46);
+                    gp.playMusic(random.nextInt(3)+19);
+                }
+                if (gp.ui.commandNumberGameOver == 1) {
+                    gp.stopMusic();
+                    gp.playSoundEffect(1);
+                    gp.music.setVolume(gp.music.currentVolume);
+                    gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
+                        gp.previousState = gp.gameOver;
+                        gp.gameState = gp.titleState;});
+                    gp.playMusic(18);
+                    gp.saveGame();
+                }
+
+
+            }
+            if (code == KeyEvent.VK_ESCAPE) {
+                gp.stopMusic();
+                gp.playSoundEffect(1);
+                gp.music.setVolume(gp.music.currentVolume);
+                gp.ui.startTransition(UI.TransitionType.FadeInOut,15,()->{
+                    gp.previousState = gp.gameOver;
+                    gp.gameState = gp.titleState;});
+                gp.playMusic(18);
+                gp.saveGame();
+
+            }
+
+        }
 
 
 
