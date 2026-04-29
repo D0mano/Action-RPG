@@ -238,7 +238,7 @@ public class Player extends Entity {
 
         // PLAYER STATUS
         maxHealth = 100;
-        health = 1;
+        health = 100;
         maxMana = 100;
         mana = 100;
 
@@ -321,7 +321,7 @@ public class Player extends Entity {
         worldX = gp.tileSize * worldCol;
         worldY = gp.tileSize * worldRow;
         speed = normalSpeed;
-        health = 1;
+        health = maxHealth;
         mana = maxMana;
         maxPotion = 3;
         potionNotUsed = maxPotion;
@@ -823,11 +823,12 @@ public class Player extends Entity {
      */
     public void draw(Graphics2D g2d) {
 
-//        if (dying){
-//            dyingAnimation(g2d);
-//        }
+        if (dying){
+            dyingAnimation(g2d);
+            gp.gameState = gp.gameOver;
+        }
         // Blink effect when taking damage
-        if (damageTaken) {
+        if (damageTaken && gp.gameState != gp.gameOver) {
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
         }
         switch (direction) {
@@ -1160,6 +1161,10 @@ public class Player extends Entity {
     public void dyingAnimation(Graphics2D g) {
         gp.ui.startTransition(UI.TransitionType.Iris,80,()->{
             System.out.println("Transition mid");
+            dying = false;
+            alive = false;
+
         });
+
     }
 }
