@@ -233,6 +233,7 @@ Each `Map` loads its tilemap from CSV files (one per layer). Maps store their ow
 ### Entity Stats
 
 **Player:**
+
 | Attribute | Value |
 |-----------|-------|
 | Max Health | 100 |
@@ -245,6 +246,7 @@ Each `Map` loads its tilemap from CSV files (one per layer). Maps store their ow
 | Attack Power | 30 |
 
 **Blob:**
+
 | Attribute | Value |
 |-----------|-------|
 | Max Health | 20 |
@@ -252,6 +254,7 @@ Each `Map` loads its tilemap from CSV files (one per layer). Maps store their ow
 | Attack Power | 10 |
 
 **FoxZombie:**
+
 | Attribute | Value |
 |-----------|-------|
 | Max Health | 70 |
@@ -261,6 +264,7 @@ Each `Map` loads its tilemap from CSV files (one per layer). Maps store their ow
 | Projectile | FireBall (cooldown 90 frames) |
 
 **Rudeling:**
+
 | Attribute | Value |
 |-----------|-------|
 | Max Health | 70 |
@@ -376,7 +380,6 @@ This is a fan project created for educational and learning purposes. All Tunic-r
 
 ## Future Enhancements
 
-- Save/load game functionality
 - More enemy types and boss battles
 - Advanced particle effects
 - Gamepad support
