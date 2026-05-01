@@ -84,7 +84,7 @@ public class GamePanel extends JPanel implements Runnable {
 
 
 
-    // GAMESATE
+    // GAME STATE
     public int gameState;
     public int previousState;
     public final int titleState = 0;
@@ -109,9 +109,8 @@ public class GamePanel extends JPanel implements Runnable {
         this.addKeyListener(keyH);
         this.setFocusable(true);
         this.setFocusTraversalKeysEnabled(false);
-        loadMap(new Map(this,"OverWorld"));
+        loadMap(new Map(this,"Overworld"));
         loadMap(new Map(this,"EastForest"));
-//        loadMap(new Map(this,"World03"));
 
     }
 
@@ -256,6 +255,10 @@ public class GamePanel extends JPanel implements Runnable {
      * Basic game initialization. Prepares the menu state and searches for save files.
      */
     public void setup(){
+        File saveDir = new File("saves");
+        if(!saveDir.exists()){
+            saveDir.mkdir();
+        }
         gameState = titleState;
         assetSetter.setPlayerSpawn();
         setLoadFile();

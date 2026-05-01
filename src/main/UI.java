@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * The UI class handles all on-screen graphical interfaces.
@@ -130,31 +131,31 @@ public class UI {
 
     public void getImage(){
         // LOAD HUD TEXTURES
-        healthOverlay = setup("/player/health_overlay", (int)(gp.scale * (2 / 3f)));
-        healthMiddle = setup("/player/health_mid", (int)(gp.scale * (2 / 3f)));
-        healthTop = setup("/player/health_top", (int)(gp.scale * (2 / 3f)));
+        healthOverlay = setup("player/health_overlay", (int)(gp.scale * (2 / 3f)));
+        healthMiddle = setup("player/health_mid", (int)(gp.scale * (2 / 3f)));
+        healthTop = setup("player/health_top", (int)(gp.scale * (2 / 3f)));
 
-        enduranceTop = setup("/player/endurance_top", (int)(gp.scale * (2 / 3f)));
-        enduranceMiddle = setup("/player/endurance_mid", (int)(gp.scale * (2 / 3f)));
+        enduranceTop = setup("player/endurance_top", (int)(gp.scale * (2 / 3f)));
+        enduranceMiddle = setup("player/endurance_mid", (int)(gp.scale * (2 / 3f)));
         enduranceOverlay = healthOverlay;
 
-        manaTop = setup("/player/mana_top", (int)(gp.scale * (2 / 3f)));
-        manaMiddle = setup("/player/mana_mid", (int)(gp.scale * (2 / 3f)));
+        manaTop = setup("player/mana_top", (int)(gp.scale * (2 / 3f)));
+        manaMiddle = setup("player/mana_mid", (int)(gp.scale * (2 / 3f)));
         manaOverlay = healthOverlay;
 
-        whiteTitle = setup("/titleScreen/tunic_logo_white", (int)(gp.scale * (5 / 3f)));
-        blackTitle = setup("/titleScreen/tunic_logo_black", 1);
+        whiteTitle = setup("titleScreen/tunic_logo_white", (int)(gp.scale * (5 / 3f)));
+        blackTitle = setup("titleScreen/tunic_logo_black", 1);
 
-        menuSelection = setup("/menu/menuOverlayWhite", gp.scale);
-        menuSelectionOrange = setup("/menu/menuOverlayOrange", gp.scale);
-        menuSelectionOrange2 = setup("/menu/menuOverlayOrange2", gp.scale);
+        menuSelection = setup("menu/menuOverlayWhite", gp.scale);
+        menuSelectionOrange = setup("menu/menuOverlayOrange", gp.scale);
+        menuSelectionOrange2 = setup("menu/menuOverlayOrange2", gp.scale);
 
-        inventoryFrame = setup("/menu/inventoryFrame", gp.scale);
-        messageWindow = setup("/menu/window1", gp.scale);
-        optionWindow = setup("/menu/optionOverlay", gp.scale);
+        inventoryFrame = setup("menu/inventoryFrame", gp.scale);
+        messageWindow = setup("menu/window1", gp.scale);
+        optionWindow = setup("menu/optionOverlay", gp.scale);
 
-        potionFull = setup("/player/potion_full", gp.scale);
-        potionEmpty = setup("/player/potion_empty", gp.scale);
+        potionFull = setup("player/potion_full", gp.scale);
+        potionEmpty = setup("player/potion_empty", gp.scale);
     }
 
     public void getFont(){
@@ -217,31 +218,31 @@ public class UI {
             e.printStackTrace();
         }
 
-        healthOverlay = setup("/player/health_overlay", (int)(gp.scale * (2 / 3f)));
-        healthMiddle = setup("/player/health_mid", (int)(gp.scale * (2 / 3f)));
-        healthTop = setup("/player/health_top", (int)(gp.scale * (2 / 3f)));
+        healthOverlay = setup("player/health_overlay", (int)(gp.scale * (2 / 3f)));
+        healthMiddle = setup("player/health_mid", (int)(gp.scale * (2 / 3f)));
+        healthTop = setup("player/health_top", (int)(gp.scale * (2 / 3f)));
 
-        enduranceTop = setup("/player/endurance_top", (int)(gp.scale * (2 / 3f)));
-        enduranceMiddle = setup("/player/endurance_mid", (int)(gp.scale * (2 / 3f)));
+        enduranceTop = setup("player/endurance_top", (int)(gp.scale * (2 / 3f)));
+        enduranceMiddle = setup("player/endurance_mid", (int)(gp.scale * (2 / 3f)));
         enduranceOverlay = healthOverlay;
 
-        manaTop = setup("/player/mana_top", (int)(gp.scale * (2 / 3f)));
-        manaMiddle = setup("/player/mana_mid", (int)(gp.scale * (2 / 3f)));
+        manaTop = setup("player/mana_top", (int)(gp.scale * (2 / 3f)));
+        manaMiddle = setup("player/mana_mid", (int)(gp.scale * (2 / 3f)));
         manaOverlay = healthOverlay;
 
-        whiteTitle = setup("/titleScreen/tunic_logo_white", (int)(gp.scale * (5 / 3f)));
-        blackTitle = setup("/titleScreen/tunic_logo_black", 1);
+        whiteTitle = setup("titleScreen/tunic_logo_white", (int)(gp.scale * (5 / 3f)));
+        blackTitle = setup("titleScreen/tunic_logo_black", 1);
 
-        menuSelection = setup("/menu/menuOverlayWhite", gp.scale);
-        menuSelectionOrange = setup("/menu/menuOverlayOrange", gp.scale);
-        menuSelectionOrange2 = setup("/menu/menuOverlayOrange2", gp.scale);
+        menuSelection = setup("menu/menuOverlayWhite", gp.scale);
+        menuSelectionOrange = setup("menu/menuOverlayOrange", gp.scale);
+        menuSelectionOrange2 = setup("menu/menuOverlayOrange2", gp.scale);
 
-        inventoryFrame = setup("/menu/inventoryFrame", gp.scale);
-        messageWindow = setup("/menu/window1", gp.scale);
-        optionWindow = setup("/menu/optionOverlay", gp.scale);
+        inventoryFrame = setup("menu/inventoryFrame", gp.scale);
+        messageWindow = setup("menu/window1", gp.scale);
+        optionWindow = setup("menu/optionOverlay", gp.scale);
 
-        potionFull = setup("/player/potion_full", gp.scale);
-        potionEmpty = setup("/player/potion_empty", gp.scale);
+        potionFull = setup("player/potion_full", gp.scale);
+        potionEmpty = setup("player/potion_empty", gp.scale);
     }
 
     /**
@@ -332,9 +333,10 @@ public class UI {
         UtilityTool uTool = new UtilityTool();
         BufferedImage image = null;
         try {
-            image = ImageIO.read(getClass().getResourceAsStream("/UI/" + imageName + ".png"));
+            image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/UI/" + imageName + ".png")));
             image = uTool.scaleImage(image, (int)(image.getWidth() * scale), (int)(image.getHeight() * scale));
         } catch (IOException e) {
+            System.out.println("Error loading image " + imageName);
             e.printStackTrace();
         }
         return image;
