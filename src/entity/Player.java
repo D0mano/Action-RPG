@@ -392,10 +392,46 @@ public class Player extends Entity {
             } else {
                 // Apply forced movement
                 switch (direction) {
-                    case "up": worldY -= speed; break;
-                    case "down": worldY += speed; break;
-                    case "left": worldX -= speed; break;
-                    case "right": worldX += speed; break;
+                    case "up":
+                        if (worldY - speed > 0) {
+                            worldY -= speed;
+                            if ((worldY + (gp.tileSize / 2) < gp.screenHeight / 2) || (gp.worldHeight - (gp.screenHeight / 2) < worldY + (gp.tileSize / 2) && worldY < gp.worldHeight)) {
+                                screenY -= speed;
+                            } else {
+                                screenY = (gp.screenHeight / 2) - (gp.tileSize / 2);
+                            }
+                        }
+                        break;
+                    case "down":
+                        if ((worldY + gp.tileSize) + speed < gp.worldHeight) {
+                            worldY += speed;
+                            if ((worldY + (gp.tileSize / 2) < gp.screenHeight / 2) || (gp.worldHeight - (gp.screenHeight / 2) < worldY + (gp.tileSize / 2))) {
+                                screenY += speed;
+                            } else {
+                                screenY = (gp.screenHeight / 2) - (gp.tileSize / 2);
+                            }
+                        }
+                        break;
+                    case "left":
+                        if (worldX - speed > 0) {
+                            worldX -= speed;
+                            if ((worldX + (gp.tileSize / 2) <= gp.screenWidth / 2) || (gp.worldWidth - (gp.screenWidth / 2) <= worldX + (gp.tileSize / 2))) {
+                                screenX -= speed;
+                            } else {
+                                screenX = (gp.screenWidth / 2) - (gp.tileSize / 2);
+                            }
+                        }
+                        break;
+                    case "right":
+                        if (worldX + gp.tileSize + speed < gp.worldWidth) {
+                            worldX += speed;
+                            if ((worldX + (gp.tileSize / 2) <= gp.screenWidth / 2) || (gp.worldWidth - (gp.screenWidth / 2) <= worldX + (gp.tileSize / 2))) {
+                                screenX += speed;
+                            } else {
+                                screenX = (gp.screenWidth / 2) - (gp.tileSize / 2);
+                            }
+                        }
+                        break;
                 }
             }
 

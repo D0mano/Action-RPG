@@ -433,11 +433,14 @@ public class UI {
         if (gp.gameState == gp.inInventory) {
             int tempScreenX = (2 * gp.screenWidth) / 3;
             // Shift the camera slightly to the right to leave space for the inventory menu
-            if (gp.player.screenX < tempScreenX) {
+            if ( gp.player.worldX > tempScreenX && gp.player.screenX < tempScreenX) {
                 gp.player.screenX += gp.tileSize;
             }
             if (gp.player.screenX >= tempScreenX) {
                 gp.player.screenX = tempScreenX;
+                drawInventoryScreen();
+            }
+            else if ( gp.player.worldX < tempScreenX){
                 drawInventoryScreen();
             }
             drawPlayerPotion();

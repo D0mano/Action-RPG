@@ -245,7 +245,7 @@
  "tilesets":[
         {
          "firstgid":1,
-         "source":"..\/..\/Tiled - files\/Tileset\/TunicTilesetV3.tsx"
+         "source":"..\/..\/Tiled - files\/Tileset\/TunicTilesetV3.tmj"
         }, 
         {
          "firstgid":121,

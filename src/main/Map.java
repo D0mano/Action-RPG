@@ -3,13 +3,14 @@ package main;
 import entity.Entity;
 import object.SuperObject;
 
-import java.io.BufferedReader;
+import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import tile.TileManager;
+import tile.Tileset;
 
 /**
  * Represents a playable area (Map) in the game, holding map dimensions,
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class Map {
     public GamePanel gp;
+    public TileManager tm;
     public String mapName;
 
     public JsonNode rootNode;
@@ -47,6 +49,7 @@ public class Map {
     public Map(GamePanel gp, String mapName){
         this.gp = gp;
         this.mapName = mapName;
+        this.tm = new TileManager(gp);
         loadMap();
     }
 
@@ -58,6 +61,7 @@ public class Map {
 
         ObjectMapper mapper = new ObjectMapper();
         String path = "/maps/"+mapName+".tmj";
+        System.out.println("Loading Map: "+path);
 
         try{
             // We load the JSON file from the res/maps folder
@@ -69,6 +73,11 @@ public class Map {
             this.maxMapRow = rootNode.get("height").asInt();
             this.mapWidth = maxMapCol * gp.tileSize;
             this.mapHeight = maxMapRow * gp.tileSize;
+
+            JsonNode tileSetNode = rootNode.get("tilesets").get(0);
+            String tileSetPath = tileSetNode.get("source").asText();
+            String tileSetName = tileSetPath.split("/")[tileSetPath.split("/").length - 1];
+            Tileset tileset = new Tileset(gp,tileSetName,tileSetNode.get("firstgid").asInt());
 
             // Count the number of layers
             int numLayer = 0;
@@ -134,5 +143,9 @@ public class Map {
         mapWidth  = gp.tileSize * this.maxMapCol;
         mapHeight = gp.tileSize * this.maxMapRow;
         loadMap();
+    }
+
+    public void draw(Graphics2D g,int layer){
+        tm.draw(g,layer);
     }
 }

@@ -329,7 +329,7 @@
  "tilesets":[
         {
          "firstgid":1,
-         "source":"..\/..\/..\/..\/OneDrive\/Bureau\/MyRpg\/TunicTilesetV2.tsx"
+         "source":"..\/..\/Tiled - files\/Tileset\/TunicTilesetV2.tsj"
         }, 
         {
          "firstgid":121,
