@@ -19,7 +19,7 @@ public class Tileset {
     public BufferedImage tilesetImg;
     public int firstId;
     public ArrayList<Tile> tiles = new ArrayList<>();
-    private JsonNode rootNode;
+    public String type;
 
     public Tileset(GamePanel gp,String tilesetName,int firstId) {
         this.gp = gp;
@@ -36,10 +36,13 @@ public class Tileset {
         try{
             // We load the JSON file from the res/maps folder
             InputStream is = getClass().getResourceAsStream(tilesetPath);
-            rootNode = mapper.readTree(is);
-            tilesetImg = ImageIO.read(getClass().getResourceAsStream("/tilesets/"+rootNode.get("name").asText()+".png"));
+            JsonNode rootNode = mapper.readTree(is);
+            this.type = String.valueOf(rootNode.get("properties").get(0).get("value").asText());
+            if (!type.equals("tile")){return;}
+            tilesetImg = ImageIO.read(getClass().getResourceAsStream("/tilesets/"+ rootNode.get("name").asText()+".png"));
             int width = rootNode.get("imagewidth").asInt();
             int height = rootNode.get("imageheight").asInt();
+
 
             // Calculate grid dimensions of the tileset image
             int tileSize = rootNode.get("tileheight").asInt();

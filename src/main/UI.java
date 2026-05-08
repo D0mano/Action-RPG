@@ -52,6 +52,8 @@ public class UI {
     BufferedImage inventoryFrame;
     BufferedImage whiteTitle, blackTitle;
 
+    boolean allowCameraShift = false;
+
     // MENU COMMAND TRACKERS
     public int commandNumber = 0;
     public String[] pauseCommand = {"Return to Game", "Options", "Quit"};

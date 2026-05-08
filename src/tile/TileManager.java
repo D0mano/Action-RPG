@@ -24,6 +24,8 @@ public class TileManager {
     // Temporarily maps a tile ID to its physical properties parsed from the text file
     HashMap<Integer, TileData> tileDataMap = new HashMap<>();
 
+    public ArrayList<Tileset> tilesets = new ArrayList<>();
+
     /**
      * Constructor for the TileManager.
      * Initializes the tile array and triggers the loading process.

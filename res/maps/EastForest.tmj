@@ -249,11 +249,11 @@
         }, 
         {
          "firstgid":121,
-         "source":"..\/..\/Tiled - files\/Tileset\/MonsterTileset.tsx"
+         "source":"..\/..\/Tiled - files\/Tileset\/MonsterTileset.tsj"
         }, 
         {
          "firstgid":125,
-         "source":"..\/..\/Tiled - files\/Tileset\/ObjectTileset.tsx"
+         "source":"..\/..\/Tiled - files\/Tileset\/ObjectTileset.tsj"
         }],
  "tilewidth":16,
  "type":"map",

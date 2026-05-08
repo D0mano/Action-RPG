@@ -74,10 +74,17 @@ public class Map {
             this.mapWidth = maxMapCol * gp.tileSize;
             this.mapHeight = maxMapRow * gp.tileSize;
 
-            JsonNode tileSetNode = rootNode.get("tilesets").get(0);
-            String tileSetPath = tileSetNode.get("source").asText();
-            String tileSetName = tileSetPath.split("/")[tileSetPath.split("/").length - 1];
-            Tileset tileset = new Tileset(gp,tileSetName,tileSetNode.get("firstgid").asInt());
+            // Tileset initialization
+            JsonNode tileSetNode = rootNode.get("tilesets");
+            ArrayList<Tileset> tilesets = new ArrayList<>();
+            for (JsonNode tileSet : tileSetNode){
+                String tileSetPath = tileSet.get("source").asText();
+                String tileSetName = tileSetPath.split("/")[tileSetPath.split("/").length - 1];
+                Tileset tileset = new Tileset(gp,tileSetName,tileSet.get("firstgid").asInt());
+                if (tileset.type.equals("tile")){tilesets.add(tileset);}
+            }
+            this.tm.tilesets = tilesets;
+
 
             // Count the number of layers
             int numLayer = 0;
