@@ -106,6 +106,7 @@ public class SaveLoad {
         // RESTORE PLAYER STATS
         gp.player.health = ds.playerHealth;
         gp.player.maxHealth = ds.playerHealthMax;
+        gp.player.health = ds.playerHealthMax;
         gp.player.mana = ds.playerMana;
         gp.player.maxMana = ds.playerManaMax;
         gp.player.endurance = ds.playerStamina;

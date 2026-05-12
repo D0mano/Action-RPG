@@ -198,6 +198,14 @@ public class GamePanel extends JPanel implements Runnable {
 
     }
 
+    public void reset(){
+        for (Map map : mapsList) {
+            map.monsterList.clear();
+            map.objectsList.clear();
+        }
+        player.resetPlayerValues();
+    }
+
     /**
      * Creates an off-screen BufferedImage buffer used for rendering to prevent flickering.
      */

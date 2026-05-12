@@ -103,28 +103,9 @@ public class AssetSetter {
                         }
                     }
                 }
-
             }
-
             i++;
-
         }
-
-//        // BLOB SPAWNS
-//        createMonster("blob", 52, 32, 0);
-//        createMonster("blob", 34, 27, 0);
-//        createMonster("blob", 75, 32, 0);
-//        createMonster("blob", 80, 27, 0);
-//
-//        // FOX ZOMBIE SPAWNS
-//        createMonster("foxZombie", 16, 25, 0);
-//        createMonster("foxZombie", 13, 12, 0);
-//        createMonster("foxZombie", 73, 16, 0);
-//        createMonster("foxZombie", 86, 14, 0);
-//
-//        // RUDELING SPAWNS
-//        createMonster("rudeling", 16, 17, 0);
-//        createMonster("rudeling", 56, 11, 0);
     }
 
     /**

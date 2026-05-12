@@ -558,6 +558,7 @@ public class KeyHandler implements KeyListener {
                     gp.gameState = gp.titleState;});
                     gp.playMusic(18);
                     gp.saveGame();
+                    gp.reset();
                 }
             }
         }
@@ -696,6 +697,7 @@ public class KeyHandler implements KeyListener {
                         gp.gameState = gp.titleState;});
                     gp.playMusic(18);
                     gp.saveGame();
+                    gp.reset();
                 }
 
 
