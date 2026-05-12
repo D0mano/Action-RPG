@@ -1061,8 +1061,8 @@ public class Player extends Entity {
     public void cutBush(List<Point> bushes) {
         if (!bushes.isEmpty()) {
             for (Point p : bushes) {
-                // Change tile ID at the point to grass (ID 16 in your tile sheet)
-                gp.tileM.currentMap.tileMap[p.y][p.x][0] = 16;
+                // Change tile ID at the point to grass (ID 17 in your tile sheet)
+                gp.currentMap.tileMap[p.y][p.x][0] = 17;
             }
         }
     }

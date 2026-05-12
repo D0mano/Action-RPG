@@ -26,8 +26,8 @@ public class EventHandler {
                 if (!gp.ui.transitionOn){
                     gp.ui.startTransition(UI.TransitionType.FadeInOut,60,()->{
                         gp.setMap(1);
-                        gp.player.worldX = gp.tileM.currentMap.playerCol * gp.tileSize;
-                        gp.player.worldY = gp.tileM.currentMap.playerRow * gp.tileSize;
+                        gp.player.worldX = gp.currentMap.playerCol * gp.tileSize;
+                        gp.player.worldY = gp.currentMap.playerRow * gp.tileSize;
                         gp.player.screenX = 0;
                         gp.player.screenY = (gp.screenHeight / 2) - (gp.tileSize / 2);
                     });

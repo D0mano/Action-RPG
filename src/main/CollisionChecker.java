@@ -55,15 +55,13 @@ public class CollisionChecker {
                     }
 
                     // Check the top-left and top-right corners of the hitbox against the tile map
-                    tileNum1 = gp.tileM.currentMap.tileMap[entityTopRow][entityLeftCol][layer];
-                    tileNum2 = gp.tileM.currentMap.tileMap[entityTopRow][entityRightCol][layer];
+                    tileNum1 = gp.currentMap.tileMap[entityTopRow][entityLeftCol][layer];
+                    tileNum2 = gp.currentMap.tileMap[entityTopRow][entityRightCol][layer];
 
                     // For bigger Entity we also check the middle
-                    tileNum3 = gp.tileM.currentMap.tileMap[entityTopRow][(entityLeftCol+entityRightCol)/2][layer];
+                    tileNum3 = gp.currentMap.tileMap[entityTopRow][(entityLeftCol+entityRightCol)/2][layer];
 
-                    if ((tileNum1 != -1 && gp.tileM.tile[tileNum1].collision ) || (tileNum2 != -1 && gp.tileM.tile[tileNum2].collision) || (tileNum3 != -1 && gp.tileM.tile[tileNum3].collision)) {
-                        entity.collisionOn = true;
-                    }
+                    isCollision(entity, tileNum1, tileNum2, tileNum3);
                     break;
 
                 case "down":
@@ -73,14 +71,12 @@ public class CollisionChecker {
                         entity.collisionOn = true;
                         break;
                     }
-                    tileNum1 = gp.tileM.currentMap.tileMap[entityBottomRow][entityLeftCol][layer];
-                    tileNum2 = gp.tileM.currentMap.tileMap[entityBottomRow][entityRightCol][layer];
-                    tileNum3 = gp.tileM.currentMap.tileMap[entityBottomRow][(entityLeftCol+entityRightCol)/2][layer];
+                    tileNum1 = gp.currentMap.tileMap[entityBottomRow][entityLeftCol][layer];
+                    tileNum2 = gp.currentMap.tileMap[entityBottomRow][entityRightCol][layer];
+                    tileNum3 = gp.currentMap.tileMap[entityBottomRow][(entityLeftCol+entityRightCol)/2][layer];
 
 
-                    if ((tileNum1 != -1 && gp.tileM.tile[tileNum1].collision ) || (tileNum2 != -1 && gp.tileM.tile[tileNum2].collision) || (tileNum3 != -1 && gp.tileM.tile[tileNum3].collision)) {
-                        entity.collisionOn = true;
-                    }
+                    isCollision(entity, tileNum1, tileNum2, tileNum3);
                     break;
 
                 case "left":
@@ -89,13 +85,11 @@ public class CollisionChecker {
                         entity.collisionOn = true;
                         break;
                     }
-                    tileNum1 = gp.tileM.currentMap.tileMap[entityTopRow][entityLeftCol][layer];
-                    tileNum2 = gp.tileM.currentMap.tileMap[entityBottomRow][entityLeftCol][layer];
-                    tileNum3 =gp.tileM.currentMap.tileMap[(entityTopRow+entityBottomRow)/2][entityLeftCol][layer];
+                    tileNum1 = gp.currentMap.tileMap[entityTopRow][entityLeftCol][layer];
+                    tileNum2 = gp.currentMap.tileMap[entityBottomRow][entityLeftCol][layer];
+                    tileNum3 =gp.currentMap.tileMap[(entityTopRow+entityBottomRow)/2][entityLeftCol][layer];
 
-                    if ((tileNum1 != -1 && gp.tileM.tile[tileNum1].collision ) || (tileNum2 != -1 && gp.tileM.tile[tileNum2].collision) || (tileNum3 != -1 && gp.tileM.tile[tileNum3].collision)) {
-                        entity.collisionOn = true;
-                    }
+                    isCollision(entity, tileNum1, tileNum2, tileNum3);
                     break;
 
                 case "right":
@@ -105,17 +99,21 @@ public class CollisionChecker {
                         entity.collisionOn = true;
                         break;
                     }
-                    tileNum1 = gp.tileM.currentMap.tileMap[entityTopRow][entityRightCol][layer];
-                    tileNum2 = gp.tileM.currentMap.tileMap[entityBottomRow][entityRightCol][layer];
-                    tileNum3 =gp.tileM.currentMap.tileMap[(entityTopRow+entityBottomRow)/2][entityRightCol][layer];
+                    tileNum1 = gp.currentMap.tileMap[entityTopRow][entityRightCol][layer];
+                    tileNum2 = gp.currentMap.tileMap[entityBottomRow][entityRightCol][layer];
+                    tileNum3 =gp.currentMap.tileMap[(entityTopRow+entityBottomRow)/2][entityRightCol][layer];
 
-                    if ((tileNum1 != -1 && gp.tileM.tile[tileNum1].collision ) || (tileNum2 != -1 && gp.tileM.tile[tileNum2].collision) || (tileNum3 != -1 && gp.tileM.tile[tileNum3].collision)) {
-                        entity.collisionOn = true;
-                    }
+                    isCollision(entity, tileNum1, tileNum2, tileNum3);
                     break;
             }
         }
 
+    }
+
+    private void isCollision(Entity entity, int tileNum1, int tileNum2, int tileNum3) {
+        if ((tileNum1 != 0 && gp.currentMap.tm.getTile(tileNum1).collision ) || (tileNum2 != 0 &&gp.currentMap.tm.getTile(tileNum2).collision) || (tileNum3 != 0 && gp.currentMap.tm.getTile(tileNum3).collision)) {
+            entity.collisionOn = true;
+        }
     }
 
     /**
@@ -160,16 +158,16 @@ public class CollisionChecker {
         int entityBottomAttRow = (entity.attackingArea.y + entity.attackingArea.height) / gp.tileSize;
 
         // Check if the specific tile ID matches a bush (ID 61)
-        if (gp.tileM.currentMap.tileMap[entityTopAttRow][entityRightAttCol][0] == 61) {
+        if (gp.currentMap.tm.getTile(gp.currentMap.tileMap[entityTopAttRow][entityRightAttCol][0]).breakable) {
             bushHit.add(new Point(entityRightAttCol, entityTopAttRow));
         }
-        if (gp.tileM.currentMap.tileMap[entityTopAttRow][entityLeftAttCol][0] == 61) {
+        if (gp.currentMap.tm.getTile(gp.currentMap.tileMap[entityTopAttRow][entityLeftAttCol][0]).breakable) {
             bushHit.add(new Point(entityLeftAttCol, entityTopAttRow));
         }
-        if (gp.tileM.currentMap.tileMap[entityBottomAttRow][entityRightAttCol][0] == 61) {
+        if (gp.currentMap.tm.getTile(gp.currentMap.tileMap[entityBottomAttRow][entityRightAttCol][0]).breakable) {
             bushHit.add(new Point(entityRightAttCol, entityBottomAttRow));
         }
-        if (gp.tileM.currentMap.tileMap[entityBottomAttRow][entityLeftAttCol][0] == 61) {
+        if (gp.currentMap.tm.getTile(gp.currentMap.tileMap[entityBottomAttRow][entityLeftAttCol][0]).breakable) {
             bushHit.add(new Point(entityLeftAttCol, entityBottomAttRow));
         }
 
@@ -394,8 +392,8 @@ public class CollisionChecker {
         }
 
         // Evaluate if the newly calculated tile is a solid wall
-        tileIndex = gp.tileM.currentMap.tileMap[worldForwardRow][worldForwardCol][0];
-        if (gp.tileM.tile[tileIndex].collision) {
+        tileIndex = gp.currentMap.tileMap[worldForwardRow][worldForwardCol][0];
+        if ( gp.currentMap.tm.getTile(tileIndex).collision) {
             // If it's solid, search one step further away
             return findNextFreeTile(worldForwardCol, worldForwardRow, direction);
         }

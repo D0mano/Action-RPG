@@ -56,7 +56,7 @@ public class GamePanel extends JPanel implements Runnable {
 
 
     // SYSTEM
-    public TileManager tileM = new TileManager(this);
+    public Map currentMap;
     KeyHandler keyH = new KeyHandler(this);
     public AssetSetter assetSetter = new AssetSetter(this);
     Thread gameThread;
@@ -179,7 +179,7 @@ public class GamePanel extends JPanel implements Runnable {
         worldWidth = tileSize * maxWorldCol;
         worldHeight = tileSize * maxWorldRow;
 
-        tileM.reload();
+
         assetSetter.reload();
         player.reload();
         ui.reload();
@@ -234,8 +234,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
         System.out.println("End for loop");
         currentMapIndex = mapIndex;
-        Map currentMap = mapsList.get(mapIndex);
-        tileM.currentMap = currentMap;
+        currentMap = mapsList.get(mapIndex);
         maxWorldLayer = currentMap.maxMapLayer;
         maxWorldCol = currentMap.maxMapCol;
         maxWorldRow = currentMap.maxMapRow;
@@ -459,12 +458,9 @@ public class GamePanel extends JPanel implements Runnable {
 
         // --- PLAY STATE LOGIC ---
         if (gameState == playState) {
+
             // Update animated tiles
-            for (Tile tile : tileM.tile) {
-                if (tile != null && tile.animation != null) {
-                    tile.animation.update();
-                }
-            }
+            currentMap.upadate();
 
             // Update main player logic
             player.update();
@@ -523,7 +519,7 @@ public class GamePanel extends JPanel implements Runnable {
         } else if ((gameState == playState) || (gameState == pauseState) || (gameState == inInventory)) {
 
             // 1. DRAW TILE MAP (Background / Layer 1)
-            tileM.draw(g2, 1);
+            currentMap.draw(g2, 1);
 
             // 2. DRAW GROUND OBJECTS (Items, Chests, Doors)
             for (SuperObject superObject : obj) {
@@ -564,7 +560,7 @@ public class GamePanel extends JPanel implements Runnable {
             entitiesList.clear();
 
             // 6. DRAW TILE MAP (Foreground / Overlapping Layer 2)
-            tileM.draw(g2, 2);
+            currentMap.draw(g2, 2);
         }
 
         // 7. DRAW UI (Health bars, Dialogues, Inventory, Menus)

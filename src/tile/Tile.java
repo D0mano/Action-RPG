@@ -18,12 +18,7 @@ public class Tile {
     // PHYSICAL PROPERTIES
     public boolean collision = false;
     public int layer = 1;
-
-    /** * Specifies which sides of the tile block movement (e.g., ["up", "left"]).
-     * Useful for one-way platforms or sloped walls.
-     */
-    public ArrayList<String> collisionSide;
-
+    public boolean breakable = false;
     // ANIMATION
     /**
      * If the tile is animated (like moving water), this holds the animation logic.

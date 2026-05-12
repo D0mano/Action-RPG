@@ -1,9 +1,15 @@
 { "columns":5,
- "image":"..\/..\/Tiled - files\/Tileset\/TunicTilesetV2.png",
+ "image":"TunicTilesetV2.png",
  "imageheight":384,
  "imagewidth":80,
  "margin":0,
  "name":"TunicTilesetV3",
+  "properties":[
+    {
+      "name":"type",
+      "type":"string",
+      "value":"tile"
+    }],
  "spacing":0,
  "tilecount":120,
  "tiledversion":"1.11.2",

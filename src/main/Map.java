@@ -49,7 +49,7 @@ public class Map {
     public Map(GamePanel gp, String mapName){
         this.gp = gp;
         this.mapName = mapName;
-        this.tm = new TileManager(gp);
+        this.tm = new TileManager(gp,this);
         loadMap();
     }
 
@@ -125,7 +125,7 @@ public class Map {
                         int row = i / maxMapCol;
                         int col = i % maxMapCol;
 
-                        tileMap[row][col][currentLayer] = tileId-1;
+                        tileMap[row][col][currentLayer] = tileId;
                     }
                     currentLayer++;
                 }
@@ -150,6 +150,10 @@ public class Map {
         mapWidth  = gp.tileSize * this.maxMapCol;
         mapHeight = gp.tileSize * this.maxMapRow;
         loadMap();
+    }
+
+    public void upadate(){
+        tm.update();
     }
 
     public void draw(Graphics2D g,int layer){

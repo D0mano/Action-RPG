@@ -10,9 +10,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Tileset {
     public GamePanel gp;
@@ -76,7 +74,7 @@ public class Tileset {
                     }
 
 
-                    setup(index, tileImage, collision, id, animated);
+                    setup(index, tileImage, collision, id, animated,breakable);
                     index++; // Increment ID for the next slice
                 }
             }
@@ -87,7 +85,7 @@ public class Tileset {
 
     }
 
-    public void setup(int index, BufferedImage image, boolean collision, int id, boolean animated) {
+    public void setup(int index, BufferedImage image, boolean collision, int id, boolean animated,boolean breakable) {
         UtilityTool uTool = new UtilityTool();
         tiles.add(new Tile());
         tiles.get(index).id = id;
@@ -95,6 +93,7 @@ public class Tileset {
         // Scale image to current game resolution
         tiles.get(index).image = uTool.scaleImage(image, gp.tileSize, gp.tileSize);
         tiles.get(index).collision = collision;
+        tiles.get(index).breakable = breakable;
 
 
         // Setup animation if required (expects a sprite sheet named "[id]-Sheet.png" in the tiles folder)
@@ -107,6 +106,14 @@ public class Tileset {
             } catch (Exception e) {
                 System.err.println("[Tileset] Could not load animation sheet for tile ID: " + id);
                 e.printStackTrace();
+            }
+        }
+    }
+
+    public void update(){
+        for (Tile tile: tiles){
+            if (tile != null && tile.animation != null) {
+                tile.animation.update();
             }
         }
     }
